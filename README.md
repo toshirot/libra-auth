@@ -191,9 +191,7 @@ function test(){
         
 }
           
-
 /* response */
-
 7. ALICE: OK. verify(msg, sigB) is true.
 9. BOB: OK. verify(sigB, sigA) is true. 
                 </code></pre>
