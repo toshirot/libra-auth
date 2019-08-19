@@ -71,7 +71,6 @@ if(res8){
                             <br>
                         </li>
                         <li>As a result, at 9, Alice is authenticated by Bob. Entry tickets or tokens with “sigA” are valid.</li>
-
                 </ul>   
         </div>
 </section>
