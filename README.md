@@ -9,6 +9,9 @@ It is an authentication based on the Libra client key. But the communication bet
 
 <a href="https://kabuda.net/test/libra/libra-auth/doc/libra-auth-en.html"><img src=https://kabuda.net/test/libra/libra-auth/img/libra-auth.png></a>
 
+<h2>document</h2>
+<li>English: <a href="https://kabuda.net/test/libra/libra-auth/doc/libra-auth-en.html">https://kabuda.net/test/libra/libra-auth/doc/libra-auth-en.html</a></li>
+<li>Japanese: <a href="https://kabuda.net/test/libra/libra-auth/doc/libra-auth-ja.html">https://kabuda.net/test/libra/libra-auth/doc/libra-auth-ja.html</a></li>
 <h2>flow</h2>
 
 <section>
