@@ -1,5 +1,4 @@
-
-
+<h1>Libra Auth</h1>
 
  
 An authentication method using Libra's Public Key and Secret Key.
