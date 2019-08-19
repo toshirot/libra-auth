@@ -202,8 +202,9 @@ function test(){
 <section>
         <div>
                 <ul>
+                        <li>pre: create alice's account. and mint.</li>
                         <li>pre: create bob's account. </li>
-                        <li>for 1: mk html </li>
+                        <li>for 1: mk htmls </li>
                         <li>for 2: transfer from browser.(create client, mint too.)  </li>
                         <li>for 3: get transaction from browser.</li>
                         <li>for 4: get transaction from server.</li>
