@@ -7,7 +7,7 @@ In the figure below, User “ALICE” pays the ticket fee to Ticket Center “BO
 
 It is an authentication based on the Libra client key. But the communication between Bob and Alice doesn't put a load on the Libra blockchain. And the processing speed is fast.
 
-<a href="https://kabuda.net/test/libra/libra-auth/doc/libra-auth-en.html"><img src=https://kabuda.net/test/libra/libra-auth/img/libra-auth.png></a>
+<a href="https://kabuda.net/test/libra/libra-auth/doc/libra-auth-en.html"><img style="max-width:700px" src=https://kabuda.net/test/libra/libra-auth/img/libra-auth.png></a>
 
 <h2>flow</h2>
 
