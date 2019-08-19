@@ -37,7 +37,6 @@ if(res6){
                         </li>
                         <li>BOB:  Verify the sigB and sigA by Alice's Public Key. <br>
 e.g.<pre class=eg>{bool}  AlicePubKey.verify(sigB, sigA) </pre>
-
                         </li>
                         <li>BOB:  if 8th is true then login is OK.<br>
 e.g.<pre class=eg>
@@ -46,7 +45,6 @@ if(res8){
 } else {
         // Error
 }</pre>
-
                         </li>
                 </ol>   
         </div>
