@@ -28,7 +28,7 @@
                 In the figure below, User “ALICE” pays the ticket fee to Ticket Center “BOB” with Libra and is authenticated with the signature ticket.
         </p>
         <p>
-                It is an authentication based on the Libra client key. But the communication between Bob and Alice doesn't put a load on the Libra blockchain. And the processing speed is fast.
+                It is authentication based on the Libra client-key. But the communication between Bob and Alice doesn't put a load on the Libra blockchain. And the processing speed is fast.
         </p>
 </nav>
 <section>
@@ -41,11 +41,11 @@
         <div>
                 <ol>
                         <li>ALICE: Tap or Click [ Entry Button ]</li>
-                        <li>ALICE: Transffer Some Libra to BOB</li>
+                        <li>ALICE: Transfer Some Libra to BOB</li>
                         <li>ALICE: get BOB's PublicKey from testnet transaction</li>
                         <li>BOB:   get ALICE's PublicKey from testnet transaction</li>
-                        <li>BOB:   Make the sigB by the msg hash and  Bob's Private Key.<br>
-                                And send sigB and msg to Alice by WebSocket. <br>
+                        <li>BOB:   Make the "sigB" by the msg hash and  Bob's Private Key.<br>
+                                And send "sigB" and msg to Alice by WebSocket. <br>
 e.g.<pre class=eg>
 msg = (new SHA3(512)).update('msg hello').digest('hex');
 sigB = BobPriKey.sign(msg).toHex();
@@ -54,7 +54,7 @@ wss.send(sigB, msg) </pre>
                         <li>ALICE: Verify by Bob's Public Key the signB and the msg that were received.<br>
 e.g.<pre class=eg>{bool} BobPubKey.verify(msg, sigB)</pre>
                         </li>
-                        <li>ALICE: if 6th is true then Make the sigA by the Alice's Private Key and the sigB.<br>
+                        <li>ALICE: if 6th is true then Make the "sigA" by the Alice's Private Key and the sigB.<br>
 e.g.<pre class=eg>
 if(res6){
         sigA = AlicePriKey.sign(sigB)
@@ -62,7 +62,7 @@ if(res6){
         //goto 1
 } </pre>
                         </li>
-                        <li>BOB:  Verify the sigB and sigA by Alice's Public Key. <br>
+                        <li>BOB:  Verify the "sigB" and "sigA" by Alice's Public Key. <br>
 e.g.<pre class=eg>{bool}  AlicePubKey.verify(sigB, sigA) </pre>
 
                         </li>
@@ -108,7 +108,7 @@ if(res8){
 <h2>test Implementation</h2>
 <section>
         <div>
-                <strong>Node.js: </strong>Signature-only test without WeSocket communication between Alice and Bob.
+                <strong>Node.js: </strong>Signature-only test without WebSocket and testnet communication between Alice and Bob.
                 <pre><code  class="javascript">
 'use strict';
 
@@ -155,7 +155,7 @@ function test(){
         // Start testing from the 5th
 
         //==============================================
-        // 5. BOB: Make the sigB by the msg hash and  Bob's Private Key.
+        // 5. BOB: Make the "sigB" by the msg hash and  Bob's Private Key.
         //        
         //         msg = sha3Hash('hello') // mk massage hash 
         //         sigB = BobPriKey.sign(msg) // Sign with BOB's private key.
@@ -175,12 +175,12 @@ function test(){
                 // Omitted
 
         //==============================================
-        // 6. ALICE: Verify by Bob's Public Key the signB and the msg that were received.
+        // 6. ALICE: Verify by Bob's Public Key the "sigB" and the msg there were received.
         //      
                 const res6 = BobPubKey.verify(msg, sigB);
         
         //==============================================
-        // 7. ALICE: if 6th is true then Make the sigA by the Alice's Private Key and the sigB.
+        // 7. ALICE: if 6th is true then Make the "sigA" by Alice's Private Key and the "sigB".
         //
         
                 //----------------------------------------------
@@ -193,7 +193,7 @@ function test(){
                 }
                 
                 //----------------------------------------------
-                // if res6 is true then  Make the sigA
+                // if res6 is true then  Make the "sigA"
                 
                 let sigA; 
                 if(res6){
@@ -203,7 +203,7 @@ function test(){
                 }
 
         //==============================================
-        // 8. BOB: Verify the sigB and sigA by Alice's Public Key.
+        // 8. BOB: Verify the "sigB" and "sigA" by Alice's Public Key.
 
                 const res8 = AlicePubKey.verify(sigB, sigA);
 
