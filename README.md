@@ -87,7 +87,7 @@ if(res8){
 <h2>test Implementation</h2>
 <section>
         <div>
-                <strong>Node.js: </strong>Signature-only test without WeSocket communication between Alice and Bob.
+                <strong>Node.js: </strong>Signature-only test without WebSocket and testnet communication between Alice and Bob.
                 <pre><code  class="javascript">
 'use strict';
 
