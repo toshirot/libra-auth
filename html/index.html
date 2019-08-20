@@ -1,1 +1,244 @@
-client
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset=utf-8>
+        <meta name=viewport content="width=device-width, initial-scale=1">
+        <title>client</title>
+        <link rel="stylesheet" href="./css/main.css">
+        <style>
+        #contents {
+            width: 100%;
+            text-align: center;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            margin: 0;
+            padding: 0;
+            border: 0;
+            margin-top: 18px;
+        }
+        #contents img.logo{
+            width: 12%;
+            min-width: 100px;
+            max-width: 130px;
+        }
+        .header{
+            margin: auto;
+            margin-top: 18px;
+            width: 85%;
+        }
+        .header h2{
+            margin: 0;
+            margin-bottom: 18px;
+            padding: 0;
+            border: 0;
+            font-size: 38px;
+            line-height: 0.9;
+        }
+
+        #btn{
+            margin-top: 18px;
+            min-width: 180px;
+            max-width: 250px;
+            padding: 4px 8px;
+            
+            font-size: 28px;
+            font-family: 'Ropa Sans', sans-serif;
+            transition: border-color 0.4s, color 0.4s;
+            transition-timing-function: cubic-bezier(0.2, 1, 0.3, 1);
+        }
+        .btn-buy{
+            background: #39298C;
+            color: #fff;
+            border: 1px solid #555;
+        }
+        .btn-buy:hover {
+            background: linear-gradient(180deg, #666, #444);
+        }
+
+        </style>
+        <script
+            src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+            integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8="
+            crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <div id=contents>
+            <section>
+                <img class=logo src="./img/libra.png">
+            </section>    
+            <header>
+                <div class=header>
+                        <h2>Bob's Ticket Center</h2>
+                        The ticket price is 20 Libra. If Buy Button click sent 20 Libra and you can take the Ticket.
+                </div>
+            </header>    
+            <section>
+                    <form>
+                        <button id=btn class="btn-buy ">Buy</button>
+                    </form>
+            </section>    
+
+        </div>
+        
+    </body>
+
+    <script>
+
+$(function(){
+
+
+//=============================================================================
+// data
+// 
+//------------------------------------------------------------------------------
+
+//=============================================================================
+// Dom operations
+// 
+//------------------------------------------------------------------------------
+
+    //------------------------------------------------------------
+    // Event for click or tap
+    const clickevt = 'ontouchstart' in window ? 'touchstart' : 'click';
+    $('.btn-buy').bind(clickevt, function(){
+        $(this).css({background: '#bbb'})
+
+        // some codes for click or tap
+        let res = getPubKey(12345, 0)
+        console.log(res)
+    })
+
+
+
+//=============================================================================
+// Util Functions
+// 
+//------------------------------------------------------------------------------
+
+    //------------------------------------------------------------
+    // pre) clientを作る
+    // @return {String} addres hex
+    function createClient(){
+        let address='';
+
+        return address;
+    }
+
+    //------------------------------------------------------------
+    // pre) mintで入金する
+    // @libra {Number} libra amount
+    function getLibraByMint(libra){
+
+    }
+    //------------------------------------------------------------
+    // 2) from address から to addressへ送金するする
+    // @from   {String} libra from address
+    // @to     {String} libra to address
+    // @amount {Number} libra amount
+    function transfer(from, to, amount){
+
+    }
+    //------------------------------------------------------------
+    // 3)4) 最新のシークエンス番号を取得する
+    // @addrees {Number} libra addrees
+    // @return sequence{Number} last sequence number
+    function getSequence(addrees){
+        let sequence;
+
+        return sequence;
+    }
+    //------------------------------------------------------------
+    // 3)4) トランザクションを取得する
+    // @addrees {Number} libra addrees
+    // @sequence{Number} sequence number
+    // @return {object} transaction 
+    function getTx(addrees, sequence){
+        //get tx from testnet
+        let tx={
+            public_key: 'test'
+        };
+
+        return tx;
+    }
+    //------------------------------------------------------------
+    // 3)4) pubKeyを取得する
+    // @addrees {Number} libra addrees
+    // @sequence{Number} sequence number
+    // @return {String} pubKey 
+    function getPubKey(addrees, sequence){
+        let tx = getTx(addrees, sequence)
+        let pubKey=tx.public_key;
+
+        return pubKey;
+    }
+    //------------------------------------------------------------
+    // 5) メッセージのハッシュを取得する
+    // @msg {String} message
+    // @return msg hash{String} msg hash by SHA3
+    function mkMsgHash(msg){
+        return  (new SHA3(512)).update(msg).digest('hex');
+    }
+    //------------------------------------------------------------
+    // 5)7) メッセージと秘密鍵絵でシグネチャを生成する
+    // @msg {String} message
+    // @prikey {String} Private key
+    // @return msg hash{String} msg hash by SHA3
+    function mkMsgHash(msg, prikey){
+        return prikey.sign(msg).toHex();
+    }
+    //------------------------------------------------------------
+    // 5) WebSocketでsignatureとmassageを送る
+    // @msg {String} message
+    // @sig {String} signature
+    function sendMsgAndSig(msg, sig){
+        const oj=JSON.stringify({
+            msg: msg,
+            sig, sig
+        })
+        if(window.wss){
+            window.wss.send(oj)
+        }
+    }
+    //------------------------------------------------------------
+    // 6)8) メッセージとシグネチャを公開鍵で検証する
+    // @msg {String} message
+    // @sig {String} signature
+    // @pubkey {String} Public key
+    // @return {bool} true|false
+    function mkMsgHash(msg, sig, pubkey){
+        //
+        return  pubkey.verify(msg, sig)
+    }
+    //------------------------------------------------------------
+    // 7) QRコードを生成する
+    // @sig {String} signature
+    // @return qr {Image} QR png image for of sig
+    function mkMsgHash(sig){
+        return  //qr
+    }
+
+
+
+    //------------------------------------------------------------
+    // パーツの描画
+    // 
+    function mkParts(callback){
+
+        var html=''
+        var parts=getPageParts();
+
+        for(var i in parts){
+            if(parts[i].use){
+                html+=''
+                + '<section>'
+                + '    <div id='+i+'>'
+                + '    </div>'
+                + '</section>'
+            }
+        }
+        $(html).appendTo('#container');
+        if(callback)callback();
+    }
+})
+    </script>
+</html>

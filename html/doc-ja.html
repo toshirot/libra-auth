@@ -51,7 +51,7 @@ msg = (new SHA3(512)).update('msg hello').digest('hex');
 sigB = BobPriKey.sign(msg).toHex();
 wss.send(sigB, msg) </pre>
                         </li>
-                        <li>ALICE: Bobの公開鍵で、受信したsignBとmsgを確認します。<br>
+                        <li>ALICE: Bobの公開鍵で、受信したsignBとmsgを検証します。<br>
 e.g.<pre class=eg>{bool} BobPubKey.verify(msg, sigB)</pre>
                         </li>
                         <li>ALICE: 6番目がtrueの場合、Aliceの秘密鍵とsigBでsigAを作成します。<br>
@@ -62,7 +62,7 @@ if(res6){
         //goto 1
 } </pre>
                         </li>
-                        <li>BOB:  Aliceの公開鍵でsigBとsigAを確認します。 <br>
+                        <li>BOB:  Aliceの公開鍵でsigBとsigAを検証します。 <br>
 e.g.<pre class=eg>{bool}  AlicePubKey.verify(sigB, sigA) </pre>
 
                         </li>
