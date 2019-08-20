@@ -33,10 +33,10 @@ msg = (new SHA3(512)).update('msg hello').digest('hex');
 sigB = BobPriKey.sign(msg).toHex();
 wss.send(sigB, msg) </pre>
                         </li>
-                        <li>ALICE: Verify by Bob's Public Key the signB and the msg that were received.<br>
+                        <li>ALICE: Verify by Bob's Public Key the "sigB" and the msg that were received.<br>
 e.g.<pre class=eg>{bool} BobPubKey.verify(msg, sigB)</pre>
                         </li>
-                        <li>ALICE: if 6th is true then Make the sigA by the Alice's Private Key and the sigB.<br>
+                        <li>ALICE: if 6th is true then Make the "sigA" by the Alice's Private Key and the "sigB".<br>
 e.g.<pre class=eg>
 if(res6){
         sigA = AlicePriKey.sign(sigB)
@@ -44,7 +44,7 @@ if(res6){
         //goto 1
 } </pre>
                         </li>
-                        <li>BOB:  Verify the sigB and sigA by Alice's Public Key. <br>
+                        <li>BOB:  Verify the "sigB" and "sigA" by Alice's Public Key. <br>
 e.g.<pre class=eg>{bool}  AlicePubKey.verify(sigB, sigA) </pre>
                         </li>
                         <li>BOB:  if 8th is true then login is OK.<br>
@@ -134,7 +134,7 @@ function test(){
         // Start testing from the 5th
 
         //==============================================
-        // 5. BOB: Make the sigB by the msg hash and  Bob's Private Key.
+        // 5. BOB: Make the "sigB" by the msg hash and  Bob's Private Key.
         //        
         //         msg = sha3Hash('hello') // mk massage hash 
         //         sigB = BobPriKey.sign(msg) // Sign with BOB's private key.
@@ -150,7 +150,7 @@ function test(){
                 const sigB = BobPriKey.sign(msg).toHex();
 
                 //----------------------------------------------
-                // Send sigB and msg to Alice by WebSocket
+                // Send "sigB" and msg to Alice by WebSocket
                 // Omitted
 
         //==============================================
@@ -159,7 +159,7 @@ function test(){
                 const res6 = BobPubKey.verify(msg, sigB);
         
         //==============================================
-        // 7. ALICE: if 6th is true then Make the sigA by the Alice's Private Key and the sigB.
+        // 7. ALICE: if 6th is true then Make the "sigA" by the Alice's Private Key and the "sigB".
         //
         
                 //----------------------------------------------
@@ -172,7 +172,7 @@ function test(){
                 }
                 
                 //----------------------------------------------
-                // if res6 is true then  Make the sigA
+                // if res6 is true then  Make the "sigA"
                 
                 let sigA; 
                 if(res6){
@@ -182,7 +182,7 @@ function test(){
                 }
 
         //==============================================
-        // 8. BOB: Verify the sigB and sigA by Alice's Public Key.
+        // 8. BOB: Verify the "sigB" and "sigA" by Alice's Public Key.
 
                 const res8 = AlicePubKey.verify(sigB, sigA);
 
