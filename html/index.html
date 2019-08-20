@@ -17,20 +17,29 @@
     <body>
         <div id=contents>
             <section>
-                <img class=logo src="./img/libra.png">
+                <img class=logo alt="libra logo" src="./img/libra.png">
             </section>    
             <header>
                 <div class=header>
                         <h2>Bob's Ticket Center</h2>
-                        The ticket price is 20 Libra. If Buy Button click sent 20 Libra and you can take the Ticket.
+                        The ticket price is <strong>20 Libra</strong>. If Buy Button click sent 20 Libra and you can take the Ticket.
                 </div>
             </header>    
             <section>
+                <div id=buy-button>
                     <form>
                         <button id=btn class="btn-buy ">Buy</button>
                     </form>
+                </div>
             </section>    
 
+            <footer>
+                <div id=powerd>
+                    <nav>
+                        powerd by <a href="https://github.com/toshirot/libra-auth">libra-auth</a>
+                    </nav>
+                </div>
+            </footer>
         </div>
         
     </body>
@@ -51,14 +60,31 @@ $(function(){
 //------------------------------------------------------------------------------
 
     //------------------------------------------------------------
+    // onload
+    mkHtml('#buy-button', BuyButton())
+
+    //------------------------------------------------------------
     // Event for click or tap
     const clickevt = 'ontouchstart' in window ? 'touchstart' : 'click';
     $('.btn-buy').bind(clickevt, function(){
+        event.preventDefault()
+        // some codes for click or tap
         $(this).css({background: '#bbb'})
 
-        // some codes for click or tap
-        let res = getPubKey(12345, 0)
-        console.log(res)
+        let ok=checkConfirm()
+        if(ok){
+            // buy
+            let res = getPubKey(12345, 0)
+            console.log(res)
+            $('#buy-button').html('<div class="loader">Loading...</div>')
+            setTimeout(function(){
+                $('#buy-button').html('lets go chk tx')
+            },1000)
+        } else {
+            // Not buy
+            $(this).css({background: '#39298C'})
+        }
+
     })
 
 
@@ -68,6 +94,22 @@ $(function(){
 // 
 //------------------------------------------------------------------------------
 
+
+    //------------------------------------------------------------
+    // pre) mk html
+    // @targetElm {String} selector for jquery e.g. '#hoge'
+    // @html {String} html
+    function mkHtml(targetElm, html){
+        $(targetElm).html(html)
+    }
+    //------------------------------------------------------------
+    // pre) buy buttom html
+    // @return {String} html
+    function BuyButton(){
+        return `<form>
+                    <button id=btn class="btn-buy ">Buy</button>
+                </form>`
+    }
     //------------------------------------------------------------
     // pre) clientを作る
     // @return {String} addres hex
@@ -78,10 +120,17 @@ $(function(){
     }
 
     //------------------------------------------------------------
-    // pre) mintで入金する
+    // pre) onload時にここでは事前にmintで入金する
     // @libra {Number} libra amount
     function getLibraByMint(libra){
 
+    }
+    //------------------------------------------------------------
+    // 1) Buy buttonを押したときに送金の意志を確認する
+    // @retuen {Bool} true|false
+    function checkConfirm(){
+        let msg='Do you want to buy a ticket? The Cost is Libra 20.'
+        return window.confirm(msg)
     }
     //------------------------------------------------------------
     // 2) from address から to addressへ送金するする
