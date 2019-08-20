@@ -5,7 +5,7 @@ An authentication method using Libra's Public Key and Secret Key.
 Use a signature by EdDSA.
 In the figure below, User “ALICE” pays the ticket fee to Ticket Center “BOB” with Libra and is authenticated with the signature ticket.
 
-It is an authentication based on the Libra client key. But the communication between Bob and Alice doesn't put a load on the Libra blockchain. And the processing speed is fast.
+It is authentication based on the Libra client-key. But the communication between Bob and Alice doesn't put a load on the Libra blockchain. And the processing speed is fast.
 
 <h2>What we are going to make</h2>
 
@@ -26,8 +26,8 @@ Make this. Client and server authentication work sample for ticket application u
                         <li>ALICE: Transffer Some Libra to BOB</li>
                         <li>ALICE: get BOB's PublicKey from testnet transaction</li>
                         <li>BOB:   get ALICE's PublicKey from testnet transaction</li>
-                        <li>BOB:   Make the sigB by the msg hash and  Bob's Private Key.<br>
-                                And send sigB and msg to Alice by WebSocket. <br>
+                        <li>BOB:   Make the "sigB" by the msg hash and  Bob's Private Key.<br>
+                                And send "sigB" and msg to Alice by WebSocket. <br>
 e.g.<pre class=eg>
 msg = (new SHA3(512)).update('msg hello').digest('hex');
 sigB = BobPriKey.sign(msg).toHex();
