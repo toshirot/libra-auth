@@ -15,8 +15,8 @@ Make this. Client and server authentication work sample for ticket application u
 <a href="https://kabuda.net/test/libra/libra-auth/doc/libra-auth-en.html"><img src=https://kabuda.net/test/libra/libra-auth/img/libra-auth.png></a>
 
 <h2>document for method</h2>
-<li>English: <a href="https://kabuda.net/test/libra/libra-auth/doc/libra-auth-en.html">https://kabuda.net/test/libra/libra-auth/doc/libra-auth-en.html</a></li>
-<li>Japanese: <a href="https://kabuda.net/test/libra/libra-auth/doc/libra-auth-ja.html">https://kabuda.net/test/libra/libra-auth/doc/libra-auth-ja.html</a></li>
+<li>English: <a href="https://kabuda.net/test/libra/libra-auth/doc/doc-en.html">https://kabuda.net/test/libra/libra-auth/doc/doc-en.html</a></li>
+<li>Japanese: <a href="https://kabuda.net/test/libra/libra-auth/doc/doc-ja.html">https://kabuda.net/test/libra/libra-auth/doc/doc-ja.html</a></li>
 <h2>flow</h2>
 
 <section>
