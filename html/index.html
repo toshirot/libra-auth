@@ -7,7 +7,6 @@
         <link rel="stylesheet" href="./css/main.css">
         <style>
 
-
         </style>
         <script
             src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
@@ -22,7 +21,7 @@
             <header>
                 <div class=header>
                         <h2>Bob's Ticket Center</h2>
-                        The ticket price is <strong>20 Libra</strong>. If Buy Button click sent 20 Libra and you can take the Ticket.
+                        The ticket price is <strong>10 Libra</strong>. If Buy Button click sent 10 Libra and you can take the Ticket.
                 </div>
             </header>    
             <section>
@@ -53,6 +52,17 @@ $(function(){
 // data
 // 
 //------------------------------------------------------------------------------
+    //In this demo, the address is fixed beforehand. 
+    const fromAddrAlice='9291e14f5e7c1ce211ce9477154faddb0c308af2f6a10324f893e2e59a13ff80'
+    const toAddrBob='9291e14f5e7c1ce211ce9477154faddb0c308af2f6a10324f893e2e59a13ff80'
+    //The ticket price is 10 Libra
+    const TICKET_AMOUNT=10*1000000;//10*1000000 is 10 Libra
+    //First mint for Alice
+    const FIRST_MINT_FOR_ALICE=TICKET_AMOUNT*2
+    //host for mint
+    const DEFAULT_FAUCET_HOST='faucet.testnet.libra.org'
+    //protocol for mint. http or https
+    const DEFAULT_FAUCET_PROTOCOL='http'
 
 //=============================================================================
 // Dom operations
@@ -61,7 +71,11 @@ $(function(){
 
     //------------------------------------------------------------
     // onload
+
+    //make buy button
     mkHtml('#buy-button', BuyButton())
+    // mint 10 Libra to Allice
+    doMint(fromAddrAlice, FIRST_MINT_FOR_ALICE)
 
     //------------------------------------------------------------
     // Event for click or tap
@@ -121,9 +135,29 @@ $(function(){
 
     //------------------------------------------------------------
     // pre) onload時にここでは事前にmintで入金する
-    // @libra {Number} libra amount
-    function getLibraByMint(libra){
+    // @address {Number} libra address
+    // @amount {Number} libra amount
+    function doMint(address, amount, host, protocol){
 
+        if(!chkInput())return
+        if(!host)host=DEFAULT_FAUCET_HOST
+        if(!protocol)protocol=DEFAULT_FAUCET_PROTOCOL
+
+        let url=`http://${host}?amount=${amount}&address=${address}`
+        fetch(url, {
+            method: 'post',
+            mode: 'no-cors'
+        }).then(data  => 
+            console.log(data)
+        ).catch(error => console.error(error));
+
+        function chkInput(){
+            //simple check input
+            if(!address){alert('address is required.'); return false }
+            try{amount=+amount}catch(e){alert('amount must be Number'); return false }
+            if(amount>TICKET_AMOUNT){ alert('amount is over 10.'); return false }
+            return true
+        }
     }
     //------------------------------------------------------------
     // 1) Buy buttonを押したときに送金の意志を確認する
@@ -133,7 +167,7 @@ $(function(){
         return window.confirm(msg)
     }
     //------------------------------------------------------------
-    // 2) from address から to addressへ送金するする
+    // 2) from address から to addressへ送金する
     // @from   {String} libra from address
     // @to     {String} libra to address
     // @amount {Number} libra amount
