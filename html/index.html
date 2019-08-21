@@ -79,9 +79,7 @@ $(function(){
         `<form>
             <button id=btn class="btn-buy ">Buy</button>
         </form>`
-    const test=`
-        <div class=youraddr><span>Your Address:</span>${fromAddrAlice}</div>
-        <div class=yourbalance><span>Your Balance:</span>${balance}</div>`
+
 
 
 //=============================================================================
@@ -99,7 +97,7 @@ $(function(){
     // mint 20 Libra to Allice
     doMint(fromAddrAlice, FIRST_MINT_FOR_ALICE)
     getBalance(fromAddrAlice, function(balance){
-        $('#balance').html(mkClientProfeel(fromAddrAlice, balance, test))
+        $('#balance').html(mkClientProfeel(fromAddrAlice, balance))
     })
 
     //------------------------------------------------------------
@@ -144,8 +142,10 @@ $(function(){
     //------------------------------------------------------------
     // pre) clientプロフィールのHTMLを作る
     // @return {String} html
-    function mkClientProfeel(fromAddrAlice, balance, html){
-        return html
+    function mkClientProfeel(fromAddrAlice, balance){
+        return `
+        <div class=youraddr><span>Your Address:</span>${fromAddrAlice}</div>
+        <div class=yourbalance><span>Your Balance:</span>${balance}</div>`
     }
     //------------------------------------------------------------
     // pre) clientを作る
