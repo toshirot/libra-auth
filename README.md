@@ -210,7 +210,8 @@ function test(){
 <section>
         <div>
                 <ul>
-                 <li>pre: ✔create alice's account. and mint. <s>In this demo, Alice's address is fixed.</s></li>
+                 <li><s>pre: ✔create alice's account. and mint. In this demo, Alice's address is fixed.</s></li>
+                 <li>Provisional draft: In this demo, Alice's wallet and address are created every time</li>
                  <li>pre: ✔create bob's account.</li>
                         <li>for 1: mk htmls </li>
                         <li>for 2: transfer from browser.(create client)  </li>
