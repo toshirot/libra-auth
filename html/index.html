@@ -12,6 +12,7 @@
             src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
             integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8="
             crossorigin="anonymous"></script>
+        <script src="./js/libraweb-v2.js"></script>
     </head>
     <body>
         <div id=contents>
@@ -25,13 +26,11 @@
                 </div>
             </header>    
             <section>
-                <div id=buy-button>
-                    <form>
-                        <button id=btn class="btn-buy ">Buy</button>
-                    </form>
-                </div>
+                <div id=buy-button></div>
             </section>    
-
+            <section>
+                    <div id=balance></div>
+                </section>   
             <footer>
                 <div id=powerd>
                     <nav>
@@ -52,17 +51,38 @@ $(function(){
 // data
 // 
 //------------------------------------------------------------------------------
+
+    //------------------------------------------------------------
+    // for LIBRA
+
     //In this demo, the address is fixed beforehand. 
     const fromAddrAlice='9291e14f5e7c1ce211ce9477154faddb0c308af2f6a10324f893e2e59a13ff80'
     const toAddrBob='9291e14f5e7c1ce211ce9477154faddb0c308af2f6a10324f893e2e59a13ff80'
+    //unit of Libra
+    const LIBRA_UNIT=1000000
     //The ticket price is 10 Libra
-    const TICKET_AMOUNT=10*1000000;//10*1000000 is 10 Libra
+    const TICKET_AMOUNT=10*LIBRA_UNIT;//10*1000000 is 10 Libra
     //First mint for Alice
     const FIRST_MINT_FOR_ALICE=TICKET_AMOUNT*2
     //host for mint
     const DEFAULT_FAUCET_HOST='faucet.testnet.libra.org'
     //protocol for mint. http or https
     const DEFAULT_FAUCET_PROTOCOL='http'
+
+    //------------------------------------------------------------
+    // for DOM
+
+    //loading html
+    const LOADING_HTML='<div class="loader">Loading...</div>'
+    //buy button
+    const BUY_BUTTON_HTML=
+        `<form>
+            <button id=btn class="btn-buy ">Buy</button>
+        </form>`
+    const test=`
+        <div class=youraddr><span>Your Address:</span>${fromAddrAlice}</div>
+        <div class=yourbalance><span>Your Balance:</span>${balance}</div>`
+
 
 //=============================================================================
 // Dom operations
@@ -73,9 +93,14 @@ $(function(){
     // onload
 
     //make buy button
-    mkHtml('#buy-button', BuyButton())
-    // mint 10 Libra to Allice
+    mkHtml('#buy-button', BUY_BUTTON_HTML)
+    //
+    $('#balance').html(LOADING_HTML)
+    // mint 20 Libra to Allice
     doMint(fromAddrAlice, FIRST_MINT_FOR_ALICE)
+    getBalance(fromAddrAlice, function(balance){
+        $('#balance').html(mkClientProfeel(fromAddrAlice, balance, test))
+    })
 
     //------------------------------------------------------------
     // Event for click or tap
@@ -90,7 +115,7 @@ $(function(){
             // buy
             let res = getPubKey(12345, 0)
             console.log(res)
-            $('#buy-button').html('<div class="loader">Loading...</div>')
+            $('#buy-button').html(LOADING_HTML)
             setTimeout(function(){
                 $('#buy-button').html('lets go chk tx')
             },1000)
@@ -117,12 +142,10 @@ $(function(){
         $(targetElm).html(html)
     }
     //------------------------------------------------------------
-    // pre) buy buttom html
+    // pre) clientプロフィールのHTMLを作る
     // @return {String} html
-    function BuyButton(){
-        return `<form>
-                    <button id=btn class="btn-buy ">Buy</button>
-                </form>`
+    function mkClientProfeel(fromAddrAlice, balance, html){
+        return html
     }
     //------------------------------------------------------------
     // pre) clientを作る
@@ -155,9 +178,34 @@ $(function(){
             //simple check input
             if(!address){alert('address is required.'); return false }
             try{amount=+amount}catch(e){alert('amount must be Number'); return false }
-            if(amount>TICKET_AMOUNT){ alert('amount is over 10.'); return false }
+            //if(amount>TICKET_AMOUNT){ alert('amount is over 10 Libra. \n amount:'+amount+'/ '+TICKET_AMOUNT); return false }
             return true
         }
+    }
+    //------------------------------------------------------------
+    // pre) get balance of address
+    // @address {string} target address
+    // @callback{function} callback
+    function getBalance(address, callback){
+        const client = new libraweb.LibraClient({
+                protocol: 'https',
+                host: 'ac-libra-testnet.kulap.io',
+                port: '443',
+               // dataProtocol: 'grpc-web-text'
+        });
+        const addr = new libraweb.AccountAddress(
+            Uint8Array.from(
+                librawebBuffer.from(address, 'hex')
+            )
+        )
+        const accountState = 
+            client
+                .getAccountState(addr)
+                .then((value) => {
+                    if(callback)callback(value.balance)
+                }, (reason) => {
+                    console.log('error:',reason)
+                });
     }
     //------------------------------------------------------------
     // 1) Buy buttonを押したときに送金の意志を確認する

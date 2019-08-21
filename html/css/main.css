@@ -75,6 +75,14 @@ body{
     max-width:180px;
     margin: auto;
 }
+
+#balance{
+    margin-top: 48px;
+    font-size: 0.5em;
+}
+#balance span{
+    font-weight: 900;
+}
 /* ========================================================
    loading spinner animated
    --------------------------------------------------------
