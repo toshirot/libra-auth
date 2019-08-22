@@ -22,10 +22,10 @@ const options = {
     cert: fs.readFileSync(pemPath+'/fullchain.pem')
     ,key: fs.readFileSync(pemPath+'/privkey.pem')
 };
-
+//-----------------------------------------------------------------------------
+// start WebSocket Server
 let wss=conn(port)
 console.log('start wss', host, port, new Date())
-
 //-----------------------------------------------------------------------------
 // conn WebSocket
 // @param port {Number}
