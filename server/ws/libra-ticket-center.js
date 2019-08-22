@@ -7,7 +7,7 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
 */
 
 //-----------------------------------------------------------------------------
-// import
+// import modules
 const https = require('https');
 const WsServer = require('ws').Server;
 const fs = require("fs");
@@ -22,6 +22,7 @@ const options = {
     cert: fs.readFileSync(pemPath+'/fullchain.pem')
     ,key: fs.readFileSync(pemPath+'/privkey.pem')
 };
+const HB=JSON.stringify({type:'hb'})//heartbeat
 //-----------------------------------------------------------------------------
 // start WebSocket Server
 let wss=conn(port)
@@ -39,14 +40,15 @@ function conn(port){
     //WS server start
     let wss = new WsServer({server: app});
     //on connection
-    wss.on('connection', function(socket) {
+    wss.on('connection', function(socket, req) {
 
         const ip = req.headers['x-forwarded-for']||req.connection.remoteAddress;
         socket.client={
-             id     : uuidv4()
-            ,ip     : ip
-            ,time   : new Date().getTime()
-            ,pubkey : null
+             id      : uuidv4()
+            ,ip      : ip
+            ,time    : new Date().getTime()
+            ,pubkey  : null
+            ,isAlive : true
         };
         
         //info
@@ -57,15 +59,9 @@ function conn(port){
             , (new Date)
             , ip
         );
-        socket.on('pong', heartbeat);
+        
         socket.on('message', function(msg) {
-            let msgStr = JSON.stringify(msg);
-            if(msgStr === 'test'){
-
-                //do test
-                onmsg(msgStr)
-
-            }
+            onmsg(msg, socket)
         });
         socket.on('close', function() {
             console.log('closed: '
@@ -76,33 +72,41 @@ function conn(port){
             delClient(socket, 'at onclose');
         });
     })
-    //png/pong
-    const interval = setInterval(function ping() {
-        wss.clients.forEach(function each(ws) {
-            if (ws.isAlive === false) return ws.terminate();
-        
-            ws.isAlive = false;
-            ws.ping(noop);
-        });
-    }, 30000);
-    function noop() {}
-    function heartbeat() {
-        wss.isAlive = true;
-    }
     return wss;
 }
 //-----------------------------------------------------------------------------
 // onmsg
 // @param msg {String} received message
-function onmsg(msg){
+function onmsg(msg, socket){
+    let data
     try {
-        let data = JSON.parse(msg);
+        console.log(1, msg);
+        data = JSON.parse(msg);
     } catch (e) {
         console.log('JSONparse err:', msg);
         return;
     }
-    console.log('ok:', msg)
+    console.log(2, data);
+    if(!data)return
+    console.log(3, data);
+    if(!data.type)return
+    console.log(4, data);
+    if(data.type === 'test'){
+        //test
+
+
+    } else if(data.type==='hb'){
+        // Heartbeat response
+        if(socket.readyState===socket.OPEN){
+            console.log(5, 'hb', data);
+            socket.send(HB);
+        }
+    } else {
+        console.log(6, 'other', msg);
+    }
+    
 }
+
 //-----------------------------------------------------------------------------
 // wssSend send to client
 // @param wss {Object} WebSocket instance
@@ -127,9 +131,10 @@ function delClient(socket, at) {
         , socket.readyState
         , socket.client.ip
     );
-    socket.client={};
-    socket.terminate();
-    socket.ping(function() {});
+    //socket.client.isAlive=false
+    socket.client=null
+    socket.close()
+    socket.terminate()
 }
 // -----------------------------------------------------------------------------
 // uuidv4

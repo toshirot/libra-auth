@@ -8,11 +8,12 @@
         <style>
 
         </style>
+        <script src="./js/libraweb-v2.js"></script>
         <script
             src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
             integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8="
             crossorigin="anonymous"></script>
-        <script src="./js/libraweb-v2.js"></script>
+        
     </head>
     <body>
         <div id=contents>
@@ -54,7 +55,7 @@ $(function(){
 //------------------------------------------------------------------------------
 
     //------------------------------------------------------------
-    // for Ticket Demo with Libra Auth method
+    // Object for Ticket Demo with Libra Auth method
     //
     // Thanx: libraweb loaded by libraweb-v2.js is browserified 
     // bandifycol/libra-web and perfectmak/libra-core.
@@ -62,6 +63,11 @@ $(function(){
     let Ticket={
          libraweb: window.libraweb//Hide from window later
         ,librawebBuffer: window.librawebBuffer//Hide from window later
+        ,conn: {
+            wss_arry: []
+            ,wss: null
+            ,wsNonStopFlg:true
+        }//for WebSocket
     };
 
 
@@ -102,6 +108,10 @@ $(function(){
     // for MESSAGE
     const M_DO_YOU_BUY_CONFIRM='Do you want to buy a ticket? The Cost is Libra 20.'
 
+    //------------------------------------------------------------
+    // for WebSocket
+    const HB=JSON.stringify({type:'hb'})//heartbeat
+    const HEARTBEAT_INTERVAL=10000//60000
 
 //=============================================================================
 // Dom operations
@@ -151,12 +161,96 @@ $(function(){
 // 
 //-----------------------------------------------------------------------------
 
-    libraAuth.wss={
-        wsary: []
-        ,wss: wssLibraAuth('wss://wss.libra-auth.com:443')
-        ,wsNonStopFlg:true
-    }
+    let wss=wssLibraAuth('wss://wss.libra-auth.com:8888/')
+    window.wss=wss//
+    //------------------------------------------------------------
+    // pre) Connect with WebSocket
+    // @url {String} target wss Server
+    // @return {Object} WebSocket instance
+    function wssLibraAuth(url){
+        let  op={
+             protocol: 'wss.libra-auth.com'
+            ,uid: 'wss-' +  uuidv4()
+            ,hbTimeout:null
+        }
 
+        let wss = new WebSocket(url, op.protocol)
+        console.log(Ticket.conn, Ticket.conn.wss_arry)
+        Ticket.conn.wss_arry.push(wss)
+        wss.op=op
+        wss.on = function (type, fnc){
+            this.addEventListener(type, fnc)
+            return this
+        }
+        //set the Event for WebSocket
+        wss
+            .on('open', function(){heartbeat(wss)})
+            .on('message', function(msg){onmsg(wss,msg)})
+            .on('close', function clear() {
+                clearTimeout(this.pingTimeout)
+                console.log('closed wss:',this.op.uid)
+            })
+
+        return wss;
+    }
+    //------------------------------------------------------------
+    // heartbeat 
+    function heartbeat(wss) {
+        // Start heartbeat send
+        clearInterval(wss.op.hbTimeout);
+        wss.send(HB);
+        wss.op.hbTimeout = setInterval(() => {
+            if(wss.readyState===WebSocket.OPEN){
+                wss.send(HB);
+            } else {
+                wssDelAll()
+            }
+        }, HEARTBEAT_INTERVAL);
+    }
+    //------------------------------------------------------------
+    // pre) onmsg
+    // @wss {Object} WebSocket instance
+    // @msg {String} stringifyd json message
+    function onmsg(wss, msg){
+        if(!wss)return
+        if(!msg)return
+        if(!msg.data)return
+        let data
+        try{
+            data = JSON.parse(msg);
+            if(msg.data.type!==undefined){
+                console.log(1, data)
+                return 
+            } else if(msg.data.type==='hb'){
+                data=msg.data
+                console.log(2, data)
+            } else if(msg.data.type==='sigs'){
+                data=msg.data
+                console.log(3, data)
+            } else {
+                console.log(4, data)
+            }
+        } catch(e){ return }
+
+        if(!data.sigs)return
+
+        alert('received',data.sigs)
+    }
+    window.wssDelAll=wssDelAll
+    function wssDelAll(callback) {
+        let wss_arry=Ticket.conn.wss_arry
+        //del all wss object
+        for(var i=0;i<wss_arry.length;i++){  
+            console.log(i
+                , 'deleted wss'
+                , (wss_arry[i].op.uid||'')
+                ,new Date()
+            )
+            wss_arry[i].close()
+        }
+        Ticket.conn.wss_arry=[]
+        if(callback)callback()
+    }
 //=============================================================================
 // Util Functions
 // 
@@ -182,9 +276,9 @@ $(function(){
     // pre) clientを作る
     // @return {String} addres hex
     function createClient(){
-        let address='';
+        let address=''
 
-        return address;
+        return address
     }
 
     //------------------------------------------------------------
@@ -203,12 +297,18 @@ $(function(){
             mode: 'no-cors'
         }).then(data  => 
             console.log(data)
-        ).catch(error => console.error(error));
+        ).catch(error => console.error(error))
 
         function chkInput(){
             //simple check input
-            if(!address){alert('address is required.'); return false }
-            try{amount=+amount}catch(e){alert('amount must be Number'); return false }
+            if(!address){
+                alert('address is required.')
+                return false
+            }
+            try{amount=+amount}catch(e){
+                alert('amount must be Number')
+                return false
+            }
             //if(amount>TICKET_AMOUNT){ alert('amount is over 10 Libra. \n amount:'+amount+'/ '+TICKET_AMOUNT); return false }
             return true
         }
@@ -223,7 +323,7 @@ $(function(){
                 host: 'ac-libra-testnet.kulap.io',
                 port: '443',
                // dataProtocol: 'grpc-web-text'
-        });
+        })
         const addr = new Ticket.libraweb.AccountAddress(
             Uint8Array.from(
                 Ticket.librawebBuffer.from(address, 'hex')
@@ -236,7 +336,7 @@ $(function(){
                     if(callback)callback(value.balance)
                 }, (reason) => {
                     console.log('error:',reason)
-                });
+                })
     }
     //------------------------------------------------------------
     // 1) Buy buttonを押したときに送金の意志を確認する
@@ -258,9 +358,9 @@ $(function(){
     // @addrees {Number} libra addrees
     // @return sequence{Number} last sequence number
     function getSequence(addrees){
-        let sequence;
+        let sequence
 
-        return sequence;
+        return sequence
     }
     //------------------------------------------------------------
     // 3)4) トランザクションを取得する
@@ -271,9 +371,9 @@ $(function(){
         //get tx from testnet
         let tx={
             public_key: 'test'
-        };
+        }
 
-        return tx;
+        return tx
     }
     //------------------------------------------------------------
     // 3)4) pubKeyを取得する
@@ -282,16 +382,16 @@ $(function(){
     // @return {String} pubKey 
     function getPubKey(addrees, sequence){
         let tx = getTx(addrees, sequence)
-        let pubKey=tx.public_key;
+        let pubKey=tx.public_key
 
-        return pubKey;
+        return pubKey
     }
     //------------------------------------------------------------
     // 5) メッセージのハッシュを取得する
     // @msg {String} message
     // @return msg hash{String} msg hash by SHA3
     function mkMsgHash(msg){
-        return  (new SHA3(512)).update(msg).digest('hex');
+        return  (new SHA3(512)).update(msg).digest('hex')
     }
     //------------------------------------------------------------
     // 5)7) メッセージと秘密鍵絵でシグネチャを生成する
@@ -299,7 +399,7 @@ $(function(){
     // @prikey {String} Private key
     // @return msg hash{String} msg hash by SHA3
     function mkMsgHash(msg, prikey){
-        return prikey.sign(msg).toHex();
+        return prikey.sign(msg).toHex()
     }
     //------------------------------------------------------------
     // 5) WebSocketでsignatureとmassageを送る
@@ -332,28 +432,29 @@ $(function(){
         return  //qr
     }
 
+    // -----------------------------------------------------------------------------
+    // uuidv4
+    //
+    function uuidv4() {
+        // Thanx for
+        // https://gist.github.com/jcxplorer/823878
+        // https://web.archive.org/web/20150201084235/http://blog.snowfinch.net/post/3254029029/uuid-v4-js
 
-
-    //------------------------------------------------------------
-    // パーツの描画
-    // 
-    function mkParts(callback){
-
-        var html=''
-        var parts=getPageParts();
-
-        for(var i in parts){
-            if(parts[i].use){
-                html+=''
-                + '<section>'
-                + '    <div id='+i+'>'
-                + '    </div>'
-                + '</section>'
+        let uuid = ''
+        let random;
+        for (let i = 0; i < 32; i++) {
+            random = Math.random() * 16 | 0;
+            if (i == 8 || i == 12 || i == 16 || i == 20) {
+                uuid += '-';
             }
+            uuid += (i == 12 ? 4 : (i == 16 ? (random & 3 | 8) : random)).toString(16);
         }
-        $(html).appendTo('#container');
-        if(callback)callback();
+        setTimeout(function() {
+            uuid=random=null;
+        }, 1000);
+        return uuid;
     }
+
 })
     </script>
 </html>
