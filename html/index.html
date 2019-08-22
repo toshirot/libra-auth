@@ -80,6 +80,9 @@ $(function(){
             <button id=btn class="btn-buy ">Buy</button>
         </form>`
 
+    //------------------------------------------------------------
+    // for MESSAGE
+    const M_DO_YOU_BUY_CONFIRM='Do you want to buy a ticket? The Cost is Libra 20.'
 
 
 //=============================================================================
@@ -108,8 +111,9 @@ $(function(){
         // some codes for click or tap
         $(this).css({background: '#bbb'})
 
-        let ok=checkConfirm()
-        if(ok){
+        //chk do you buy?
+        let okbuy=checkConfirm(M_DO_YOU_BUY_CONFIRM)
+        if(okbuy){
             // buy
             let res = getPubKey(12345, 0)
             console.log(res)
@@ -209,9 +213,9 @@ $(function(){
     }
     //------------------------------------------------------------
     // 1) Buy buttonを押したときに送金の意志を確認する
+    // @msg {String} massage
     // @retuen {Bool} true|false
-    function checkConfirm(){
-        let msg='Do you want to buy a ticket? The Cost is Libra 20.'
+    function checkConfirm(msg){
         return window.confirm(msg)
     }
     //------------------------------------------------------------
