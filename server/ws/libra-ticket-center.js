@@ -13,6 +13,15 @@ const WsServer = require('ws').Server;
 const fs = require("fs");
 
 //-----------------------------------------------------------------------------
+// data
+const AddrBob='9291e14f5e7c1ce211ce9477154faddb0c308af2f6a10324f893e2e59a13ff80'
+//unit of Libra
+const LIBRA_UNIT=1000000
+//The ticket price is 10 Libra
+const TICKET_AMOUNT=10*LIBRA_UNIT//10*1000000 is 10 Libra
+
+
+//-----------------------------------------------------------------------------
 // WebSocket config
 //
 const port = 8888; //from client port 443 by nginx proxy upstream websocket 

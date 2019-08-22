@@ -1,0 +1,27 @@
+{
+  "name": "libra-auth",
+  "version": "0.0.1",
+  "description": "An authentication method using Libra's Public Key and Secret Key. ",
+  "main": "index.js",
+  "dependencies": {
+    "libra-core": "^1.0.7",
+    "ws": "^7.1.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/toshirot/libra-auth.git"
+  },
+  "keywords": [
+    "Libra"
+  ],
+  "author": "Toshiro Takahashi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/toshirot/libra-auth/issues"
+  },
+  "homepage": "https://github.com/toshirot/libra-auth#readme"
+}
