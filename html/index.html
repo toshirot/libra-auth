@@ -58,7 +58,7 @@ $(function(){
     //
     // Thanx: libraweb loaded by libraweb-v2.js is browserified 
     // bandifycol/libra-web and perfectmak/libra-core.
-    // client is connected to ac-libra-testnet.kulap.io in kulapio/libra-core.
+    // Alice's client is connected to proxy ac-libra-testnet.kulap.io in kulapio/libra-core.
     let Ticket={
          libraweb: window.libraweb//Hide from window later
         ,librawebBuffer: window.librawebBuffer//Hide from window later
@@ -153,7 +153,7 @@ $(function(){
 
     libraAuth.wss={
         wsary: []
-        ,wss: wssLibraAuth('wss://libra-auth.com:443')
+        ,wss: wssLibraAuth('wss://wss.libra-auth.com:443')
         ,wsNonStopFlg:true
     }
 
