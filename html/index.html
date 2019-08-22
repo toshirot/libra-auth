@@ -3,7 +3,7 @@
     <head>
         <meta charset=utf-8>
         <meta name=viewport content="width=device-width, initial-scale=1">
-        <title>client</title>
+        <title>Ticket Center</title>
         <link rel="stylesheet" href="./css/main.css">
         <style>
 
@@ -45,6 +45,24 @@
     <script>
 
 $(function(){
+
+// Eventually the libraweb code will be Hide from window object later.
+
+//=============================================================================
+// main object
+// 
+//------------------------------------------------------------------------------
+
+    //------------------------------------------------------------
+    // for Ticket Demo with Libra Auth method
+    //
+    // Thanx: libraweb loaded by libraweb-v2.js is browserified 
+    // bandifycol/libra-web and perfectmak/libra-core.
+    // client is connected to ac-libra-testnet.kulap.io in kulapio/libra-core.
+    let Ticket={
+         libraweb: window.libraweb//Hide from window later
+        ,librawebBuffer: window.librawebBuffer//Hide from window later
+    };
 
 
 //=============================================================================
@@ -128,12 +146,21 @@ $(function(){
 
     })
 
+//=============================================================================
+// WebSocket Operations
+// 
+//-----------------------------------------------------------------------------
 
+    libraAuth.wss={
+        wsary: []
+        ,wss: wssLibraAuth('wss://libra-auth.com:443')
+        ,wsNonStopFlg:true
+    }
 
 //=============================================================================
 // Util Functions
 // 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 
     //------------------------------------------------------------
@@ -191,15 +218,15 @@ $(function(){
     // @address {string} target address
     // @callback{function} callback
     function getBalance(address, callback){
-        const client = new libraweb.LibraClient({
+        const client = new Ticket.libraweb.LibraClient({
                 protocol: 'https',
                 host: 'ac-libra-testnet.kulap.io',
                 port: '443',
                // dataProtocol: 'grpc-web-text'
         });
-        const addr = new libraweb.AccountAddress(
+        const addr = new Ticket.libraweb.AccountAddress(
             Uint8Array.from(
-                librawebBuffer.from(address, 'hex')
+                Ticket.librawebBuffer.from(address, 'hex')
             )
         )
         const accountState = 
