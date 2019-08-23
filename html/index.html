@@ -111,7 +111,8 @@ $(function(){
     //get nemonic button
     const GET_NEMONIC_HTML=
         `<form>
-            <button class="btn-nemonic">Get nemonic</button>
+            <button class="btn-get-nemonic btn-nemonic">Export nemonic</button>
+            <!--button class="btn-import-nemonic btn-nemonic">Import nemonic</button-->
         </form>`
     //output nemonic
     const OUTPUT_NEMONIC_HTML=
@@ -161,53 +162,67 @@ $(function(){
     // click and tap Event string
     const clickevt = 'ontouchstart' in window ? 'touchstart' : 'click';
     //------------------------------------------------------------
+    // 
+    setBuyButtonEvent()
+    //------------------------------------------------------------
+    // 
+    setExprtNemonicEvent()
+    //------------------------------------------------------------
     // Works at click or tap Buy Button
-    $('#btn-buy').bind(clickevt, function(){
-        event.preventDefault()
-        // some codes for click or tap
-        $(this).css({background: '#bbb'})
+    //
+    function setBuyButtonEvent(){
+        $('#btn-buy').bind(clickevt, function(){
+            event.preventDefault()
+            // some codes for click or tap
+            $(this).css({background: '#bbb'})
 
-        //chk do you buy?
-        let okbuy=checkConfirm(M_DO_YOU_BUY_CONFIRM)
-        if(okbuy){
-            // buy
-            let res = getPubKey(12345, 0)
-            console.log(res)
-            $('#buy-button-box').html(LOADING_HTML)
-            setTimeout(function(){
-                $('#buy-button-box').html('lets go chk tx')
-            },1000)
-        } else {
-            // Not buy
-            $(this).css({background: '#39298C'})
-        }
+            //chk do you buy?
+            let okbuy=checkConfirm(M_DO_YOU_BUY_CONFIRM)
+            if(okbuy){
+                // buy
+                let res = getPubKey(12345, 0)
+                console.log(res)
+                $('#buy-button-box').html(LOADING_HTML)
+                setTimeout(function(){
+                    $('#buy-button-box').html('lets go chk tx')
+                },1000)
+            } else {
+                // Not buy
+                $(this).css({background: '#39298C'})
+            }
 
-    })
+        })
+    }
     //------------------------------------------------------------
     // Works at click or tap Get nemonic Button
-    $('.btn-nemonic').bind(clickevt, function(){
-        event.preventDefault()
-        // make output-nemonic area
-        mkHtml('#get-nemonic-box', OUTPUT_NEMONIC_HTML)
-        $('#outout-nemonic-area').html(newWallet.getMnemonic().toString())
+    //
+    function setExprtNemonicEvent(){
+        $('.btn-get-nemonic').bind(clickevt, function(){
+            event.preventDefault()
+            // make output-nemonic area
+            mkHtml('#get-nemonic-box', OUTPUT_NEMONIC_HTML)
+            $('#outout-nemonic-area').html(newWallet.getMnemonic().toString())
 
-        //------------------------------------------------------------
-        // copy the textarea to clipboard
-        $('#btn-copy-text').bind(clickevt, function(){
-            event.preventDefault()
-            let textarea = document.getElementById("outout-nemonic-area")
-            // select all text
-            textarea.select()
-            // copy
-            document.execCommand("copy")
+            //------------------------------------------------------------
+            // copy the textarea to clipboard
+            $('#btn-copy-text').bind(clickevt, function(){
+                event.preventDefault()
+                let textarea = document.getElementById("outout-nemonic-area")
+                // select all text
+                textarea.select()
+                // copy
+                document.execCommand("copy")
+            })
+            //------------------------------------------------------------
+            // close nemonic box
+            $('#btn-close-nemonic').bind(clickevt, function(){
+                event.preventDefault()
+                mkHtml('#get-nemonic-box', GET_NEMONIC_HTML)
+                setExprtNemonicEvent()
+                //$('.btn-get-nemonic').trigger(clickevt);
+            })
         })
-        //------------------------------------------------------------
-        // close nemonic box
-        $('#btn-close-nemonic').bind(clickevt, function(){
-            event.preventDefault()
-            mkHtml('#get-nemonic-box', GET_NEMONIC_HTML)
-        })
-    })
+    }
 
 //=============================================================================
 // WebSocket Operations
