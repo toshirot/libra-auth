@@ -96,6 +96,34 @@ body{
   border: 1px solid #555;
 }
 
+.outout-nemonic{
+    margin: auto;
+    margin-top: 18px;
+    width: 65%;
+    padding: 12px;
+    text-align: center;
+}
+.outout-nemonic-bar{
+    height:14px;
+    background: #39298C;
+    color: #fff;
+    border: 1px solid #39298D;
+    padding-top: 8px;
+}
+#outout-nemonic-area{
+    height:48px;
+    margin-top: 3px;
+}
+#btn-copy-text,
+#btn-close-nemonic{
+    background: rgb(130, 123, 186);
+    color: #fff;
+    border-width: 0;
+    padding: 2px 12px;
+    border-radius: 8px;
+    padding-top: 0px;
+}
+
 /* ========================================================
    loading spinner animated
    --------------------------------------------------------

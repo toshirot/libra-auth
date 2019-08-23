@@ -109,11 +109,20 @@ $(function(){
             <button id=btn-buy class="btn-buy btn">Buy</button>
         </form>`
     //get nemonic button
-    const GET_NEMONIC=
+    const GET_NEMONIC_HTML=
         `<form>
             <button class="btn-nemonic">Get nemonic</button>
         </form>`
-
+    //output nemonic
+    const OUTPUT_NEMONIC_HTML=
+        `<div class="outout-nemonic-bar outout-nemonic">
+            Please backup the  24 mnemonic words.
+            <button id=btn-copy-text>copy</button>
+            <button id=btn-close-nemonic>close</button>
+        </div>
+        <form>
+            <textarea id="outout-nemonic-area" class="outout-nemonic"></textarea>
+        </form>`
     //------------------------------------------------------------
     // for MESSAGE
     const M_DO_YOU_BUY_CONFIRM='Do you want to buy a ticket? The Cost is Libra 20.'
@@ -133,7 +142,8 @@ $(function(){
 
     // make buy button
     mkHtml('#buy-button-box', BUY_BUTTON_HTML)
-    mkHtml('#get-nemonic-box', GET_NEMONIC)
+    // make get-nemonic button
+    mkHtml('#get-nemonic-box', GET_NEMONIC_HTML)
     // draw loading 
     $('#balance-box').html(LOADING_HTML)
     // mk new wallet
@@ -174,12 +184,31 @@ $(function(){
 
     })
     //------------------------------------------------------------
-    // Works at click or tap Buy Button
+    // Works at click or tap Get nemonic Button
     $('.btn-nemonic').bind(clickevt, function(){
         event.preventDefault()
-        alert(newWallet.getMnemonic())
-        
-    }) 
+        // make output-nemonic area
+        mkHtml('#get-nemonic-box', OUTPUT_NEMONIC_HTML)
+        $('#outout-nemonic-area').html(newWallet.getMnemonic().toString())
+
+        //------------------------------------------------------------
+        // copy the textarea to clipboard
+        $('#btn-copy-text').bind(clickevt, function(){
+            event.preventDefault()
+            let textarea = document.getElementById("outout-nemonic-area")
+            // select all text
+            textarea.select()
+            // copy
+            document.execCommand("copy")
+        })
+        //------------------------------------------------------------
+        // close nemonic box
+        $('#btn-close-nemonic').bind(clickevt, function(){
+            event.preventDefault()
+            mkHtml('#get-nemonic-box', GET_NEMONIC_HTML)
+        })
+    })
+
 //=============================================================================
 // WebSocket Operations
 // 
