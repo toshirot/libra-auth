@@ -40,7 +40,7 @@ body{
     line-height: 0.9;
 }
 
-#btn{
+.btn{
     margin-top: 18px;
     min-width: 180px;
     max-width: 250px;
@@ -51,12 +51,12 @@ body{
     transition: border-color 0.2s, color 0.2s;
     transition-timing-function: cubic-bezier(0.2, 1, 0.3, 1);
 }
-.btn-buy{
+#btn-buy{
     background: #39298C;
     color: #fff;
     border: 1px solid #555;
 }
-.btn-buy:hover {
+#btn-buy:hover {
     transition: 0.5s;
     background: linear-gradient(180deg, #666, #444);
     
@@ -68,7 +68,7 @@ body{
     bottom: 12px;
 }
 
-#buy-button{
+#buy-button-box{
     margin-top: 18px;
     width: 180px;
     height: 48px;
@@ -76,13 +76,26 @@ body{
     margin: auto;
 }
 
-#balance{
+#balance-box{
     margin-top: 48px;
     font-size: 0.5em;
 }
-#balance span{
+#balance-box span{
     font-weight: 900;
 }
+
+#balance-box  .yourbalance{
+  font-size: 2.5em;
+}
+#get-nemonic-box {
+  margin-top: 18px;
+} 
+#get-nemonic-box .btn-nemonic{
+  background: #39298C;
+  color: #fff;
+  border: 1px solid #555;
+}
+
 /* ========================================================
    loading spinner animated
    --------------------------------------------------------

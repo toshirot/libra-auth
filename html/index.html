@@ -27,11 +27,16 @@
                 </div>
             </header>    
             <section>
-                <div id=buy-button></div>
+                <div id=buy-button-box></div>
             </section>    
             <section>
-                    <div id=balance></div>
-                </section>   
+                <div id=balance-box></div>
+            </section>   
+
+            <section>
+                <div id=get-nemonic-box></div>
+            </section>  
+
             <footer>
                 <div id=powerd>
                     <nav>
@@ -80,7 +85,7 @@ $(function(){
     // for LIBRA
 
     //In this demo Alice wallet and account is Newly made every time.
-    const AliceAddress=getNewAddress()
+    let AliceAddress=''
     const BobAddress='9291e14f5e7c1ce211ce9477154faddb0c308af2f6a10324f893e2e59a13ff80'
     //unit of Libra
     const LIBRA_UNIT=1000000
@@ -101,7 +106,12 @@ $(function(){
     //buy button
     const BUY_BUTTON_HTML=
         `<form>
-            <button id=btn class="btn-buy ">Buy</button>
+            <button id=btn-buy class="btn-buy btn">Buy</button>
+        </form>`
+    //get nemonic button
+    const GET_NEMONIC=
+        `<form>
+            <button class="btn-nemonic">Get nemonic</button>
         </form>`
 
     //------------------------------------------------------------
@@ -122,20 +132,27 @@ $(function(){
     // Works at onload
 
     // make buy button
-    mkHtml('#buy-button', BUY_BUTTON_HTML)
+    mkHtml('#buy-button-box', BUY_BUTTON_HTML)
+    mkHtml('#get-nemonic-box', GET_NEMONIC)
     // draw loading 
-    $('#balance').html(LOADING_HTML)
+    $('#balance-box').html(LOADING_HTML)
+    // mk new wallet
+    let newWallet=getNewWallet()
+    // set alice address
+    AliceAddress=getNewAddress(newWallet)
     // mint 20 Libra to Allice
     doMint(AliceAddress, FIRST_MINT_FOR_ALICE)
     // get balance
     getBalance(AliceAddress, function(balance){
-        $('#balance').html(mkClientProfeel(AliceAddress, balance))
+        let _balance=(balance/LIBRA_UNIT).toFixed(2)+' LIBRA'
+        $('#balance-box').html(mkClientProfeel(AliceAddress, _balance))
     })
-
+    //------------------------------------------------------------
+    // click and tap Event string
+    const clickevt = 'ontouchstart' in window ? 'touchstart' : 'click';
     //------------------------------------------------------------
     // Works at click or tap Buy Button
-    const clickevt = 'ontouchstart' in window ? 'touchstart' : 'click';
-    $('.btn-buy').bind(clickevt, function(){
+    $('#btn-buy').bind(clickevt, function(){
         event.preventDefault()
         // some codes for click or tap
         $(this).css({background: '#bbb'})
@@ -146,9 +163,9 @@ $(function(){
             // buy
             let res = getPubKey(12345, 0)
             console.log(res)
-            $('#buy-button').html(LOADING_HTML)
+            $('#buy-button-box').html(LOADING_HTML)
             setTimeout(function(){
-                $('#buy-button').html('lets go chk tx')
+                $('#buy-button-box').html('lets go chk tx')
             },1000)
         } else {
             // Not buy
@@ -156,7 +173,13 @@ $(function(){
         }
 
     })
-
+    //------------------------------------------------------------
+    // Works at click or tap Buy Button
+    $('.btn-nemonic').bind(clickevt, function(){
+        event.preventDefault()
+        alert(newWallet.getMnemonic())
+        
+    }) 
 //=============================================================================
 // WebSocket Operations
 // 
@@ -270,8 +293,8 @@ $(function(){
     // @return {String} html
     function mkClientProfeel(AliceAddress, balance){
         return `
-        <div class=youraddr><span>Your Address:</span>${AliceAddress}</div>
-        <div class=yourbalance><span>Your Balance:</span>${balance}</div>`
+        <div class=youraddr><span>Your Address: </span>${AliceAddress}</div>
+        <div class=yourbalance><span>Your Balance: </span>${balance}</div>`
     }
     //------------------------------------------------------------
     // pre) clientを作る
@@ -340,11 +363,17 @@ $(function(){
                 })
     }
     //------------------------------------------------------------
+    // pre) make new Wallet
+    // @retuen {String} new wallet
+    function getNewWallet(){
+        return libraweb.LibraWallet.create()
+    }
+    //------------------------------------------------------------
     // pre) make new Alice Account 
     // In this demo Alice wallet and account and address is Newly made every time
+    // @wallet{Object} wallet
     // @retuen {String} new address
-    function getNewAddress(){
-        const wallet = libraweb.LibraWallet.create()
+    function getNewAddress(wallet){
         const account = wallet.getAccount(0)
         return account.getAddress().toHex()
     }
