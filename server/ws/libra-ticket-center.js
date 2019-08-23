@@ -26,7 +26,7 @@ const TICKET_AMOUNT=10*LIBRA_UNIT//10*1000000 is 10 Libra
 //
 const port = 8888; //from client port 443 by nginx proxy upstream websocket 
 const host='wss.libra-auth.com';
-const pemPath='/etc/letsencrypt/live/'+host;
+const pemPath='/etc/myletsencrypt/live/'+host;
 const options = {
     cert: fs.readFileSync(pemPath+'/fullchain.pem')
     ,key: fs.readFileSync(pemPath+'/privkey.pem')

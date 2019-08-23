@@ -79,9 +79,9 @@ $(function(){
     //------------------------------------------------------------
     // for LIBRA
 
-    //In this demo, the address is fixed beforehand. 
-    const fromAddrAlice='9291e14f5e7c1ce211ce9477154faddb0c308af2f6a10324f893e2e59a13ff80'
-    const toAddrBob='9291e14f5e7c1ce211ce9477154faddb0c308af2f6a10324f893e2e59a13ff80'
+    //In this demo Alice wallet and account is Newly made every time.
+    const AliceAddress=getNewAddress()
+    const BobAddress='9291e14f5e7c1ce211ce9477154faddb0c308af2f6a10324f893e2e59a13ff80'
     //unit of Libra
     const LIBRA_UNIT=1000000
     //The ticket price is 10 Libra
@@ -119,20 +119,21 @@ $(function(){
 //------------------------------------------------------------------------------
 
     //------------------------------------------------------------
-    // onload
+    // Works at onload
 
-    //make buy button
+    // make buy button
     mkHtml('#buy-button', BUY_BUTTON_HTML)
-    //
+    // draw loading 
     $('#balance').html(LOADING_HTML)
     // mint 20 Libra to Allice
-    doMint(fromAddrAlice, FIRST_MINT_FOR_ALICE)
-    getBalance(fromAddrAlice, function(balance){
-        $('#balance').html(mkClientProfeel(fromAddrAlice, balance))
+    doMint(AliceAddress, FIRST_MINT_FOR_ALICE)
+    // get balance
+    getBalance(AliceAddress, function(balance){
+        $('#balance').html(mkClientProfeel(AliceAddress, balance))
     })
 
     //------------------------------------------------------------
-    // Event for click or tap
+    // Works at click or tap Buy Button
     const clickevt = 'ontouchstart' in window ? 'touchstart' : 'click';
     $('.btn-buy').bind(clickevt, function(){
         event.preventDefault()
@@ -267,9 +268,9 @@ $(function(){
     //------------------------------------------------------------
     // pre) clientプロフィールのHTMLを作る
     // @return {String} html
-    function mkClientProfeel(fromAddrAlice, balance){
+    function mkClientProfeel(AliceAddress, balance){
         return `
-        <div class=youraddr><span>Your Address:</span>${fromAddrAlice}</div>
+        <div class=youraddr><span>Your Address:</span>${AliceAddress}</div>
         <div class=yourbalance><span>Your Balance:</span>${balance}</div>`
     }
     //------------------------------------------------------------
@@ -337,6 +338,15 @@ $(function(){
                 }, (reason) => {
                     console.log('error:',reason)
                 })
+    }
+    //------------------------------------------------------------
+    // pre) make new Alice Account 
+    // In this demo Alice wallet and account and address is Newly made every time
+    // @retuen {String} new address
+    function getNewAddress(){
+        const wallet = libraweb.LibraWallet.create()
+        const account = wallet.getAccount(0)
+        return account.getAddress().toHex()
     }
     //------------------------------------------------------------
     // 1) Buy buttonを押したときに送金の意志を確認する
