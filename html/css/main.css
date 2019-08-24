@@ -83,9 +83,12 @@ body{
 #balance-box span{
     font-weight: 900;
 }
-
+#balance-box  .youraddr{
+  margin-left: -10px;
+}
 #balance-box  .yourbalance{
   font-size: 2.5em;
+  margin-left: -10px;
 }
 #get-nemonic-box {
   margin-top: 18px;

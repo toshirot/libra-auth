@@ -104,6 +104,8 @@ $(function(){
     const DEFAULT_FAUCET_PROTOCOL='http'
     //default libra explorer url
     const LIBRA_EXPLORER='https://www.libravista.com/address'
+    let GET_BALANCE_TIMER=1000
+    const GET_BALANCE_COUNTER_MAX=5
 
     //------------------------------------------------------------
     // for DOM
@@ -166,10 +168,8 @@ $(function(){
         // mint some Libra to Allice "TICKET_PRICE*2"
         doMint(AliceAddressHex, FIRST_MINT_FOR_ALICE)
         // show new balance of AliceAddressHex on the testnet
-        getBalance(AliceAddressHex, function(balance){
-            // message of balance
-            let _balance=(balance/LIBRA_UNIT).toFixed(2)+' LIBRA'
-            $('#balance-box').html(mkClientProfeel(AliceAddressHex, _balance))
+        getAliceBalanceInterval(function(balance){
+            // chked mint 
         })
         //------------------------------------------------------------
         // set Event Buy Button
@@ -204,15 +204,9 @@ $(function(){
                 let res = getPubKey(12345, 0)
                 console.log(res)
                 $('#buy-button-box').html(LOADING_HTML)
-                setTimeout(function(){
-                    $('#buy-button-box').html('lets go chk tx')
-
-                    getBalance(AliceAddressHex, function(balance){
-                        // message of balance
-                        let _balance=(balance/LIBRA_UNIT).toFixed(2)+' LIBRA'
-                        $('#balance-box').html(mkClientProfeel(AliceAddressHex, _balance))
-                    })
-                },1000)
+                getAliceBalanceInterval(function(balance){
+                    $('#buy-button-box').html('2 lets go chk tx')
+                })
             } else {
                 // Not buy
                 $(this).css({background: '#39298C'})
@@ -386,7 +380,7 @@ $(function(){
     // @return {String} html
     function mkClientProfeel(AliceAddressHex, balance){
         return `
-        <div class=youraddr><span>Your Address: </span>
+        <div class=youraddr><span>Your Address:</span><br>
             <a target=_blank href=${LIBRA_EXPLORER}/${AliceAddressHex}>${AliceAddressHex}</a>
         </div>
         <div class=yourbalance><span>Your Balance: </span>${balance}</div>`
@@ -456,6 +450,34 @@ $(function(){
                 }, (reason) => {
                     console.log('error:',reason)
                 })
+    }
+    //------------------------------------------------------------
+    //
+    function getAliceBalanceInterval(callback){
+        let getBalanceCounter=0;
+        clearInterval(GET_BALANCE_TIMER)
+        GET_BALANCE_TIMER=setInterval(function(){
+            if( getBalanceCounter>=GET_BALANCE_COUNTER_MAX){
+                console.log('---')
+                clearInterval(GET_BALANCE_TIMER)
+                if(callback)callback('-')
+            }
+           
+            _getBalance(AliceAddressHex, callback)
+            getBalanceCounter++;
+        },1000)
+
+        function _getBalance(AliceAddressHex, callback){
+            getBalance(AliceAddressHex, function(balance){
+                if(balance<=(FIRST_MINT_FOR_ALICE-TICKET_PRICE)){
+                    clearInterval(GET_BALANCE_TIMER)
+                    if(callback)callback(balance)
+                }
+                // message of balance
+                let _balance=(balance/LIBRA_UNIT).toFixed(2)+' LIBRA'
+                $('#balance-box').html(mkClientProfeel(AliceAddressHex, _balance))
+            })
+        }
     }
     //------------------------------------------------------------
     // pre) make new Wallet
