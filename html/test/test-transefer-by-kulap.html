@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset=utf-8>
+        <meta name=viewport content="width=device-width, initial-scale=1">
+        <title>test transefer</title>
+        <style>
+        </style>
+        <script src="../js/kulap-libra-b.js"></script>
+    </head>
+    <body>
+ 
+        <script>
+        'use strict';
+    
+        test()
+    
+        function test(){
+            
+            //==============================================
+            //  
+            //@see https://github.com/kulapio/libra-core
+
+            //On Browser
+            const client = new kulaplibra.LibraClient({
+                transferProtocol: 'https',
+                host: 'ac-libra-testnet.kulap.io',
+                port: '443',
+                dataProtocol: 'grpc-web-text'
+            })
+
+            let mnemonic='recipe patch airport shove toast detect echo type stand zero choice eye head spoon jungle three lava shallow lizard craft cancel brush stairs avoid'
+            let address1='ca1b2332ed90385257598d9bba84d15bc35bc7260540ab1f48e39428bee60955'
+
+            let address2='5ddea88879129cf59fd59fa82c3096c52e377e1bb258fe70672c016580ae9b89'
+            
+            const wallet = new kulaplibra.LibraWallet({ mnemonic:mnemonic  })
+            const account1 = wallet.newAccount()
+            console.log('account1',account1)
+            const account2 = address2//wallet.getAccount(1)
+
+            const response = client.transferCoins(account1, account2, 3e6)
+        }
+
+        </script>
+    </body>
+</html>

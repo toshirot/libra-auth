@@ -9,7 +9,9 @@
 
         </style>
         <script src="./js/libraweb-v2.js"></script>
+        <script src="./js/kulap-libra-b.js"></script>
         <script src="./js/elliptic-b.js"></script>
+        <script src="./js/qrcode.min.js"></script>
         <script
             src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
             integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8="
@@ -41,7 +43,7 @@
             <footer>
                 <div id=powerd>
                     <nav>
-                        powerd by <a href="https://github.com/toshirot/libra-auth">libra-auth</a>
+                        powerd by <a href="https://github.com/toshirot/libra-auth">libra-auth method</a>
                     </nav>
                 </div>
             </footer>
@@ -74,6 +76,7 @@ $(function(){
             ,wss: null
             ,wsNonStopFlg:true
         }//for WebSocket
+        ,clickevt: 'ontouchstart' in window ? 'touchstart' : 'click'
     };
 
 
@@ -86,18 +89,21 @@ $(function(){
     // for LIBRA
 
     //In this demo Alice wallet and account is Newly made every time.
-    let AliceAddress=''
-    const BobAddress='9291e14f5e7c1ce211ce9477154faddb0c308af2f6a10324f893e2e59a13ff80'
+    let AliceAddressHex=''
+    let AliceAccountOj=null
+    const BOB_ADDRESS_HEX='b7c811fd8f488e9c41f03a2cc1671b3a65b4638806a2ad72c96109924bde8454'
     //unit of Libra
     const LIBRA_UNIT=1000000
     //The ticket price is 10 Libra
-    const TICKET_AMOUNT=10*LIBRA_UNIT//10*1000000 is 10 Libra
+    const TICKET_PRICE=10*LIBRA_UNIT//10*1000000 is 10 Libra
     //First mint for Alice
-    const FIRST_MINT_FOR_ALICE=TICKET_AMOUNT*2
+    const FIRST_MINT_FOR_ALICE=TICKET_PRICE*2
     //host for mint
     const DEFAULT_FAUCET_HOST='faucet.testnet.libra.org'
     //protocol for mint. http or https
     const DEFAULT_FAUCET_PROTOCOL='http'
+    //default libra explorer url
+    const LIBRA_EXPLORER='https://www.libravista.com/address'
 
     //------------------------------------------------------------
     // for DOM
@@ -135,7 +141,7 @@ $(function(){
     const HEARTBEAT_INTERVAL=10000//60000
 
 //=============================================================================
-// Dom and Event operations
+// main 
 // 
 //------------------------------------------------------------------------------
 
@@ -153,32 +159,37 @@ $(function(){
         $('#balance-box').html(LOADING_HTML)
         // mk new wallet
         let newWallet=getNewWallet()
+        // get Alice account object
+        AliceAccountOj=getNewAccountOj(newWallet)
         // set alice address
-        AliceAddress=getNewAddress(newWallet)
-        // mint some Libra to Allice "TICKET_AMOUNT*2"
-        doMint(AliceAddress, FIRST_MINT_FOR_ALICE)
-        // show balance of AliceAddress
-        getBalance(AliceAddress, function(balance){
+        AliceAddressHex=getNewAddressHex(AliceAccountOj)
+        // mint some Libra to Allice "TICKET_PRICE*2"
+        doMint(AliceAddressHex, FIRST_MINT_FOR_ALICE)
+        // show new balance of AliceAddressHex on the testnet
+        getBalance(AliceAddressHex, function(balance){
             // message of balance
             let _balance=(balance/LIBRA_UNIT).toFixed(2)+' LIBRA'
-            $('#balance-box').html(mkClientProfeel(AliceAddress, _balance))
+            $('#balance-box').html(mkClientProfeel(AliceAddressHex, _balance))
         })
-        //------------------------------------------------------------
-        // click and tap Event string
-        const clickevt = 'ontouchstart' in window ? 'touchstart' : 'click';
         //------------------------------------------------------------
         // set Event Buy Button
         setBuyButtonEvent()
         //------------------------------------------------------------
         // set Event Nemonic Button
-        setExprtNemonicEvent()
+        setExprtNemonicEvent(newWallet)
     }
+
+//=============================================================================
+// Dom Event operations
+// 
+//------------------------------------------------------------------------------
+
 
     //------------------------------------------------------------
     // Works at click or tap Buy Button
     //
     function setBuyButtonEvent(){
-        $('#btn-buy').bind(clickevt, function(){
+        $('#btn-buy').bind(Ticket.clickevt, function(){
             event.preventDefault()
             // some codes for click or tap
             $(this).css({background: '#bbb'})
@@ -187,11 +198,20 @@ $(function(){
             let okbuy=checkConfirm(M_DO_YOU_BUY_CONFIRM)
             if(okbuy){
                 // buy
+                transfer(AliceAccountOj, BOB_ADDRESS_HEX, TICKET_PRICE)
+
+                //
                 let res = getPubKey(12345, 0)
                 console.log(res)
                 $('#buy-button-box').html(LOADING_HTML)
                 setTimeout(function(){
                     $('#buy-button-box').html('lets go chk tx')
+
+                    getBalance(AliceAddressHex, function(balance){
+                        // message of balance
+                        let _balance=(balance/LIBRA_UNIT).toFixed(2)+' LIBRA'
+                        $('#balance-box').html(mkClientProfeel(AliceAddressHex, _balance))
+                    })
                 },1000)
             } else {
                 // Not buy
@@ -203,8 +223,8 @@ $(function(){
     //------------------------------------------------------------
     // Works at click or tap Get nemonic Button
     //
-    function setExprtNemonicEvent(){
-        $('.btn-get-nemonic').bind(clickevt, function(){
+    function setExprtNemonicEvent(newWallet){
+        $('.btn-get-nemonic').bind(Ticket.clickevt, function(){
             event.preventDefault()
             // make output-nemonic area
             mkHtml('#get-nemonic-box', OUTPUT_NEMONIC_HTML)
@@ -212,7 +232,7 @@ $(function(){
 
             //------------------------------------------------------------
             // copy the textarea to clipboard
-            $('#btn-copy-text').bind(clickevt, function(){
+            $('#btn-copy-text').bind(Ticket.clickevt, function(){
                 event.preventDefault()
                 let textarea = document.getElementById("outout-nemonic-area")
                 // select all text
@@ -222,11 +242,11 @@ $(function(){
             })
             //------------------------------------------------------------
             // close nemonic box
-            $('#btn-close-nemonic').bind(clickevt, function(){
+            $('#btn-close-nemonic').bind(Ticket.clickevt, function(){
                 event.preventDefault()
                 mkHtml('#get-nemonic-box', GET_NEMONIC_HTML)
-                setExprtNemonicEvent()
-                //$('.btn-get-nemonic').trigger(clickevt);
+                setExprtNemonicEvent(newWallet)
+                //$('.btn-get-nemonic').trigger(Ticket.clickevt);
             })
         })
     }
@@ -326,11 +346,33 @@ $(function(){
         Ticket.conn.wss_arry=[]
         if(callback)callback()
     }
+
+
+//=============================================================================
+// QR Function
+// 
+//-----------------------------------------------------------------------------
+
+    //------------------------------------------------------------
+    // pre) mk and show QR code
+    // @targetElm {String} selector for jquery e.g. '#hoge'
+    // @return {Object} QRCode Object
+    function showQR(targetElm, text){
+        return  new QRCode(
+            $(targetElm), {
+                 text: text
+                ,width: 128
+                ,height: 128
+                ,colorDark : "#000"
+                ,colorLight : "#fff"
+                ,correctLevel : QRCode.CorrectLevel.H
+        });
+    }
+
 //=============================================================================
 // Util Functions
 // 
 //-----------------------------------------------------------------------------
-
 
     //------------------------------------------------------------
     // pre) mk html
@@ -342,9 +384,11 @@ $(function(){
     //------------------------------------------------------------
     // pre) clientプロフィールのHTMLを作る
     // @return {String} html
-    function mkClientProfeel(AliceAddress, balance){
+    function mkClientProfeel(AliceAddressHex, balance){
         return `
-        <div class=youraddr><span>Your Address: </span>${AliceAddress}</div>
+        <div class=youraddr><span>Your Address: </span>
+            <a target=_blank href=${LIBRA_EXPLORER}/${AliceAddressHex}>${AliceAddressHex}</a>
+        </div>
         <div class=yourbalance><span>Your Balance: </span>${balance}</div>`
     }
     //------------------------------------------------------------
@@ -384,7 +428,7 @@ $(function(){
                 alert('amount must be Number')
                 return false
             }
-            //if(amount>TICKET_AMOUNT){ alert('amount is over 10 Libra. \n amount:'+amount+'/ '+TICKET_AMOUNT); return false }
+            //if(amount>TICKET_PRICE){ alert('amount is over 10 Libra. \n amount:'+amount+'/ '+TICKET_PRICE); return false }
             return true
         }
     }
@@ -420,12 +464,19 @@ $(function(){
         return libraweb.LibraWallet.create()
     }
     //------------------------------------------------------------
-    // pre) make new Alice Account 
+    // pre) make new Alice Account oj
     // In this demo Alice wallet and account and address is Newly made every time
     // @wallet{Object} wallet
     // @retuen {String} new address
-    function getNewAddress(wallet){
-        const account = wallet.getAccount(0)
+    function getNewAccountOj(wallet){
+        return  wallet.getAccount(0)
+    }
+    //------------------------------------------------------------
+    // pre) make new Alice Account Hex
+    // In this demo Alice wallet and account and address is Newly made every time
+    // @account{Object} account
+    // @retuen {String} new address
+    function getNewAddressHex(account){
         return account.getAddress().toHex()
     }
     //------------------------------------------------------------
@@ -437,11 +488,17 @@ $(function(){
     }
     //------------------------------------------------------------
     // 2) from address から to addressへ送金する
-    // @from   {String} libra from address
-    // @to     {String} libra to address
+    // @fromAddrOj {Object} libra from address
+    // @toAddrHex  {String} libra to address
     // @amount {Number} libra amount
-    function transfer(from, to, amount){
-
+    function transfer(fromAddrOj, toAddrHex, amount){
+        const client = new kulaplibra.LibraClient({
+            transferProtocol: 'https',
+            host: 'ac-libra-testnet.kulap.io',
+            port: '443',
+            dataProtocol: 'grpc-web-text'
+        })
+        const response = client.transferCoins(fromAddrOj, toAddrHex, amount)
     }
     //------------------------------------------------------------
     // 3)4) 最新のシークエンス番号を取得する
