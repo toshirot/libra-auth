@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset=utf-8>
+        <meta name=viewport content="width=device-width, initial-scale=1">
+        <title>test mk qr</title>
+        <style>
+
+        </style>
+        <script src="../js/qrcode.min.js"></script>
+    </head>
+    <body>
+        <div id="qrcode"></div>
+        <script>
+        'use strict';
+    
+        test()
+    
+        function test(){
+            
+            //==============================================
+            // Mk QR
+    
+            let qrcode = new QRCode(document.getElementById("qrcode"), {
+                text: "854563c50d20788fb6c11fac1010b553d722edb0c02f87c2edbdd3923726d13f",
+                width: 128,
+                height: 128,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+            
+        }
+
+        //@see https://github.com/davidshimjs/qrcodejs
+        //qrcode.clear(); // clear the code.
+        //qrcode.makeCode("http://naver.com"); // make another code.
+        </script>
+    </body>
+</html>

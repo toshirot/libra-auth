@@ -135,39 +135,45 @@ $(function(){
     const HEARTBEAT_INTERVAL=10000//60000
 
 //=============================================================================
-// Dom operations
+// Dom and Event operations
 // 
 //------------------------------------------------------------------------------
 
+    // lets start
+    main ()
+
     //------------------------------------------------------------
     // Works at onload
+    function main (){
+        // make buy button
+        mkHtml('#buy-button-box', BUY_BUTTON_HTML)
+        // make get-nemonic button
+        mkHtml('#get-nemonic-box', GET_NEMONIC_HTML)
+        // draw loading 
+        $('#balance-box').html(LOADING_HTML)
+        // mk new wallet
+        let newWallet=getNewWallet()
+        // set alice address
+        AliceAddress=getNewAddress(newWallet)
+        // mint some Libra to Allice "TICKET_AMOUNT*2"
+        doMint(AliceAddress, FIRST_MINT_FOR_ALICE)
+        // show balance of AliceAddress
+        getBalance(AliceAddress, function(balance){
+            // message of balance
+            let _balance=(balance/LIBRA_UNIT).toFixed(2)+' LIBRA'
+            $('#balance-box').html(mkClientProfeel(AliceAddress, _balance))
+        })
+        //------------------------------------------------------------
+        // click and tap Event string
+        const clickevt = 'ontouchstart' in window ? 'touchstart' : 'click';
+        //------------------------------------------------------------
+        // set Event Buy Button
+        setBuyButtonEvent()
+        //------------------------------------------------------------
+        // set Event Nemonic Button
+        setExprtNemonicEvent()
+    }
 
-    // make buy button
-    mkHtml('#buy-button-box', BUY_BUTTON_HTML)
-    // make get-nemonic button
-    mkHtml('#get-nemonic-box', GET_NEMONIC_HTML)
-    // draw loading 
-    $('#balance-box').html(LOADING_HTML)
-    // mk new wallet
-    let newWallet=getNewWallet()
-    // set alice address
-    AliceAddress=getNewAddress(newWallet)
-    // mint 20 Libra to Allice
-    doMint(AliceAddress, FIRST_MINT_FOR_ALICE)
-    // get balance
-    getBalance(AliceAddress, function(balance){
-        let _balance=(balance/LIBRA_UNIT).toFixed(2)+' LIBRA'
-        $('#balance-box').html(mkClientProfeel(AliceAddress, _balance))
-    })
-    //------------------------------------------------------------
-    // click and tap Event string
-    const clickevt = 'ontouchstart' in window ? 'touchstart' : 'click';
-    //------------------------------------------------------------
-    // 
-    setBuyButtonEvent()
-    //------------------------------------------------------------
-    // 
-    setExprtNemonicEvent()
     //------------------------------------------------------------
     // Works at click or tap Buy Button
     //
