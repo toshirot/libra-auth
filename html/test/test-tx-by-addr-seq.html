@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset=utf-8>
+        <meta name=viewport content="width=device-width, initial-scale=1">
+        <title>test transefer</title>
+        <style>
+        </style>
+        <script src="../js/libracore-b.js"></script>
+    </head>
+    <body>
+ 
+        <script>
+        'use strict';
+    console.log(libracore)
+        test()
+    
+        async function test(){
+            
+            //==============================================
+            //  
+            const client = new LibraClient({ network: libracore.LibraNetwork.Testnet });
+
+            //On Browser
+            /*
+
+            const client = new window.libracore.LibraClient({
+                transferProtocol: 'https',
+                host: 'ac-libra-testnet.kulap.io',
+                port: '443',
+                //dataProtocol: 'grpc-web-text'
+            })
+*/
+            const accountAddress = '000000000000000000000000000000000000000000000000000000000a550c18'//'7f58df27522872ecfac340c5c072427e6f8083ca3c79bb748cdd1ae073dacc42';
+            const sequenceNumber = 3084; //can also use a string for really large sequence numbers;
+
+            const transaction = client.getAccountTransaction(accountAddress, sequenceNumber, false);
+            console.log(transaction)
+            console.log(transaction.signedTransaction.publicKey)
+            console.log(+transaction.signedTransaction.transaction.sequenceNumber)
+            
+ 
+        }
+
+        </script>
+    </body>
+</html>

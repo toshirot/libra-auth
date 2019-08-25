@@ -9,6 +9,7 @@
 
         </style>
         <script src="./js/libraweb-v2.js"></script>
+        <!--script src="./js/libracore-b.js"></script-->
         <script src="./js/kulap-libra-b.js"></script>
         <script src="./js/elliptic-b.js"></script>
         <script src="./js/qrcode.min.js"></script>
@@ -186,7 +187,7 @@ $(function(){
 
 
     //------------------------------------------------------------
-    // Works at click or tap Buy Button
+    // 1) Works at click or tap Buy Button
     //
     function setBuyButtonEvent(){
         $('#btn-buy').bind(Ticket.clickevt, function(){
@@ -198,11 +199,36 @@ $(function(){
             let okbuy=checkConfirm(M_DO_YOU_BUY_CONFIRM)
             if(okbuy){
                 // buy
-                transfer(AliceAccountOj, BOB_ADDRESS_HEX, TICKET_PRICE)
+                transfer(AliceAccountOj, BOB_ADDRESS_HEX, TICKET_PRICE, function(fromAddrOj){
+                    // get Address Hex of Alice
+                    let senderAddrHex=Ticket.librawebBuffer.from(fromAddrOj.address.addressBytes).toString('hex') 
+                    //get accountState
+                    getAccountState(senderAddrHex, function(accountState){
 
-                //
-                let res = getPubKey(12345, 0)
-                console.log(res)
+                        let sequence=accountState.sequenceNumber.toString()
+                        console.log('AccountState', accountState )
+                        console.log('balance', accountState.balance.toString())
+                        console.log('senderAddrHex', senderAddrHex)
+                        console.log('sequenc', accountState.sequenceNumber.toString())
+
+
+                        //Bobのpubkeyを入手する
+                        //senderAddrHexとsequenceNumberを使ってtxを取得し、
+                        let host='librascript.io/api/events/'
+                        let addr=senderAddrHex
+                        let url=`https://${host}${addr}/${sequence}/false/1`
+                        fetch(url, {
+                            method: 'get',
+                            mode: 'no-cors'
+                        }).then(data  => 
+                            console.log(data)
+                        ).catch(error => console.error(error))
+ 
+                    })
+
+
+                })
+
                 $('#buy-button-box').html(LOADING_HTML)
                 getAliceBalanceInterval((FIRST_MINT_FOR_ALICE-TICKET_PRICE),function(balance){
                     $('#buy-button-box').html('2 lets go chk tx')
@@ -287,13 +313,9 @@ $(function(){
     function heartbeat(wss) {
         // Start heartbeat send
         clearInterval(wss.op.hbTimeout);
-        wss.send(HB);
+        wssSend('hb');
         wss.op.hbTimeout = setInterval(() => {
-            if(wss.readyState===WebSocket.OPEN){
-                wss.send(HB);
-            } else {
-                wssDelAll()
-            }
+            wssSend('hb');
         }, HEARTBEAT_INTERVAL);
     }
     //------------------------------------------------------------
@@ -339,6 +361,24 @@ $(function(){
         }
         Ticket.conn.wss_arry=[]
         if(callback)callback()
+    }
+
+    function wssSend(type, data){
+        let wss=window.wss
+        if(wss.readyState!==WebSocket.OPEN){
+            wssDelAll(function(){console.error('Error at wssSend', type, data)})
+        }
+        if(type==='hb'){
+            wss.send(HB)
+        } else {
+            wss.send(
+                JSON.stringify({
+                    type: type,
+                    data: data
+                })
+            )
+        }
+
     }
 
 
@@ -431,6 +471,24 @@ $(function(){
     // @address {string} target address
     // @callback{function} callback
     function getBalance(address, callback){
+        getAccountState(address, function(value){
+            if(callback)callback(value.balance)
+        })
+    }
+    //------------------------------------------------------------
+    // pre) get last sequenceNumber of address
+    // @address {string} target address
+    // @callback{function} callback
+    function getLastSequenceNumber(address, callback){
+        getAccountState(address, function(value){
+            if(callback)callback(value.sequenceNumber)
+        })
+    }
+    //------------------------------------------------------------
+    // pre) get AccountState of address
+    // @address {string} target address
+    // @callback{function} callback
+    function getAccountState(address, callback){
         const client = new Ticket.libraweb.LibraClient({
                 protocol: 'https',
                 host: 'ac-libra-testnet.kulap.io',
@@ -446,7 +504,7 @@ $(function(){
             client
                 .getAccountState(addr)
                 .then((value) => {
-                    if(callback)callback(value.balance)
+                    if(callback)callback(value)
                 }, (reason) => {
                     console.log('error:',reason)
                 })
@@ -513,47 +571,83 @@ $(function(){
     // @fromAddrOj {Object} libra from address
     // @toAddrHex  {String} libra to address
     // @amount {Number} libra amount
-    function transfer(fromAddrOj, toAddrHex, amount){
+    async function transfer(fromAddrOj, toAddrHex, amount, callback){
         const client = new kulaplibra.LibraClient({
             transferProtocol: 'https',
             host: 'ac-libra-testnet.kulap.io',
             port: '443',
             dataProtocol: 'grpc-web-text'
         })
-        const response = client.transferCoins(fromAddrOj, toAddrHex, amount)
+        const response = await client.transferCoins(fromAddrOj, toAddrHex, amount)
+        //let res = await response.awaitConfirmation(client);
+ 
+        if(callback)callback(fromAddrOj)
     }
     //------------------------------------------------------------
-    // 3)4) 最新のシークエンス番号を取得する
+    // 3) 最新のシークエンス番号を取得する
     // @addrees {Number} libra addrees
-    // @return sequence{Number} last sequence number
-    function getSequence(addrees){
-        let sequence
-
-        return sequence
+    // @return sequence{String} string of last sequence number
+    function getLastSequence(client, addrees){
+        const accountState = client.getAccountState(addrees)
+        return accountState.sequenceNumber.toString()
     }
     //------------------------------------------------------------
-    // 3)4) トランザクションを取得する
+    // 3) get transaction
     // @addrees {Number} libra addrees
     // @sequence{Number} sequence number
-    // @return {object} transaction 
-    function getTx(addrees, sequence){
-        //get tx from testnet
-        let tx={
-            public_key: 'test'
+    // @fetch_events{Bool} fetch event? true|false 
+    // @return {object} transaction
+    function getTx(addrees, sequence, fetch_events){
+        if(!fetch_events)fetch_events=false
+        //get tx from testnet by libra-core
+        return CLIENT.getAccountTransaction(addrees, sequence, fetch_events);
+        /* return transaction object
+            LibraSignedTransactionWithProof {
+            signedTransaction: LibraSignedTransaction {
+                transaction: LibraTransaction {
+                program: [Object],
+                gasContraint: [Object],
+                expirationTime: [BigNumber],
+                sendersAddress: [AccountAddress],
+                sequenceNumber: [BigNumber]
+                },
+                publicKey: Uint8Array [Array],
+                signature: Uint8Array [Array]
+            },
+            proof: {
+                wrappers_: { '1': [Object], '2': [Object] },
+                messageId_: undefined,
+                arrayIndexOffset_: -1,
+                array: [ [Array], [Array] ],
+                pivot_: 1.7976931348623157e+308,
+                convertedPrimitiveFields_: {}
+            },
+            events: undefined
+            }
+        */
+    }
+    //------------------------------------------------------------
+    // 3) seach last transaction from bob and alice address
+    // @sequence{Number} sequence number
+    // @clientAddr {Number} client Address
+    // @return {object} transaction
+    function findLastTxBobAndAlic(sequence, clientAddr){
+        let tx
+        for(let i=sequence;i<=0;i--){
+            tx=null; tx=getTx(alice, sequence, false)
+
+            //chk alice bob balance これで特定してよいか
+            console.log(getPubKey(transaction))
         }
 
         return tx
     }
     //------------------------------------------------------------
-    // 3)4) pubKeyを取得する
-    // @addrees {Number} libra addrees
-    // @sequence{Number} sequence number
-    // @return {String} pubKey 
-    function getPubKey(addrees, sequence){
-        let tx = getTx(addrees, sequence)
-        let pubKey=tx.public_key
-
-        return pubKey
+    // 3) pubKeyを取得する
+    // @transaction {object} transaction 
+    // @return {String} pubKey Hex
+    function getPubKeyByTx(transaction){
+        return transaction.signedTransaction.publicKey
     }
     //------------------------------------------------------------
     // 5) メッセージのハッシュを取得する
@@ -575,13 +669,11 @@ $(function(){
     // @msg {String} message
     // @sig {String} signature
     function sendMsgAndSig(msg, sig){
-        const oj=JSON.stringify({
-            msg: msg,
-            sig, sig
-        })
-        if(window.wss){
-            window.wss.send(oj)
+        const data={
+             msg: msg
+            ,sig: sig
         }
+        wssSend('sig', data)
     }
     //------------------------------------------------------------
     // 6)8) メッセージとシグネチャを公開鍵で検証する
