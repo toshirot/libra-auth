@@ -65,14 +65,16 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
 // 
 //------------------------------------------------------------------------------
 
-
-
-    //------------------------------------------------------------
-    // start WebSocket Server
-
     // lets start
-    let wss=conn(port)
-    console.log('start wss', host, port, new Date())
+    main()
+
+    function main() {
+
+        //------------------------------------------------------------
+        // start WebSocket Server
+        let wss=conn(port)
+        console.log('start wss', host, port, new Date())
+    }
 
 
 //=============================================================================

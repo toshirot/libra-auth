@@ -68,7 +68,7 @@ $(function(){
 //=============================================================================
 // main object
 // 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
     //------------------------------------------------------------
     // Object for Ticket Demo with Libra Auth method
@@ -91,15 +91,16 @@ $(function(){
 //=============================================================================
 // data
 // 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
     //------------------------------------------------------------
     // for LIBRA
 
     //In this demo Alice wallet and account is Newly made every time.
-    let AliceAddressHex=''
-    let AliceAccountOj=null
+    let   AliceAddressHex=''//made every time
+    let   AliceAccountOj=null//made every time
     const BOB_ADDRESS_HEX='b7c811fd8f488e9c41f03a2cc1671b3a65b4638806a2ad72c96109924bde8454'
+    let   BobPubKey=null;//from LIBRA
     //unit of Libra
     const LIBRA_UNIT=1000000
     //The ticket price is 10 Libra
@@ -112,7 +113,7 @@ $(function(){
     const DEFAULT_FAUCET_PROTOCOL='http'
     //default libra explorer url
     const LIBRA_EXPLORER='https://www.libravista.com/address'
-    let GET_BALANCE_TIMER=1000
+    let   GET_BALANCE_TIMER=1000
     const GET_BALANCE_COUNTER_MAX=3
 
     //------------------------------------------------------------
@@ -148,12 +149,12 @@ $(function(){
     //------------------------------------------------------------
     // for WebSocket
     const HB=JSON.stringify({type:'hb'})//heartbeat
-    const HEARTBEAT_INTERVAL=10000//60000
+    const HEARTBEAT_INTERVAL=60000
 
 //=============================================================================
 // main 
 // 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
     // lets start
     main ()
@@ -189,9 +190,32 @@ $(function(){
     }
 
 //=============================================================================
+// Dom operations
+// 
+//-----------------------------------------------------------------------------
+
+    //------------------------------------------------------------
+    // pre) mk html
+    // @targetElm {string} selector for jquery e.g. '#hoge'
+    // @html {string} html
+    function mkHtml(targetElm, html){
+        $(targetElm).html(html)
+    }
+    //------------------------------------------------------------
+    // pre) clientプロフィールのHTMLを作る
+    // @return {string} html
+    function mkClientProfeel(AliceAddressHex, balance){
+        return `
+        <div class=youraddr><span>Your Address:</span><br>
+            <a target=_blank href=${LIBRA_EXPLORER}/${AliceAddressHex}>${AliceAddressHex}</a>
+        </div>
+        <div class=yourbalance><span>Your Balance: </span>${balance}</div>`
+    }
+
+//=============================================================================
 // Dom Event operations
 // 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 
     //------------------------------------------------------------
@@ -208,31 +232,26 @@ $(function(){
             if(okbuy){
                 // buy
                 transfer(AliceAccountOj, BOB_ADDRESS_HEX, TICKET_PRICE, function(fromAddrOj){
+                    
                     // get Address Hex of Alice
                     let senderAddrHex=Ticket.librawebBuffer.from(fromAddrOj.address.addressBytes).toString('hex') 
                     //get accountState
                     getAccountState(senderAddrHex, function(accountState){
-
-                        let sequence=accountState.sequenceNumber.toString()
-                        console.log('AccountState', accountState )
-                        console.log('balance', accountState.balance.toString())
-                        console.log('senderAddrHex', senderAddrHex)
-                        console.log('sequenc', accountState.sequenceNumber.toString())
-
+                        // get balance
                         balance=+accountState.balance.toString()
                         if(typeof balance==='number'){
                             $('#buy-button-box').html('2 lets go chk tx aaa')
+                            wssSend('addr', AliceAddressHex)
                             clearInterval(GET_BALANCE_TIMER)
                             $('#balance-box').html(mkClientProfeel(AliceAddressHex, balance))
                         }
- 
                     })
                 })
 
                 $('#buy-button-box').html(LOADING_HTML)
                 let maxBalance=FIRST_MINT_FOR_ALICE-TICKET_PRICE
                 getAliceBalanceInterval(maxBalance, function(balance){
-                    wssSend('addr', AliceAddressHex)
+                    //wssSend('addr', AliceAddressHex)
                 })
             } else {
                 // Not buy
@@ -281,8 +300,8 @@ $(function(){
     window.wss=wss//
     //------------------------------------------------------------
     // pre) Connect with WebSocket
-    // @url {String} target wss Server
-    // @return {Object} WebSocket instance
+    // @url {string} target wss Server
+    // @return {object} WebSocket instance
     function wssLibraAuth(url){
         let  op={
              protocol: 'wss.libra-auth.com'
@@ -321,32 +340,29 @@ $(function(){
     }
     //------------------------------------------------------------
     // pre) onmsg
-    // @wss {Object} WebSocket instance
-    // @msg {String} stringifyd json message
+    // @wss {object} WebSocket instance
+    // @msg {string} stringifyd json message
     function onmsg(wss, msg){
+        //console.log(0, msg.data, wss, msg)
         if(!wss)return
         if(!msg)return
         if(!msg.data)return
         let data
         try{
-            data = JSON.parse(msg);
-            if(msg.data.type!==undefined){
-                console.log(1, data)
-                return 
-            } else if(msg.data.type==='hb'){
-                data=msg.data
-                console.log(2, data)
-            } else if(msg.data.type==='sigs'){
-                data=msg.data
+            data = JSON.parse(msg.data);
+            console.log(111,data.type, data)
+            if(data.type==='hb'){
+                //hb
+            } else if(data.type==='sig'){
                 console.log(3, data)
+                onReceivedSigB(data, wss)
             } else {
                 console.log(4, data)
             }
-        } catch(e){ return }
-
-        if(!data.sigs)return
-
-        alert('received',data.sigs)
+        } catch(e){ 
+            console.error('err', e, data)
+            return 
+        }
     }
     window.wssDelAll=wssDelAll
     function wssDelAll(callback) {
@@ -384,7 +400,29 @@ $(function(){
             }
         }
     }
-
+    //------------------------------------------------------------
+    // 6) Event executed when an sigB is received from the server
+    // @data {object} sigB and msg {type:'sig', data:[sigB, msgHash]}
+    async function onReceivedSigB(data, wss){
+        console.log('onReceivedSigB', data)
+        if(!data)return
+        const sigB=data[0]
+        const msgHash=data[1]
+        getPubKey(AliceAddressHex, function(BobPubKey){
+            //-------------------------------------------------
+            // 6. ALICE: verify {bool} BobPubKey.verify(msg, sigB)
+            const res7 = BobPubKey.verify(msgHash, sigB)
+    
+            //-------------------------------------------------
+            // 7. ALICE: 
+            if(res7===true){
+                console.info('8. OK. verify(msg, sigB) is true.',)
+                
+            } else {
+                console.error('8. Error. verify(msg, sigB) is false.')
+            }
+        })
+    }
 
 //=============================================================================
 // QR Function
@@ -393,8 +431,8 @@ $(function(){
 
     //------------------------------------------------------------
     // pre) mk and show QR code
-    // @targetElm {String} selector for jquery e.g. '#hoge'
-    // @return {Object} QRCode Object
+    // @targetElm {string} selector for jquery e.g. '#hoge'
+    // @return {object} QRCode Object
     function showQR(targetElm, text){
         return  new QRCode(
             $(targetElm), {
@@ -412,26 +450,41 @@ $(function(){
 // 
 //-----------------------------------------------------------------------------
 
-    //------------------------------------------------------------
-    // pre) mk html
-    // @targetElm {String} selector for jquery e.g. '#hoge'
-    // @html {String} html
-    function mkHtml(targetElm, html){
-        $(targetElm).html(html)
+    // 3) get getPubKey
+    // @addrees {number} libra addrees
+    // @callback{function} callback
+    function getPubKey(fromAddress, callback){
+
+        //for bobs tx
+        sequence=0
+        fetch_events=false
+
+        let url=`https://api-test.libexplorer.com/api?module=account&action=txlist&address=${BOB_ADDRESS_HEX}`
+        fetch(url, {
+            method: 'get',
+            mode: 'no-cors',
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }).then(data  => {
+            console.log(data)
+            let publicKey=seachSender(fromAddress, data)
+            if(callback)callback(publicKey)
+        }).catch(error => console.error(error))
+
+        //https://api-test.libexplorer.com/api?module=account&action=txlist&address=4debfa90ca96d014cecdc1ba71da0896c15e933740b1c632c1775c987f2ef4fb
+        function seachSender(fromAddress, data){
+            for(let i in data){
+                if(data[i].result.from===fromAddress){
+                    return data[i].result.publicKey
+                }
+            }
+        }
     }
-    //------------------------------------------------------------
-    // pre) clientプロフィールのHTMLを作る
-    // @return {String} html
-    function mkClientProfeel(AliceAddressHex, balance){
-        return `
-        <div class=youraddr><span>Your Address:</span><br>
-            <a target=_blank href=${LIBRA_EXPLORER}/${AliceAddressHex}>${AliceAddressHex}</a>
-        </div>
-        <div class=yourbalance><span>Your Balance: </span>${balance}</div>`
-    }
+
     //------------------------------------------------------------
     // pre) clientを作る
-    // @return {String} addres hex
+    // @return {string} addres hex
     function createClient(){
         let address=''
 
@@ -440,8 +493,8 @@ $(function(){
 
     //------------------------------------------------------------
     // pre) onload時にここでは事前にmintで入金する
-    // @address {Number} libra address
-    // @amount {Number} libra amount
+    // @address {number} libra address
+    // @amount {number} libra amount
     function doMint(address, amount, host, protocol){
 
         if(!chkInput())return
@@ -543,38 +596,38 @@ $(function(){
     }
     //------------------------------------------------------------
     // pre) make new Wallet
-    // @retuen {String} new wallet
+    // @retuen {string} new wallet
     function getNewWallet(){
         return libraweb.LibraWallet.create()
     }
     //------------------------------------------------------------
     // pre) make new Alice Account oj
     // In this demo Alice wallet and account and address is Newly made every time
-    // @wallet{Object} wallet
-    // @retuen {String} new address
+    // @wallet{object} wallet
+    // @retuen {string} new address
     function getNewAccountOj(wallet){
         return  wallet.getAccount(0)
     }
     //------------------------------------------------------------
     // pre) make new Alice Account Hex
     // In this demo Alice wallet and account and address is Newly made every time
-    // @account{Object} account
-    // @retuen {String} new address
+    // @account{object} account
+    // @retuen {string} new address
     function getNewAddressHex(account){
         return account.getAddress().toHex()
     }
     //------------------------------------------------------------
     // 1) Buy buttonを押したときに送金の意志を確認する
-    // @msg {String} massage
+    // @msg {string} massage
     // @retuen {Bool} true|false
     function checkConfirm(msg){
         return window.confirm(msg)
     }
     //------------------------------------------------------------
     // 2) from address から to addressへ送金する
-    // @fromAddrOj {Object} libra from address
-    // @toAddrHex  {String} libra to address
-    // @amount {Number} libra amount
+    // @fromAddrOj {object} libra from address
+    // @toAddrHex  {string} libra to address
+    // @amount {number} libra amount
     async function transfer(fromAddrOj, toAddrHex, amount, callback){
         const client = new kulaplibra.LibraClient({
             transferProtocol: 'https',
@@ -589,16 +642,16 @@ $(function(){
     }
     //------------------------------------------------------------
     // 3) 最新のシークエンス番号を取得する
-    // @addrees {Number} libra addrees
-    // @return sequence{String} string of last sequence number
+    // @addrees {number} libra addrees
+    // @return sequence{string} string of last sequence number
     function getLastSequence(client, addrees){
         const accountState = client.getAccountState(addrees)
         return accountState.sequenceNumber.toString()
     }
     //------------------------------------------------------------
     // 3) get transaction
-    // @addrees {Number} libra addrees
-    // @sequence{Number} sequence number
+    // @addrees {number} libra addrees
+    // @sequence{number} sequence number
     // @fetch_events{Bool} fetch event? true|false 
     // @return {object} transaction
     function getTx(addrees, sequence, fetch_events){
@@ -632,8 +685,8 @@ $(function(){
     }
     //------------------------------------------------------------
     // 3) seach last transaction from bob and alice address
-    // @sequence{Number} sequence number
-    // @clientAddr {Number} client Address
+    // @sequence{number} sequence number
+    // @clientAddr {number} client Address
     // @return {object} transaction
     function findLastTxBobAndAlic(sequence, clientAddr){
         let tx
@@ -649,29 +702,29 @@ $(function(){
     //------------------------------------------------------------
     // 3) pubKeyを取得する
     // @transaction {object} transaction 
-    // @return {String} pubKey Hex
+    // @return {string} pubKey Hex
     function getPubKeyByTx(transaction){
         return transaction.signedTransaction.publicKey
     }
     //------------------------------------------------------------
     // 5) メッセージのハッシュを取得する
-    // @msg {String} message
-    // @return msg hash{String} msg hash by SHA3
+    // @msg {string} message
+    // @return msg hash{string} msg hash by SHA3
     function mkMsgHash(msg){
         return  (new SHA3(512)).update(msg).digest('hex')
     }
     //------------------------------------------------------------
     // 5)7) メッセージと秘密鍵絵でシグネチャを生成する
-    // @msg {String} message
-    // @prikey {String} Private key
-    // @return msg hash{String} msg hash by SHA3
+    // @msg {string} message
+    // @prikey {string} Private key
+    // @return msg hash{string} msg hash by SHA3
     function mkMsgHash(msg, prikey){
         return prikey.sign(msg).toHex()
     }
     //------------------------------------------------------------
     // 5) WebSocketでsignatureとmassageを送る
-    // @msg {String} message
-    // @sig {String} signature
+    // @msg {string} message
+    // @sig {string} signature
     function sendMsgAndSig(msg, sig){
         const data={
              msg: msg
@@ -681,9 +734,9 @@ $(function(){
     }
     //------------------------------------------------------------
     // 6)8) メッセージとシグネチャを公開鍵で検証する
-    // @msg {String} message
-    // @sig {String} signature
-    // @pubkey {String} Public key
+    // @msg {string} message
+    // @sig {string} signature
+    // @pubkey {string} Public key
     // @return {bool} true|false
     function mkMsgHash(msg, sig, pubkey){
         //
@@ -691,7 +744,7 @@ $(function(){
     }
     //------------------------------------------------------------
     // 7) QRコードを生成する
-    // @sig {String} signature
+    // @sig {string} signature
     // @return qr {Image} QR png image for of sig
     function mkMsgHash(sig){
         return  //qr
