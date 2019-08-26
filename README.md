@@ -209,6 +209,7 @@ function test(){
 <h2>Thanx main dependence</h2>
 <section>
         <div>
+         <h4>for LIBRA</h4>
                 <ul>
                         <li>perfectmak/libra-core https://github.com/perfectmak/libra-core</li>
                         <li>bandprotocol/libra-web https://github.com/bandprotocol/libra-web</li>
@@ -216,6 +217,27 @@ function test(){
                         <li>LibraVista https://www.libravista.com/</li>
                 </ul>
         </div>
+        <div>
+        <h4>for Crypto</h4>
+                <ul>
+                        <li>indutny/elliptic https://github.com/indutny/elliptic</li>
+                        <li>phusion/node-sha3 https://github.com/phusion/node-sha3</li>
+                </ul>
+        </div>
+        <div>
+         <h4>for WebSocket</h4>
+                <ul>
+                        <li>websockets/ws https://github.com/websockets/ws</li>
+                </ul>
+        </div>
+         <div>
+         <h4>for Others</h4>
+                <ul>
+                        <li>davidshimjs/qrcodejs https://github.com/davidshimjs/qrcodejs</li>
+                        <li>jquery https://jquery.com/</li>
+                </ul>
+        </div>
+ 
 </section>
 </body>
 </html>
