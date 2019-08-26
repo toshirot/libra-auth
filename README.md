@@ -206,19 +206,14 @@ function test(){
                 </code></pre>
         </div>
 </section>
-<h2>todos</h2>
+<h2>Thanx main dependence</h2>
 <section>
         <div>
                 <ul>
-                        <li>pre: create alice's account. and mint.</li>
-                        <li>pre: create bob's account. </li>
-                        <li>for 1: mk htmls </li>
-                        <li>for 2: transfer from browser.(create client, mint too.)  </li>
-                        <li>for 3: get transaction from browser.</li>
-                        <li>for 4: get transaction from server.</li>
-                        <li>for 5,6: instal EdDSA, sha3, WebSocket</li>
-                        <li>for 7: install QR for browser.</li>
-                        <li>for 8,9: Smile</li>
+                        <li>perfectmak/libra-core https://github.com/perfectmak/libra-core</li>
+                        <li>bandprotocol/libra-web https://github.com/bandprotocol/libra-web</li>
+                        <li>kulapio/libra-core(kulap-libra) https://github.com/kulapio/libra-core </li>
+                        <li>LibraVista https://www.libravista.com/</li>
                 </ul>
         </div>
 </section>
