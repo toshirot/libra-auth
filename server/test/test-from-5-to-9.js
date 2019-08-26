@@ -3,6 +3,7 @@
 const EdDSA = require('elliptic').eddsa;
 const ec = new EdDSA('ed25519');
 const assert = require('assert');
+const { SHA3 } = require('sha3');
 
 test()
 
