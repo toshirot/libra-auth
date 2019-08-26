@@ -206,21 +206,38 @@ function test(){
                 </code></pre>
         </div>
 </section>
-<h2>todos</h2>
+<h2>Thanx main dependence</h2>
 <section>
         <div>
+         <h4>for LIBRA</h4>
                 <ul>
-                        <li>pre: create alice's account. and mint.</li>
-                        <li>pre: create bob's account. </li>
-                        <li>for 1: mk htmls </li>
-                        <li>for 2: transfer from browser.(create client, mint too.)  </li>
-                        <li>for 3: get transaction from browser.</li>
-                        <li>for 4: get transaction from server.</li>
-                        <li>for 5,6: instal EdDSA, sha3, WebSocket</li>
-                        <li>for 7: install QR for browser.</li>
-                        <li>for 8,9: Smile</li>
+                        <li>perfectmak/libra-core https://github.com/perfectmak/libra-core</li>
+                        <li>bandprotocol/libra-web https://github.com/bandprotocol/libra-web</li>
+                        <li>kulapio/libra-core(kulap-libra) https://github.com/kulapio/libra-core </li>
+                        <li>LibraVista https://www.libravista.com/</li>
                 </ul>
         </div>
+        <div>
+        <h4>for Crypto</h4>
+                <ul>
+                        <li>indutny/elliptic https://github.com/indutny/elliptic</li>
+                        <li>phusion/node-sha3 https://github.com/phusion/node-sha3</li>
+                </ul>
+        </div>
+        <div>
+         <h4>for WebSocket</h4>
+                <ul>
+                        <li>websockets/ws https://github.com/websockets/ws</li>
+                </ul>
+        </div>
+         <div>
+         <h4>for Others</h4>
+                <ul>
+                        <li>davidshimjs/qrcodejs https://github.com/davidshimjs/qrcodejs</li>
+                        <li>jquery https://jquery.com/</li>
+                </ul>
+        </div>
+ 
 </section>
 </body>
 </html>
