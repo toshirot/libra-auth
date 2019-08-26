@@ -6,20 +6,23 @@
         <title>test transefer</title>
         <style>
         </style>
-        <script src="../js/libracore-b.js"></script>
+        <script src="../js/libra-core-b.js"></script>
     </head>
     <body>
  
         <script>
         'use strict';
-    console.log(libracore)
+
+      //  console.log(hoge)
+    console.log(libracore)// libracore is not defined
+    
         test()
     
         async function test(){
             
             //==============================================
             //  
-            const client = new LibraClient({ network: libracore.LibraNetwork.Testnet });
+            const client = new libracore.LibraClient({ network: libracore.LibraNetwork.Testnet });
 
             //On Browser
             /*

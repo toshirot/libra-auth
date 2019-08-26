@@ -13,7 +13,7 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
 
     const EdDSA = require('elliptic').eddsa
     const ec = new EdDSA('ed25519')
-    const assert = require('assert')
+    const { SHA3 } = require('sha3');
     const libracore =require('libra-core')
     const https = require('https')
     const WsServer = require('ws').Server
@@ -25,9 +25,20 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
 //-----------------------------------------------------------------------------
 
     //------------------------------------------------------------
-    // for LIBRA
-    const BOB_ADDRESS_HEX='b7c811fd8f488e9c41f03a2cc1671b3a65b4638806a2ad72c96109924bde8454'
+    // BOB
+    const BOB_ADDRESS_HEX='4fb5de5cf96588273ceab41ee1a807ea4efb0c6f8c08f10c2efc617175cea390'
+    const BOB_PRI_KEY_HEX='16253458330e54b08e3d492d200776d8af2d0367bbca4ca59df88985175a6069';
+    // Create key pair from secret
+    const BobPriKey = ec.keyFromSecret(BOB_PRI_KEY_HEX, 'hex');// hex string, array or Buffer
+    // const nemonic=["uncle", "grow", "purchase", "fury", "upper", "chalk", "venture", "evidence", "enrich", "margin", "gentle", "range", "seven", "route", "clip", "vehicle", "ticket", "lawn", "stuff", "hungry", "clap", "muffin", "choice", "such"]
+    // Import public key
+    const BOB_PUB_KEY_HEX = '6e6579f1f368f9a4ac6d20a11a7741ed44d1409a923fa9b213e0160d90aa0ecc';
+    const BobPubKey = ec.keyFromPublic(BOB_PUB_KEY_HEX, 'hex');
+    //------------------------------------------------------------
+    // ALICE
     let ALICE_ADDRESS_HEX='5ddea88879129cf59fd59fa82c3096c52e377e1bb258fe70672c016580ae9b89'
+    //------------------------------------------------------------
+    // LIBRA
     const CLIENT = new libracore.LibraClient({ network: libracore.LibraNetwork.Testnet });
     //unit of Libra
     const LIBRA_UNIT=1000000
@@ -45,8 +56,7 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
         ,key: fs.readFileSync(pemPath+'/privkey.pem')
     }
     const HB=JSON.stringify({type:'hb'})//heartbeat
-
-
+ 
     //test
 
 
@@ -55,18 +65,15 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
 // 
 //------------------------------------------------------------------------------
 
+
+
+    //------------------------------------------------------------
+    // start WebSocket Server
+
     // lets start
-    main ()
+    let wss=conn(port)
+    console.log('start wss', host, port, new Date())
 
-    function main (){
-
-        
-
-        //------------------------------------------------------------
-        // start WebSocket Server
-        let wss=conn(port)
-        console.log('start wss', host, port, new Date())
-    }
 
 //=============================================================================
 // WebSocket Operations
@@ -75,8 +82,8 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
 
     //------------------------------------------------------------
     // conn WebSocket
-    // @param port {Number}
-    // @return wss {Object} WebSocket
+    // @param port {number}
+    // @return wss {object} WebSocket
     function conn(port){
         let app = https.createServer(options, function (req, res) {
             res.writeHead(200, {'Content-Type': 'text/plain'})
@@ -107,6 +114,7 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
             )
             
             socket.on('message', function(msg) {
+                console.log('on message')
                 onmsg(msg, socket)
             })
             socket.on('close', function() {
@@ -122,7 +130,7 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
     }
     //------------------------------------------------------------
     // onmsg
-    // @param msg {String} received json stringified message
+    // @param msg {string} received json stringified message
     function onmsg(msg, socket){
 
         //parse
@@ -136,22 +144,23 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
         }
 
         //branch
+        console.log('received', received)
         if(!received)return
+        console.log('received.type', received.type)
         if(!received.type)return
+        console.log(received.data)
         if(received.type === 'addr'){
             if(!received.data)return
             //address
-            onReceivedAddress(received.data)
+            console.log(received.data)
+            onReceivedAddress(received.data, socket)
         } else if(received.type === 'sig'){
             if(!received.data)return
             //signeture 
-            onGetSigneture(received.data)
+            onGetSigneture(received.data, socket)
         } else if(received.type==='hb'){
             // Heartbeat response
-            if(socket.readyState===socket.OPEN){
-                console.log(5, 'hb', received)
-                socket.send(HB)
-            }
+            wssSend(socket, 'hb')
         } else {
             return
         }
@@ -160,27 +169,32 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
 
     //------------------------------------------------------------
     // wssSend send to client
-    // @param wss {Object} WebSocket instance
-    // @param oj {Object} The object to send
-    function wssSend(wss, oj){
-        if(!oj)return// e.g. oj = {"type":"sigs","body":{"msg":"...", "sig":"..."} }
-        if (wss.readyState===1) {
-            if(oj.type==='sigs'){
-                let data=JSON.stringify(oj)
-                wss.send(data)
-            }
-        } else {
+    // @param type {object} type e.g. 'hb'|'addr'|'sig'
+    // @param data {any} The object to send
+    function wssSend(socket, type, data){
+        if(socket.readyState!==1){
             delClient(socket, 'at wssSend')
+        } else {
+            if(type==='hb'){
+                socket.send(HB)
+            } else {
+                socket.send(
+                    JSON.stringify({
+                        type: type,
+                        data: data
+                    })
+                )
+            }
         }
     }
     //------------------------------------------------------------
     // delClient
-    // @param socket {Object} socket
+    // @param socket {object} socket
     function delClient(socket, at) {
         console.log('--to be del--: '
             , at
             , socket.readyState
-            , socket.client.ip
+            , socket.client
         )
         //socket.client.isAlive=false
         socket.client=null
@@ -195,77 +209,113 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
 
     //------------------------------------------------------------
     // Event executed when an address is received from the client
-    // @addrees {Number} libra addrees
-    // @return sequence{Number} last sequence number
-    function onReceivedAddress(addrees){
-        let sequence=getLastSequence(addrees)
+    // @addrees {number} libra addrees
+    // @return sequence{number} last sequence number
+    async function onReceivedAddress(addrees, socket){
 
+        //-------------------------------------------------
+        // 5) mk sigB
+
+        //get tx
+        // In this demo, Alice generates a new address every time, 
+        // so it is assumed that the sequence is 0. 
+        // At the time of implementation, 
+        // it is necessary to search for an appropriate tx.
+        let seq=0
+        const transaction = await CLIENT.getAccountTransaction(addrees, seq, false)
+        const publicKeyHex=buffer2hex(transaction.signedTransaction.publicKey)
+        const AlicePubKey = ec.keyFromPublic(publicKeyHex, 'hex')
+
+        // set to Notes for each client
+        socket.client.addrees=addrees
+        socket.client.pubkey=publicKeyHex
+
+        // mk Massage
+        const salt = 'my sweet salt'
+        const saltHash = (new SHA3(512)).update(salt).digest('hex')
+        const random = saltHash + Math.random().toString()
+        const msgHash = (new SHA3(512)).update(random).digest('hex')
+
+        // 5. BOB: sigB = BobPriKey.sign(msg)
+        const sigB= BobPriKey.sign(msgHash).toHex();
+
+        //-------------------------------------------------
+        // 6) BOB: Send sigB and msg to Alice by WebSocket. socket.send(sigB, msg)
+
+        wssSend(socket, 'sig', [sigB, msgHash])
+
+        
+        return
+        const sequence=getLastSequence(addrees, async function(val){
+            let sequence=+val.sequenceNumber
+
+            console.log('onReceivedAddress', addrees, sequence)
+
+
+
+                /*
+                .then((value) => {
+                    //if(callback)callback( value)
+                    console.log('value:',value)
+                }, (reason) => {
+                    console.log('error:',reason)
+                })*/
+        })
+        
         return
         findLastTxBobAndAlic(sequence, ALICE_ADDRESS_HEX)
         let pubKey=getPubKey(addrees, sequence)
         //BOB_ADDRESS_HEX   
     }
+    async function getTx2(client, addrees, sequence) {
+        const transaction = await client.getAccountTransaction(addr, sequence, false)
+        .then((value) => {
+            console.log(value)
+           // if(callback)callback( value)
+        }, (reason) => {
+            
+        console.log(reason)
+        })
+        //console.log(transaction.signedTransaction.publicKey)
+        //console.log(+transaction.signedTransaction.transaction.sequenceNumber)
+        
+        //console.log(JSON.stringify(transaction, null, 2))
+      }
+
     //------------------------------------------------------------
     // get accountState object
-    // @addrees {Number} libra addrees
+    // @addrees {number} libra addrees
     // @return accountState{Objecr} accountState
     function getAccountStat(addrees){
         return CLIENT.getAccountState(addrees)
     }
     //------------------------------------------------------------
     // get balance 
-    // @addrees {Number} libra addrees
+    // @addrees {number} libra addrees
     // @return accountState{Objecr} accountState
     function getBalance(accountState){
         return CLIENT.getAccountState(addrees)
     }
     //------------------------------------------------------------
     // 4) 最新のシークエンス番号を取得する
-    // @addrees {Number} libra addrees
-    // @return sequence{String} string of last sequence number
-    function getLastSequence(addrees){
-        const accountState = CLIENT.getAccountState(addrees)
-        return accountState.sequenceNumber.toString()
-    }
-    //------------------------------------------------------------
-    // 4) get transaction
-    // @addrees {Number} libra addrees
-    // @sequence{Number} sequence number
-    // @fetch_events{Bool} fetch event? true|false 
-    // @return {object} transaction
-    function getTx(addrees, sequence, fetch_events){
-        if(!fetch_events)fetch_events=false
-        //get tx from testnet by libra-core
-        return CLIENT.getAccountTransaction(addrees, sequence, fetch_events);
-        /* return transaction object
-            LibraSignedTransactionWithProof {
-            signedTransaction: LibraSignedTransaction {
-                transaction: LibraTransaction {
-                program: [Object],
-                gasContraint: [Object],
-                expirationTime: [BigNumber],
-                sendersAddress: [AccountAddress],
-                sequenceNumber: [BigNumber]
-                },
-                publicKey: Uint8Array [Array],
-                signature: Uint8Array [Array]
-            },
-            proof: {
-                wrappers_: { '1': [Object], '2': [Object] },
-                messageId_: undefined,
-                arrayIndexOffset_: -1,
-                array: [ [Array], [Array] ],
-                pivot_: 1.7976931348623157e+308,
-                convertedPrimitiveFields_: {}
-            },
-            events: undefined
-            }
-        */
+    // @addrees {number} libra addrees
+    // @return sequence{string} string of last sequence number
+    function getLastSequence(addrees, callback){
+        //const accountState = CLIENT.getAccountState(addrees)
+            CLIENT
+                .getAccountState(addrees)
+                .then((value) => {
+                    if(callback)callback( value)
+                }, (reason) => {
+                    console.log('error:',reason)
+                })
+        
+        
     }
     //------------------------------------------------------------
     // 4) seach last transaction from bob and alice address
-    // @sequence{Number} sequence number
-    // @clientAddr {Number} client Address
+    // @sequence{number} sequence number
+    // @clientAddr {number} client Address
     // @return {object} transaction
     function findLastTxBobAndAlic(sequence, clientAddr){
         let tx
@@ -278,13 +328,14 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
 
         return tx
     }
-
     //------------------------------------------------------------
-    // 4) pubKeyを取得する
-    // @transaction {object} transaction
-    // @return {String} pubKey 
-    function getPubKey(transaction){
-        return transaction.public_key
+    // buffer to hex
+    // @array{uint8array} array
+    // @return {string} hex
+    function buffer2hex(array) {
+        return Array.prototype.map.call(
+          new Uint8Array(array), x => ('00' + x.toString(16)
+        ).slice(-2)).join('')
     }
 
 //=============================================================================

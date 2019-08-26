@@ -127,6 +127,12 @@ body{
     padding-top: 0px;
 }
 
+#info{
+    margin: auto;
+    margin-top: 18px;
+    padding: 0px 24px;
+    width: 52.5%;
+}
 /* ========================================================
    loading spinner animated
    --------------------------------------------------------
