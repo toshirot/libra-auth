@@ -23,7 +23,7 @@ let key=getPubKeyOj(client, ADDRESS_HEX, sequence, function(pubkeyHex){
 async function getPubKeyOj(client, addr, sequence, callback) {
   const transaction = await client.getAccountTransaction(addr, sequence, false);
   const pubkeyHex=buffer2hex(transaction.signedTransaction.publicKey)
-  if(callback)callback(pubkeyHex)
+  //if(callback)callback(pubkeyHex)
 }
 
 function buffer2hex(buffer) {

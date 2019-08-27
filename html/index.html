@@ -13,11 +13,10 @@
         <script src="./js/kulap-libra-b.js"></script>
         <script src="./js/elliptic-b.js"></script>
         <script src="./js/qrcode.min.js"></script>
-        <!--script
+        <script
             src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
             integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8="
-            crossorigin="anonymous"></script-->>
-        <script src=https://code.jquery.com/jquery-3.4.1.js></script>
+            crossorigin="anonymous"></script>
         
     </head>
     <body>
@@ -103,7 +102,7 @@ $(function(){
     let   AliceAddressHex=''//made every time
     let   AliceAccountOj=null//made every time
     const BOB_ADDRESS_HEX='b7c811fd8f488e9c41f03a2cc1671b3a65b4638806a2ad72c96109924bde8454'
-    let   BobPubKey=null;//from LIBRA
+    let   BobPubKeyOj=null;//from LIBRA
     //unit of Libra
     const LIBRA_UNIT=1000000
     //The ticket price is 10 Libra
@@ -242,6 +241,12 @@ $(function(){
                 // buy
                 // 2) ALICE: Transffer Some Libra to BOB 
                 transfer(AliceAccountOj, BOB_ADDRESS_HEX, TICKET_PRICE, function(fromAddrOj){
+
+                    //-------------------------------------------------
+                    // 3) ALICE: get BOB's PublicKey from testnet transaction
+                    getBobPubKeyHex(function(BobPubKeyHex){
+                        BobPubKeyOj = ec.keyFromPublic(BobPubKeyHex, 'hex');
+                    })
                     
                     // get Address Hex of Alice
                     let senderAddrHex=Ticket.librawebBuffer.from(fromAddrOj.address.addressBytes).toString('hex') 
@@ -415,16 +420,35 @@ $(function(){
     //------------------------------------------------------------
     // 6) Event executed when an sigB is received from the server
     // @data {object} sigB and msg {type:'sig', data:[sigB, msgHash]}
-    async function onReceivedSigB(data, wss){
-        console.log('onReceivedSigB', data)
-        if(!data)return
-        const sigB=data[0]
-        const msgHash=data[1]
-        getPubKey(AliceAddressHex, function(BobPubKey){
+    function onReceivedSigB(data, wss){
+        if(!data.data)return
+        if(data.data.length!==2)return
+        const sigB=data.data[0]
+        const msgHash=data.data[1]
+        if(!chkDataSimple(sigB, msgHash))return
+        
+        if(!BobPubKeyOj){
             //-------------------------------------------------
-            // 6. ALICE: verify {bool} BobPubKey.verify(msg, sigB)
-            const res7 = BobPubKey.verify(msgHash, sigB)
-    
+            // 3) ALICE: get BOB's PublicKey from testnet transaction
+            getBobPubKeyHex(function(BobPubKeyHex){
+                BobPubKeyOj = ec.keyFromPublic(BobPubKeyHex, 'hex');
+
+                console.log('BobPubKeyOj 1', BobPubKeyOj)
+                console.log('msgHash, sigB', msgHash, sigB)
+                do6and7(BobPubKeyOj, msgHash, sigB)
+            })
+        } else {
+                console.log('BobPubKeyOj 2', BobPubKeyOj)
+                console.log('msgHash, sigB', msgHash, sigB)
+                do6and7(BobPubKeyOj, msgHash, sigB)
+        }
+        function do6and7(BobPubKeyOj, msgHash, sigB){
+            //-------------------------------------------------
+            // 6. ALICE: verify {bool} BobPubKeyOj.verify(msg, sigB)
+            const res7 = BobPubKeyOj.verify(msgHash, sigB)
+
+            console.log('res7', res7)
+
             //-------------------------------------------------
             // 7. ALICE: 
             if(res7===true){
@@ -433,7 +457,14 @@ $(function(){
             } else {
                 console.error('8. Error. verify(msg, sigB) is false.')
             }
-        })
+        }
+        function chkDataSimple(sigB, msgHash){
+            if(!sigB)return
+            if(!msgHash)return
+            if(sigB.length!==128)return
+            if(msgHash.length!==128)return
+            return true
+        } 
     }
 
 //=============================================================================
@@ -470,50 +501,49 @@ $(function(){
     function unitConversionToLibra(balance, decimalDigits){
         return (balance/LIBRA_UNIT).toFixed(decimalDigits)
     }
-
     //------------------------------------------------------------
-    // 3) get getPubKey
-    // @addrees {number} libra addrees
+    // 3) get BobPubKeyHex //In ths demo this response is Stub.
+
+    // In the future, if possible I really want to get to the official libra.org proxy that can be trusted directly from the browse
+    // Because i think there is a risk that such an important connection goes through a un offical proxy.
+
     // @callback{function} callback
-    function getPubKey(fromAddress, callback){
+    function getBobPubKeyHex(callback){
 
-        //for bobs tx
-        sequence=0
-        fetch_events=false
-
-        let url=`https://api-test.libexplorer.com/api?module=account&action=txlist&address=${BOB_ADDRESS_HEX}`
-        fetch(url, {
-            method: 'get',
-            mode: 'no-cors',
-            headers: {
-                "Content-Type": "application/json"
-                ,"sec-fetch-mode": "navigate"
-            }
-        }).then(data  => {
-            console.log(data)
-            let publicKey=seachSender(fromAddress, data)
-            if(callback)callback(publicKey)
-        }).catch(error => console.error(error))
-
-        //https://api-test.libexplorer.com/api?module=account&action=txlist&address=4debfa90ca96d014cecdc1ba71da0896c15e933740b1c632c1775c987f2ef4fb
-        function seachSender(fromAddress, data){
-            for(let i in data){
-                if(data[i].result.from===fromAddress){
-                    return data[i].result.publicKey
+        let url=`http://libra-auth.com:3000/api/pubkey/${BOB_ADDRESS_HEX}`
+        url='http://libra-auth.com:3000/api/pubkey/b7c811fd8f488e9c41f03a2cc1671b3a65b4638806a2ad72c96109924bde8454'
+        xhr = new XMLHttpRequest()
+        get()
+        function get() {
+            if (xhr) {
+                xhr.open('GET', url, true)
+               // xhr.setRequestHeader('X-PINGOTHER', 'pingpong')
+                xhr.withCredentials = true
+                xhr.onreadystatechange = function(){
+                    if(xhr.status===200){
+                        console.log('getBobPubKeyHex', xhr.responseText ) //e.g. {"type":"pubkey","key":"36506166e7e95d4bcffb2a23334df63f36d3e11aed5ad689524fb6f8d3e80ec2"}
+                        let res=JSON.parse(xhr.responseText)
+                        let publicKey=res.key
+                        console.log('publicKey', publicKey )
+                        if(!publicKey)return
+                        if(publicKey.length!==64)return
+                        if(callback)callback(publicKey)
+                    }
                 }
+                xhr.send(null)
             }
         }
+        /*
+        fetch(url, {
+                method: 'get',
+                mode: 'no-cors'
+            })
+            .then(data  => {
+                console.log('getBobPubKeyHex', data) //e.g. {"type":"pubkey","key":"36506166e7e95d4bcffb2a23334df63f36d3e11aed5ad689524fb6f8d3e80ec2"}
+                let publicKey=data.key
+                if(callback)callback(publicKey)
+            }).catch(error => console.error(error))*/
     }
-
-    //------------------------------------------------------------
-    // pre) clientを作る
-    // @return {string} addres hex
-    function createClient(){
-        let address=''
-
-        return address
-    }
-
     //------------------------------------------------------------
     // pre) onload時にここでは事前にmintで入金する
     // @address {number} libra address
@@ -553,15 +583,6 @@ $(function(){
     function getBalance(address, callback){
         getAccountState(address, function(value){
             if(callback)callback(value.balance)
-        })
-    }
-    //------------------------------------------------------------
-    // pre) get last sequenceNumber of address
-    // @address {string} target address
-    // @callback{function} callback
-    function getLastSequenceNumber(address, callback){
-        getAccountState(address, function(value){
-            if(callback)callback(value.sequenceNumber)
         })
     }
     //------------------------------------------------------------
@@ -663,87 +684,6 @@ $(function(){
         if(callback)callback(fromAddrOj)
     }
     //------------------------------------------------------------
-    // 3) 最新のシークエンス番号を取得する
-    // @addrees {number} libra addrees
-    // @return sequence{string} string of last sequence number
-    function getLastSequence(client, addrees){
-        const accountState = client.getAccountState(addrees)
-        return accountState.sequenceNumber.toString()
-    }
-    //------------------------------------------------------------
-    // 3) get transaction
-    // @addrees {number} libra addrees
-    // @sequence{number} sequence number
-    // @fetch_events{Bool} fetch event? true|false 
-    // @return {object} transaction
-    function getTx(addrees, sequence, fetch_events){
-        if(!fetch_events)fetch_events=false
-        //get tx from testnet by libra-core
-        return CLIENT.getAccountTransaction(addrees, sequence, fetch_events);
-        /* return transaction object
-            LibraSignedTransactionWithProof {
-            signedTransaction: LibraSignedTransaction {
-                transaction: LibraTransaction {
-                program: [Object],
-                gasContraint: [Object],
-                expirationTime: [BigNumber],
-                sendersAddress: [AccountAddress],
-                sequenceNumber: [BigNumber]
-                },
-                publicKey: Uint8Array [Array],
-                signature: Uint8Array [Array]
-            },
-            proof: {
-                wrappers_: { '1': [Object], '2': [Object] },
-                messageId_: undefined,
-                arrayIndexOffset_: -1,
-                array: [ [Array], [Array] ],
-                pivot_: 1.7976931348623157e+308,
-                convertedPrimitiveFields_: {}
-            },
-            events: undefined
-            }
-        */
-    }
-    //------------------------------------------------------------
-    // 3) seach last transaction from bob and alice address
-    // @sequence{number} sequence number
-    // @clientAddr {number} client Address
-    // @return {object} transaction
-    function findLastTxBobAndAlic(sequence, clientAddr){
-        let tx
-        for(let i=sequence;i<=0;i--){
-            tx=null; tx=getTx(alice, sequence, false)
-
-            //chk alice bob balance これで特定してよいか
-            console.log(getPubKey(transaction))
-        }
-
-        return tx
-    }
-    //------------------------------------------------------------
-    // 3) pubKeyを取得する
-    // @transaction {object} transaction 
-    // @return {string} pubKey Hex
-    function getPubKeyByTx(transaction){
-        return transaction.signedTransaction.publicKey
-    }
-    //------------------------------------------------------------
-    // 5) メッセージのハッシュを取得する
-    // @msg {string} message
-    // @return msg hash{string} msg hash by SHA3
-    function mkMsgHash(msg){
-        return  (new SHA3(512)).update(msg).digest('hex')
-    }
-    //------------------------------------------------------------
-    // 5)7) メッセージと秘密鍵絵でシグネチャを生成する
-    // @msg {string} message
-    // @prikey {string} Private key
-    // @return msg hash{string} msg hash by SHA3
-    function mkMsgHash(msg, prikey){
-        return prikey.sign(msg).toHex()
-    }
-    //------------------------------------------------------------
     // 5) WebSocketでsignatureとmassageを送る
     // @msg {string} message
     // @sig {string} signature
@@ -755,20 +695,10 @@ $(function(){
         wssSend('sig', data)
     }
     //------------------------------------------------------------
-    // 6)8) メッセージとシグネチャを公開鍵で検証する
-    // @msg {string} message
-    // @sig {string} signature
-    // @pubkey {string} Public key
-    // @return {bool} true|false
-    function mkMsgHash(msg, sig, pubkey){
-        //
-        return  pubkey.verify(msg, sig)
-    }
-    //------------------------------------------------------------
     // 7) QRコードを生成する
     // @sig {string} signature
     // @return qr {Image} QR png image for of sig
-    function mkMsgHash(sig){
+    function mkQR(sig){
         return  //qr
     }
 
