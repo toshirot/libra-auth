@@ -11,6 +11,11 @@ It is authentication based on the Libra client-key. But the communication betwee
 
 Make this. Client and server authentication work sample for ticket application using the libra-auth method.
 
+<h2>Demo</h2>
+<ul>
+<li><a href=http://libra-auth.com/sample-test-2019-08-28.html>http://libra-auth.com/sample-test-2019-08-28.html</a></li>
+</ul>
+<br>
 
 <a href="https://kabuda.net/test/libra/libra-auth/doc/libra-auth-en.html"><img src=https://kabuda.net/test/libra/libra-auth/img/libra-auth.png></a>
 
