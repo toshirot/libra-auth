@@ -360,7 +360,6 @@ $(function(){
     // @wss {object} WebSocket instance
     // @msg {string} stringifyd json message
     function onmsg(wss, msg){
-        //console.log(0, msg.data, wss, msg)
         if(!wss)return
         if(!msg)return
         if(!msg.data)return
@@ -371,10 +370,9 @@ $(function(){
             if(data.type==='hb'){
                 //hb
             } else if(data.type==='sig'){
-                console.log(3, data)
                 onReceivedSigB(data, wss)
             } else {
-                console.log(4, data)
+               
             }
         } catch(e){ 
             console.error('err', e, data)
@@ -386,7 +384,7 @@ $(function(){
         let wss_arry=Ticket.conn.wss_arry
         //del all wss object
         for(var i=0;i<wss_arry.length;i++){  
-            console.log(i
+            if(debug)console.log(i
                 , 'deleted wss'
                 , (wss_arry[i].op.uid||'')
                 ,new Date()
@@ -432,30 +430,22 @@ $(function(){
             // 3) ALICE: get BOB's PublicKey from testnet transaction
             getBobPubKeyHex(function(BobPubKeyHex){
                 BobPubKeyOj = ec.keyFromPublic(BobPubKeyHex, 'hex');
-
-                console.log('BobPubKeyOj 1', BobPubKeyOj)
-                console.log('msgHash, sigB', msgHash, sigB)
                 do6and7(BobPubKeyOj, msgHash, sigB)
             })
         } else {
-                console.log('BobPubKeyOj 2', BobPubKeyOj)
-                console.log('msgHash, sigB', msgHash, sigB)
                 do6and7(BobPubKeyOj, msgHash, sigB)
         }
         function do6and7(BobPubKeyOj, msgHash, sigB){
             //-------------------------------------------------
             // 6. ALICE: verify {bool} BobPubKeyOj.verify(msg, sigB)
             const res7 = BobPubKeyOj.verify(msgHash, sigB)
-
-            console.log('res7', res7)
-
             //-------------------------------------------------
             // 7. ALICE: 
             if(res7===true){
-                console.info('8. OK. verify(msg, sigB) is true.',)
+                if(debug)console.info('8. OK. verify(msg, sigB) is true.',)
                 
             } else {
-                console.error('8. Error. verify(msg, sigB) is false.')
+                if(debug)console.error('8. Error. verify(msg, sigB) is false.')
             }
         }
         function chkDataSimple(sigB, msgHash){
@@ -521,10 +511,9 @@ $(function(){
                 xhr.withCredentials = true
                 xhr.onreadystatechange = function(){
                     if(xhr.status===200){
-                        console.log('getBobPubKeyHex', xhr.responseText ) //e.g. {"type":"pubkey","key":"36506166e7e95d4bcffb2a23334df63f36d3e11aed5ad689524fb6f8d3e80ec2"}
+                         //e.g. {"type":"pubkey","key":"36506166e7e95d4bcffb2a23334df63f36d3e11aed5ad689524fb6f8d3e80ec2"}
                         let res=JSON.parse(xhr.responseText)
                         let publicKey=res.key
-                        console.log('publicKey', publicKey )
                         if(!publicKey)return
                         if(publicKey.length!==64)return
                         if(callback)callback(publicKey)
@@ -533,16 +522,6 @@ $(function(){
                 xhr.send(null)
             }
         }
-        /*
-        fetch(url, {
-                method: 'get',
-                mode: 'no-cors'
-            })
-            .then(data  => {
-                console.log('getBobPubKeyHex', data) //e.g. {"type":"pubkey","key":"36506166e7e95d4bcffb2a23334df63f36d3e11aed5ad689524fb6f8d3e80ec2"}
-                let publicKey=data.key
-                if(callback)callback(publicKey)
-            }).catch(error => console.error(error))*/
     }
     //------------------------------------------------------------
     // pre) onload時にここでは事前にmintで入金する
