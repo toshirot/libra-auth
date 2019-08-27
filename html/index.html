@@ -9,14 +9,15 @@
 
         </style>
         <script src="./js/libraweb-v2.js"></script>
-        <!--script src="./js/libracore-b.js"></script-->
+        <script src="./js/libra-core-b.js"></script>
         <script src="./js/kulap-libra-b.js"></script>
         <script src="./js/elliptic-b.js"></script>
         <script src="./js/qrcode.min.js"></script>
-        <script
+        <!--script
             src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
             integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8="
-            crossorigin="anonymous"></script>
+            crossorigin="anonymous"></script-->>
+        <script src=https://code.jquery.com/jquery-3.4.1.js></script>
         
     </head>
     <body>
@@ -62,6 +63,8 @@
     <script>
 
 $(function(){
+
+    let debug=true
 
 // Eventually the libraweb code will be Hide from window object later.
 
@@ -110,7 +113,7 @@ $(function(){
     //host for mint
     const DEFAULT_FAUCET_HOST='faucet.testnet.libra.org'
     //protocol for mint. http or https
-    const DEFAULT_FAUCET_PROTOCOL='http'
+    const DEFAULT_FAUCET_PROTOCOL='http' //Currently you must post it via http "DEFAULT_FAUCET_PROTOCOL" instead of https. 2019-08-27
     //default libra explorer url
     const LIBRA_EXPLORER='https://www.libravista.com/address'
     let   GET_BALANCE_TIMER=1000
@@ -174,13 +177,10 @@ $(function(){
         AliceAccountOj=getNewAccountOj(newWallet)
         // set alice address
         AliceAddressHex=getNewAddressHex(AliceAccountOj)
-        console.log(AliceAddressHex)
-        // mint some Libra to Allice "TICKET_PRICE*2"
+        // mint some Libra to Allice "TICKET_PRICE*2"  //Currently you must post it via http "DEFAULT_FAUCET_PROTOCOL" instead of https. 2019-08-27
         doMint(AliceAddressHex, FIRST_MINT_FOR_ALICE)
-        // show new balance of AliceAddressHex on the testnet
-        getAliceBalanceInterval(FIRST_MINT_FOR_ALICE, function(balance){
-            // chked mint 
-        })
+        // get new balance of AliceAddressHex on the testnet, and show it
+        getAliceBalanceInterval(FIRST_MINT_FOR_ALICE)
         //------------------------------------------------------------
         // set Event Buy Button
         setBuyButtonEvent()
@@ -211,6 +211,15 @@ $(function(){
         </div>
         <div class=yourbalance><span>Your Balance: </span>${balance}</div>`
     }
+    //------------------------------------------------------------
+    // Show alice addr and balance
+    // @AliceAddressHex {string} AliceAddressHex
+    // @balance {number} Alice's balance
+    function showAliceAddrAndBalance(AliceAddressHex, balance){
+        // show of balance
+        let _balance=unitConversionToLibra(balance, 2) +' LIBRA'
+        $('#balance-box').html(mkClientProfeel(AliceAddressHex, _balance))
+    }
 
 //=============================================================================
 // Dom Event operations
@@ -231,6 +240,7 @@ $(function(){
             let okbuy=checkConfirm(M_DO_YOU_BUY_CONFIRM)
             if(okbuy){
                 // buy
+                // 2) ALICE: Transffer Some Libra to BOB 
                 transfer(AliceAccountOj, BOB_ADDRESS_HEX, TICKET_PRICE, function(fromAddrOj){
                     
                     // get Address Hex of Alice
@@ -241,9 +251,12 @@ $(function(){
                         balance=+accountState.balance.toString()
                         if(typeof balance==='number'){
                             $('#buy-button-box').html('2 lets go chk tx aaa')
+                            //1) send alice address to bob
                             wssSend('addr', AliceAddressHex)
+                            // stop Interval
                             clearInterval(GET_BALANCE_TIMER)
-                            $('#balance-box').html(mkClientProfeel(AliceAddressHex, balance))
+                            // show addr and balance
+                            showAliceAddrAndBalance(AliceAddressHex, balance)
                         }
                     })
                 })
@@ -310,7 +323,6 @@ $(function(){
         }
 
         let wss = new WebSocket(url, op.protocol)
-        console.log(Ticket.conn, Ticket.conn.wss_arry)
         Ticket.conn.wss_arry.push(wss)
         wss.op=op
         wss.on = function (type, fnc){
@@ -350,7 +362,7 @@ $(function(){
         let data
         try{
             data = JSON.parse(msg.data);
-            console.log(111,data.type, data)
+            if(debug)console.log('onmsg:', data.type, data)
             if(data.type==='hb'){
                 //hb
             } else if(data.type==='sig'){
@@ -450,6 +462,16 @@ $(function(){
 // 
 //-----------------------------------------------------------------------------
 
+    //------------------------------------------------------------
+    // unit Conversion To Libra
+    // @balance {number} libra balance
+    // @decimalDigits {number} Decimal digits
+    // @return {String} LIBRA
+    function unitConversionToLibra(balance, decimalDigits){
+        return (balance/LIBRA_UNIT).toFixed(decimalDigits)
+    }
+
+    //------------------------------------------------------------
     // 3) get getPubKey
     // @addrees {number} libra addrees
     // @callback{function} callback
@@ -465,6 +487,7 @@ $(function(){
             mode: 'no-cors',
             headers: {
                 "Content-Type": "application/json"
+                ,"sec-fetch-mode": "navigate"
             }
         }).then(data  => {
             console.log(data)
@@ -505,9 +528,9 @@ $(function(){
         fetch(url, {
             method: 'post',
             mode: 'no-cors'
-        }).then(data  => 
-            console.log(data)
-        ).catch(error => console.error(error))
+        }).then(data  => {
+            //
+        }).catch(error => console.error(error))
 
         function chkInput(){
             //simple check input
@@ -588,9 +611,8 @@ $(function(){
                     clearInterval(GET_BALANCE_TIMER)
                     if(callback)callback(balance)
                 }
-                // message of balance
-                let _balance=(balance/LIBRA_UNIT).toFixed(2)+' LIBRA'
-                $('#balance-box').html(mkClientProfeel(AliceAddressHex, _balance))
+                // show addr and balance
+                showAliceAddrAndBalance(AliceAddressHex, balance)
             })
         }
     }

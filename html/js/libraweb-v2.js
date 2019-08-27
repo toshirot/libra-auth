@@ -1709,7 +1709,6 @@ module.exports = function isBuffer (obj) {
      * v {number|string|BigNumber} A numeric value.
      * [b] {number} The base of v. Integer, 2 to ALPHABET.length inclusive.
      */
-    window.BigNumber=BigNumber//★
     function BigNumber(v, b) {
       var alphabet, c, caseChanged, e, i, isNum, len, str,
         x = this;
@@ -33134,7 +33133,6 @@ class AccountAddress {
         return length === Addresses_1.default.AddressLength * 2;
     }
     static isValidBytes(addressBytes) {
-      console.log(addressBytes.length ,  Addresses_1.default.AddressLength)//★
         return addressBytes.length === Addresses_1.default.AddressLength;
     }
     static default() {
@@ -33144,7 +33142,6 @@ class AccountAddress {
         return new AccountAddress(Uint8Array.from(Buffer.from(addressHex, 'hex')));
     }
     constructor(hash) {
-      console.log('hash', hash)//★
         if (!AccountAddress.isValidBytes(hash)) {
             throw new Error(`The address is of invalid length [${hash.length}]`);
         }
@@ -46275,7 +46272,6 @@ class LibraTransaction {
         this.program = program;
         this.gasContraint = gasConstraint;
         this.expirationTime = new bignumber_js_1.default(expirationTime);
-        console.log('sendersAddress',sendersAddress)//★
         this.sendersAddress = new libra_web_account_1.AccountAddress(sendersAddress);
         this.sequenceNumber = new bignumber_js_1.default(sequenceNumber);
     }
