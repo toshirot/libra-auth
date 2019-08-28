@@ -1,10 +1,54 @@
 const EdDSA = require('elliptic').eddsa;
 const ec = new EdDSA('ed25519');
 const libracore =require('libra-core')
+const fs = require('fs');
+const http = require('http');
+const https = require('https');
 const express = require('express');
 const app = express();
-app.use(express.json());
 
+
+
+//=============================================================================
+// data
+// 
+//-----------------------------------------------------------------------------
+
+    //------------------------------------------------------------
+    // for LIBRA
+
+    //unit of Libra
+    const LIBRA_UNIT=1000000
+    //The ticket price is 10 Libra
+    const TICKET_PRICE=10*LIBRA_UNIT//10*1000000 is 10 Libra
+    //First mint for Alice
+    const FIRST_MINT_FOR_ALICE=TICKET_PRICE*2
+    //host for mint
+    const DEFAULT_FAUCET_HOST='faucet.testnet.libra.org'
+    //protocol for mint. http or https
+    const DEFAULT_FAUCET_PROTOCOL='http' //Currently you must post it via http "DEFAULT_FAUCET_PROTOCOL" instead of https. 2019-08-27
+
+//=============================================================================
+// https
+// 
+//-----------------------------------------------------------------------------
+
+    const host='libra-auth.com'
+    const pemPath='/etc/myletsencrypt/live/'+host
+    const options = {
+        cert: fs.readFileSync(pemPath+'/fullchain.pem')
+        ,key: fs.readFileSync(pemPath+'/privkey.pem')
+    }
+    const server = https.createServer(options,app);
+    const port = process.env.PORT || 3000;
+    server.listen(port, () => console.log(`Listening on port ${port}...`));
+
+//=============================================================================
+// express
+// 
+//-----------------------------------------------------------------------------
+
+app.use(express.json());
 // 
 app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Origin', req.headers.origin);
@@ -25,8 +69,19 @@ app.get('/', (req, res) => {
     res.send('Simple REST API');
 });
 
-app.get('/api/pubkey/:addr', (req, res) => {
+app.get('/api/faucet-testnet/:addr', (req, res) => {
 
+    console.log('ADDRESS_HEX', req.params.addr)
+       // res.send(JSON.stringify({type:'faucet',res:'ok'}));
+    doMint(res, req.params.addr, FIRST_MINT_FOR_ALICE, function(res2){
+        res2.send(JSON.stringify({type:'mint', body:'ok'}));
+    })
+    //res.send(JSON.stringify({type:'mint', body:'ok'}));
+});
+
+app.get('/api/pubkey/:addr', (req, res) => {
+    
+    console.log('ADDRESS_HEX', req.params.addr)
     // Stub for test
     let pubkeyHex='6e6579f1f368f9a4ac6d20a11a7741ed44d1409a923fa9b213e0160d90aa0ecc'
     res.send(JSON.stringify({type:'pubkey',key:pubkeyHex}));
@@ -41,8 +96,13 @@ app.get('/api/pubkey/:addr', (req, res) => {
     });
 });
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`Listening on port ${port}...`));
+
+
+
+//=============================================================================
+// functions
+// 
+//-----------------------------------------------------------------------------
 
 async function getPubKeyOj(client, addr, sequence, callback) {
     const transaction = await client.getAccountTransaction(addr, sequence, false);
@@ -54,4 +114,42 @@ function buffer2hex(buffer) {
     return Array.prototype.map.call(
     new Uint8Array(buffer), x => ('00' + x.toString(16)
     ).slice(-2)).join('')
+}
+
+//------------------------------------------------------------
+// mintで入金する
+// @address {number} libra address
+function doMint(res2, address, amount, callback){
+
+    const host=DEFAULT_FAUCET_HOST
+    const protocol=DEFAULT_FAUCET_PROTOCOL
+
+    const url=`${protocol}://${host}?amount=${amount}&address=${address}`
+
+    const options = {
+        host: host,
+        method: "POST"
+    };
+    console.log('url', url)
+    const req = http.request(url, options, res => {
+         
+        //console.log(`STATUS: ${res.statusCode}`);
+        //console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
+        res.setEncoding('utf8');
+        res.on('data', (chunk) => {
+            //console.log(`BODY: ${chunk}`);
+        });
+        res.on('end', () => {
+            //console.log('No more data in response.');
+            if(callback)callback(res2)
+        });
+    });
+    
+    req.on('error', (e) => {
+        console.error(`problem with request: ${e.message}`);
+    });
+    
+    // Write data to request body
+    //req.write('');
+    req.end();
 }

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset=utf-8>
+        <meta name=viewport content="width=device-width, initial-scale=1">
+        <title>Ticket Center</title>
+        <link rel="stylesheet" href="./css/main.css?2">
+        <style>
+
+        </style>
+        <script src="./js/libraweb-v2.js"></script>
+        <script src="./js/kulap-libra-b.js"></script>
+        <script src="./js/elliptic-b.js"></script>
+        <script src="./js/jsQR.js"> </script>
+        <script
+            src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+            crossorigin="anonymous"></script>
+        
+    </head>
+    <body>
+        <header>
+            <div style="position:absolute;bottom:12px;left:12px;">
+                <nav>
+                        v2019-08-28-00
+                </nav>
+            </div>
+        </header>
+        <div id=contents>
+            <section>
+                <img class=logo alt="libra logo" src="./img/libra.png">
+            </section>    
+            <header>
+                <div class=header>
+                        <h2>Load User's QR Ticket　</h2>
+                        　
+                </div>
+            </header>    
+            <section>
+                <div id=load-button-box></div>
+            </section>    
+            <section>
+                <div id=video-box>
+
+                    
+                    Read and authenticate QR code.<br>
+                    <div id="loadingMessage">🎥 Press the QR button</div>
+                    <canvas id="canvas" hidden></canvas>
+                    <div id="output" hidden>
+                        <div id="outputMessage">No QR code detected.</div>
+                        <div ><b>Data:</b> <span id="outputData"></span></div>
+                    </div>
+                    <form>
+                        <input type=text id="addr" value="" placeholder="Enter the address here"><br>
+                        <button id=btn class="btn-readqr ">Or read QR</button>
+            
+                    </form>
+                           
+                </div>
+            </section>   
+
+            <footer>Bob's Ticket Center
+                <div id=info>
+                    <aside>  
+                    ●<br>  
+
+                    </aside>
+                </div>
+                <div id=powerd>
+                    <nav>
+                        powerd by <a href="https://github.com/toshirot/libra-auth">libra-auth method</a>
+                    </nav>
+                </div>
+            </footer>
+        </div>
+        
+    </body>
+
+    <script>
+
+$(function(){
+
+    let debug=true
+
+// Eventually the libraweb code will be Hide from window object later.
+
+//=============================================================================
+// main object
+// 
+//-----------------------------------------------------------------------------
+
+    //------------------------------------------------------------
+    // Object for Ticket Demo with Libra Auth method
+    //
+    // Thanx: libraweb loaded by libraweb-v2.js is browserified 
+    // bandifycol/libra-web and perfectmak/libra-core.
+    // Alice's client is connected to proxy ac-libra-testnet.kulap.io in kulapio/libra-core.
+    let Ticket={
+         libraweb: window.libraweb//Hide from window later
+        ,librawebBuffer: window.librawebBuffer//Hide from window later
+        ,conn: {
+            wss_arry: []
+            ,wss: null
+            ,wsNonStopFlg:true
+        }//for WebSocket
+        ,clickevt: 'ontouchstart' in window ? 'touchstart' : 'click'
+    };
+
+//=============================================================================
+// data
+// 
+//-----------------------------------------------------------------------------
+
+    //------------------------------------------------------------
+    // for DOM
+
+    //loading html
+    const LOADING_HTML='<div class="loader">Loading...</div>'
+    //load button
+    const LOAD_BUTTON_HTML=
+        `<form>
+            <button id=btn-load class="btn">Load QR</button>
+        </form>`
+    const DISABLE_VIDEO_MSG='Unable to access video stream (please make sure you have a webcam enabled)'
+    //video box
+    const VIDEO_HTML=
+        ``
+
+    window.REQUEST_ID=null //cancel AnimationFrame
+
+    const video = document.createElement("video");
+    const canvasElement = document.getElementById("canvas");
+    const canvas = canvasElement.getContext("2d");
+    const loadingMessage = document.getElementById("loadingMessage");
+    const outputContainer = document.getElementById("output");
+    const outputMessage = document.getElementById("outputMessage");
+    const outputData = document.getElementById("outputData");
+
+
+    
+            var addr=document.getElementById("addr");
+            var btn= document.getElementById("btn");
+
+//=============================================================================
+// main 
+// 
+//-----------------------------------------------------------------------------
+
+    // lets start
+    main ()
+
+    //------------------------------------------------------------
+    // Works at onload
+    function main (){
+        // make load QR button
+        mkHtml('#load-button-box', LOAD_BUTTON_HTML)
+        $('#balance-box')
+           .hide()
+           .html(VIDEO_HTML)
+           .fadeIn()
+        //------------------------------------------------------------
+        // set Event Load Button
+        setLoadButtonEvent()
+
+    }
+
+//=============================================================================
+// Dom operations
+// 
+//-----------------------------------------------------------------------------
+
+    //------------------------------------------------------------
+    // pre) mk html
+    // @targetElm {string} selector for jquery e.g. '#hoge'
+    // @html {string} html
+    function mkHtml(targetElm, html){
+        $(targetElm).html(html)
+    }
+
+//=============================================================================
+// Dom Event operations
+// 
+//-----------------------------------------------------------------------------
+
+
+    //------------------------------------------------------------
+    // 9) BOB: if 8th is true then login is OK.
+    //
+    function setLoadButtonEvent(){
+        $('#btn-load').bind(Ticket.clickevt, function(){
+            event.preventDefault()
+            doTick()
+        })
+    }
+//=============================================================================
+// Video operations
+// 
+//-----------------------------------------------------------------------------
+
+    function drawLine(begin, end, color) {
+      canvas.beginPath();
+      canvas.moveTo(begin.x, begin.y);
+      canvas.lineTo(end.x, end.y);
+      canvas.lineWidth = 4;
+      canvas.strokeStyle = color;
+      canvas.stroke();
+    }
+
+    function doTick(){
+        
+        // Use facingMode: environment to attemt to get the front camera on phones
+        navigator.mediaDevices.getUserMedia({ video: { 
+            facingMode: "environment"
+        } })
+        .then(function(stream) {
+            video.srcObject = stream;
+            video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
+            video.play();
+            window.cancelAnimationFrame(window.REQUEST_ID)
+            window.REQUEST_ID=requestAnimationFrame(tick);
+        });
+    }
+
+
+    function tick() {
+      loadingMessage.innerText = "⌛ Loading video..."
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        loadingMessage.hidden = true;
+        canvasElement.hidden = false;
+        outputContainer.hidden = false;
+
+        canvasElement.height =  $('#video-box').width()//video.videoHeight;
+        canvasElement.width = $('#video-box').width()//video.videoWidth;
+
+        canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+        var imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+        var code = jsQR(imageData.data, imageData.width, imageData.height)//, {
+        //  inversionAttempts: "dontInvert",
+        //});
+        if (code) {
+          drawLine(code.location.topLeftCorner, code.location.topRightCorner, "#FF3B58");
+          drawLine(code.location.topRightCorner, code.location.bottomRightCorner, "#FF3B58");
+          drawLine(code.location.bottomRightCorner, code.location.bottomLeftCorner, "#FF3B58");
+          drawLine(code.location.bottomLeftCorner, code.location.topLeftCorner, "#FF3B58");
+          outputMessage.hidden = true;
+          outputData.parentElement.hidden = false;
+          outputData.innerText += '-'+code.data;
+console.log(typeof code.data)
+console.log( code.data.length)
+
+          clearAnimationFrame()
+          
+        } else {
+          outputMessage.hidden = false;
+          loadingMessage.innerText =DISABLE_VIDEO_MSG
+          //outputData.parentElement.hidden = true;
+        }
+      }
+      
+      if(window.REQUEST_ID!==null)window.REQUEST_ID=requestAnimationFrame(tick);
+      
+    }
+
+    function clearAnimationFrame(){
+        window.cancelAnimationFrame(window.REQUEST_ID)
+        window.REQUEST_ID=null
+    }
+})
+    </script>
+</html>

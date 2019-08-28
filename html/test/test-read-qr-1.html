@@ -1,0 +1,267 @@
+
+<html>
+        <head>
+          <meta charset="utf-8">
+          <title>register member</title>
+          <script src="../js/jsQR.js"> </script>
+          <link href="https://fonts.googleapis.com/css?family=Ropa+Sans" rel="stylesheet">
+          <style>
+            body {
+              font-family: 'Ropa Sans', sans-serif;
+              color: #333;
+              max-width: 640px;
+              margin: 0 auto;
+              position: relative;
+            }
+        
+            #githubLink {
+              position: absolute;
+              right: 0;
+              top: 12px;
+              color: #2D99FF;
+            }
+        
+            h1 {
+              margin: 10px 0;
+              font-size: 40px;
+            }
+        
+
+        
+            #canvas {
+              width: 100%;
+            }
+        
+        
+            #noQRFound {
+              text-align: center;
+            }
+
+
+
+
+            body{
+            margin:12px;
+        }
+        #contents {
+            width: 100%;
+            text-align: center;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            margin: 0;
+            padding: 0;
+            border: 0;
+        }
+        .header img.logo{
+            width: 12%;
+        }
+        .header h2{
+            margin: 0;
+            padding: 0;
+            border: 0;
+            font-size: 38px;
+        }
+
+        #register{
+            margin-top: 12px;
+            padding:12px 4px;
+            border: 12px solid #ddd;
+        }
+        .plus{
+            position:relative;
+            top:0;
+            left:0;
+            width: 48px;
+
+        }
+
+        #loadingMessage {
+            text-align: center;
+            padding: 28px;
+            margin: 12px;
+            background-color: #eee;
+        }
+
+        #addr{
+            width: 500px;
+            color: #000;
+            background-color: #ccc;
+            padding: 4px;
+            margin: 12px 0px;
+            font-family: "Courier New", Consolas, monospace;
+            text-align: center;
+
+        }
+        #btn{
+          margin-top: 12px;
+          min-width: 150px;
+          max-width: 250px;
+          padding: 4px 8px;
+          
+          font-size: 28px;
+          font-family: 'Ropa Sans', sans-serif;
+          transition: border-color 0.4s, color 0.4s;
+          transition-timing-function: cubic-bezier(0.2, 1, 0.3, 1);
+        }
+        .btn-readqr{
+          background: #39298C;
+          color: #fff;
+          border: 1px solid #555;
+        }
+        .btn-signup{
+          background: rgba(129, 0, 0, 0.699);
+          color: #fff;
+          border: 1px solid rgb(136, 22, 22);
+        }
+
+          </style>
+        </head>
+        <body>
+
+          <div id=contents>
+                <section>
+                    <div class="header" id="header">
+                        <img class=logo src="./img/libra.png">
+                        <h2>register member</h2>
+                        
+                    </div>
+                </section>    
+                <section>
+                    <div class="register" id="register">
+                        
+                        <img class="plus" src="img/plus-ccc.png"><br>
+                        Input the address or read the QR code of the member to be authenticated.
+                        <div id="loadingMessage">🎥 Unable to access video stream (please make sure you have a webcam enabled)</div>
+                        <canvas id="canvas" hidden></canvas>
+
+                        <form>
+                            <input type=text id="addr" value="" placeholder="Enter the address here"><br>
+                            <button id=btn class="btn-readqr ">Or read QR</button>
+                
+                        </form>
+                    </div>
+                </section>
+                <section>
+                    <div id=lists>
+
+                    </div>
+                </section>
+                </div>
+          <script>
+            var video = document.createElement("video");
+            var canvasElement = document.getElementById("canvas");
+            var canvas = canvasElement.getContext("2d");
+            var loadingMessage = document.getElementById("loadingMessage");
+            var addr=document.getElementById("addr");
+            var btn= document.getElementById("btn");
+            var lists= document.getElementById("lists");
+
+            var listAry=[];
+
+            var rectBorderColor="red";
+
+            addr.addEventListener("keyup", function(){
+                event.preventDefault();
+                
+                if(this.value.length!==64)return;
+                
+            });
+
+            btn.addEventListener("click", function(){
+                event.preventDefault();
+                canvasElement.hidden = false;
+                
+            });
+
+        
+            function drawLine(begin, end, color) {
+              canvas.beginPath();
+              canvas.moveTo(begin.x, begin.y);
+              canvas.lineTo(end.x, end.y);
+              canvas.lineWidth = 4;
+              canvas.strokeStyle = color;
+              canvas.stroke();
+            }
+        
+            // Use facingMode: environment to attemt to get the front camera on phones
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(function(stream) {
+              video.srcObject = stream;
+              video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
+              video.play();
+              requestAnimationFrame(tick);
+            });
+        
+            function tick() { 
+              loadingMessage.innerText = "⌛ Loading video..."
+              if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                loadingMessage.hidden = true;
+
+                canvasElement.height = video.videoHeight;
+                canvasElement.width = video.videoWidth;
+                canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+                var imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+
+                var code = jsQR(imageData.data, imageData.width, imageData.height, {
+                  inversionAttempts: "attemptBoth",//"dontInvert",
+                });
+
+                
+                if (code) {
+
+console.log(code)
+console.log(code.data)
+console.log(code.toString())
+                  drawLine(code.location.topLeftCorner, code.location.topRightCorner, rectBorderColor);
+                  drawLine(code.location.topRightCorner, code.location.bottomRightCorner, rectBorderColor);
+                  drawLine(code.location.bottomRightCorner, code.location.bottomLeftCorner, rectBorderColor);
+                  drawLine(code.location.bottomLeftCorner, code.location.topLeftCorner, rectBorderColor);
+                  if(listAry.indexOf(code.data)!==-1){
+                    return false;
+                  }
+                  
+                  listAry.push(code.data)
+                  
+                  addr.value = code.data;
+                  //info.innerText = code.data;
+                  alert(code.data);
+                  createList( code.data);
+                  signup();
+                } else {
+
+
+                }
+              }
+              requestAnimationFrame(tick);
+            }
+
+            function createList(data){
+
+              lists.innerHTML+=data+'<hr>'
+
+            }
+
+            function signup(){
+              btn.innerHTML='Sign up this?';
+              btn.setAttribute('class', 'btn-signup')
+
+            }
+
+                        /*
+                  let topLeft = code.location.topLeftCorner
+                  let topRight = code.location.topRightCorner 
+                  let bottomRight = code.location.bottomRightCorner 
+                  let bottomLef = code.location.bottomLeftCorner 
+
+                  drawLine(topLeftr, topRight, "red");
+                  drawLine(topRight, topRight, "red");
+                  drawLine(topRight, bottomLef, "red");
+                  drawLine(bottomLef, topLeftr, "red");
+            */
+          </script>
+
+
+ 
+
+
+        </body>
+        </html>
