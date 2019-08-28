@@ -29,7 +29,7 @@ app.get('/api/pubkey/:addr', (req, res) => {
 
     // Stub for test
     let pubkeyHex='6e6579f1f368f9a4ac6d20a11a7741ed44d1409a923fa9b213e0160d90aa0ecc'
-    res.send(JSON.stringify({type: 'pubkey', key: pubkeyHex}));
+    res.send(JSON.stringify({type:'pubkey',key:pubkeyHex}));
 
     return 
     let ADDRESS_HEX=req.params.addr
