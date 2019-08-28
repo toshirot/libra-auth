@@ -13,9 +13,6 @@ Make this. Client and server authentication work sample for ticket application u
 
 <img src=https://libra-auth.com/img/doc/libra-auth-2019-08-29-01.png> 
 
-<h2>document for method</h2>
-<li>English: <a href="https://kabuda.net/test/libra/libra-auth/doc/doc-en.html">https://kabuda.net/test/libra/libra-auth/doc/doc-en.html</a></li>
-<li>Japanese: <a href="https://kabuda.net/test/libra/libra-auth/doc/doc-ja.html">https://kabuda.net/test/libra/libra-auth/doc/doc-ja.html</a></li>
 <h2>flow</h2>
 
 <section>
