@@ -46,7 +46,9 @@ if(res6){
 } </pre>
                         </li>
                         <li>BOB:  find sigB from DB by Address, and Verify the "sigB" and "sigA" by Alice's Public Key. <br>
-e.g.<pre class=eg>{bool}  AlicePubKey.verify(sigB, sigA) </pre>
+e.g.<pre class=eg>
+find sigB from DB by Address
+{bool}  AlicePubKey.verify(sigB, sigA) </pre>
                         </li>
                         <li>BOB:  if 8th is true then login is OK.<br>
 e.g.<pre class=eg>
@@ -178,7 +180,7 @@ function test(){
                 let sigA; 
                 if(res6){
                         sigA = AlicePriKey.sign(sigB)
-                        mkQR([sigB, Address])
+                        //mkQR([sigB, Address])
                 } else {
                         //goto 1
                 }
