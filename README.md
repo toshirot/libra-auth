@@ -21,7 +21,7 @@ Make this. Client and server authentication work sample for ticket application u
 <section>
         <div>
                 <ol>
-                        <li>ALICE: Tap or Click [ Entry Button ]</li>
+                        <li>ALICE: Tap or Click [ Entry Button ] send address each other</li>
                         <li>ALICE: Transffer Some Libra to BOB</li>
                         <li>ALICE: get BOB's PublicKey from testnet transaction</li>
                         <li>BOB:   get ALICE's PublicKey from testnet transaction</li>
@@ -30,6 +30,7 @@ Make this. Client and server authentication work sample for ticket application u
 e.g.<pre class=eg>
 msg = (new SHA3(512)).update('msg hello').digest('hex');
 sigB = BobPriKey.sign(msg).toHex();
+insert sigB and address to DB
 wss.send(sigB, msg) </pre>
                         </li>
                         <li>ALICE: Verify by Bob's Public Key the "sigB" and the msg that were received.<br>
@@ -39,11 +40,12 @@ e.g.<pre class=eg>{bool} BobPubKey.verify(msg, sigB)</pre>
 e.g.<pre class=eg>
 if(res6){
         sigA = AlicePriKey.sign(sigB)
+        mkQR([sigB, Address])
 } else {
         //goto 1
 } </pre>
                         </li>
-                        <li>BOB:  Verify the "sigB" and "sigA" by Alice's Public Key. <br>
+                        <li>BOB:  find sigB from DB by Address, and Verify the "sigB" and "sigA" by Alice's Public Key. <br>
 e.g.<pre class=eg>{bool}  AlicePubKey.verify(sigB, sigA) </pre>
                         </li>
                         <li>BOB:  if 8th is true then login is OK.<br>
@@ -176,6 +178,7 @@ function test(){
                 let sigA; 
                 if(res6){
                         sigA = AlicePriKey.sign(sigB)
+                        mkQR([sigB, Address])
                 } else {
                         //goto 1
                 }
