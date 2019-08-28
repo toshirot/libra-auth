@@ -4,7 +4,7 @@
         <meta charset=utf-8>
         <meta name=viewport content="width=device-width, initial-scale=1">
         <title>Ticket Center</title>
-        <link rel="stylesheet" href="./css/main.css?2">
+        <link rel="stylesheet" href="./css/main.css?3">
         <style>
 
         </style>
@@ -20,9 +20,10 @@
     </head>
     <body>
         <header>
-            <div style="position:absolute;bottom:12px;left:12px;">
+            <div id="btn-menu" style="position:absolute;top:12px;left:12px;">
                 <nav>
-                        v2019-08-28-00
+                    <img src='./img/menu-icon-36.jpg'>
+                    <div id="menu" style="display: none;"></div>
                 </nav>
             </div>
         </header>
@@ -33,7 +34,7 @@
             <header>
                 <div class=header>
                         <h2>Load User's QR Ticket　</h2>
-                        　
+                        　Read the Ticket of QR code and authenticate.
                 </div>
             </header>    
             <section>
@@ -41,29 +42,21 @@
             </section>    
             <section>
                 <div id=video-box>
-
-                    
-                    Read and authenticate QR code.<br>
-                    <div id="loadingMessage">🎥 Press the QR button</div>
+                    <div id="loadingMessage">🎥 Press the Load QR button</div>
                     <canvas id="canvas" hidden></canvas>
                     <div id="output" hidden>
                         <div id="outputMessage">No QR code detected.</div>
                         <div ><b>Data:</b> <span id="outputData"></span></div>
                     </div>
-                    <form>
-                        <input type=text id="addr" value="" placeholder="Enter the address here"><br>
-                        <button id=btn class="btn-readqr ">Or read QR</button>
-            
-                    </form>
                            
                 </div>
             </section>   
 
-            <footer>Bob's Ticket Center
+            <footer>
                 <div id=info>
                     <aside>  
                     ●<br>  
-
+                    <strong>Bob's Ticket Center</strong>
                     </aside>
                 </div>
                 <div id=powerd>
@@ -121,10 +114,13 @@ $(function(){
         `<form>
             <button id=btn-load class="btn">Load QR</button>
         </form>`
-    const DISABLE_VIDEO_MSG='Unable to access video stream (please make sure you have a webcam enabled)'
+    const DISABLE_VIDEO_MSG='🎥 Unable to access video stream (please make sure you have a webcam enabled)'
     //video box
-    const VIDEO_HTML=
-        ``
+    const MENU_HTML=
+        `<li><a href="./index.html">Home</a></li>
+         <hr><li><a href="./buy-ticket.html">Buy Ticket</a></li>
+         <hr><li><a href="./auth-ticket.html">Auth Ticket</a></li>
+        `
 
     window.REQUEST_ID=null //cancel AnimationFrame
 
@@ -135,11 +131,6 @@ $(function(){
     const outputContainer = document.getElementById("output");
     const outputMessage = document.getElementById("outputMessage");
     const outputData = document.getElementById("outputData");
-
-
-    
-            var addr=document.getElementById("addr");
-            var btn= document.getElementById("btn");
 
 //=============================================================================
 // main 
@@ -152,12 +143,17 @@ $(function(){
     //------------------------------------------------------------
     // Works at onload
     function main (){
+        mkHtml('#menu', '')
         // make load QR button
         mkHtml('#load-button-box', LOAD_BUTTON_HTML)
         $('#balance-box')
            .hide()
-           .html(VIDEO_HTML)
+           .html('')
            .fadeIn()
+
+        //------------------------------------------------------------
+        // set Event Menu Button
+        setMenuButtonEvent()   
         //------------------------------------------------------------
         // set Event Load Button
         setLoadButtonEvent()
@@ -174,7 +170,7 @@ $(function(){
     // @targetElm {string} selector for jquery e.g. '#hoge'
     // @html {string} html
     function mkHtml(targetElm, html){
-        $(targetElm).html(html)
+        return $(targetElm).html(html)
     }
 
 //=============================================================================
@@ -182,6 +178,14 @@ $(function(){
 // 
 //-----------------------------------------------------------------------------
 
+    //------------------------------------------------------------
+    // pre) Set Menu Event.
+    //
+    function setMenuButtonEvent(){
+        $('#btn-menu').bind(Ticket.clickevt, function(){
+            mkHtml('#menu', MENU_HTML).fadeToggle()
+        })
+    }
 
     //------------------------------------------------------------
     // 9) BOB: if 8th is true then login is OK.
@@ -218,7 +222,11 @@ $(function(){
             video.play();
             window.cancelAnimationFrame(window.REQUEST_ID)
             window.REQUEST_ID=requestAnimationFrame(tick);
-        });
+        })
+        .catch(function(e){
+            console.log(e)
+            loadingMessage.innerText = DISABLE_VIDEO_MSG
+        })
     }
 
 

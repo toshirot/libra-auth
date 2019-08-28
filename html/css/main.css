@@ -37,7 +37,7 @@ body{
     padding: 0;
     border: 0;
     font-size: 38px;
-    line-height: 0.9;
+    line-height: 1;
 }
 
 .btn{
@@ -156,6 +156,22 @@ body{
    auth page
    --------------------------------------------------------
 */
+#menu{
+    margin-top: -15px;
+    display: block;
+    background: rgba(220, 220, 220, 0.8);
+    padding: 12px;
+    position: relative;
+    left: 12px;
+    list-style: none;
+}
+#menu li a{
+    text-decoration: none;
+}
+#menu hr{
+    margin: 8px 0px;
+    width: 150px;
+}
 #load-button-box{
     margin-top: 12px;
     width: 180px;

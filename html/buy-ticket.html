@@ -13,16 +13,17 @@
         <script src="./js/elliptic-b.js"></script>
         <script src="./js/qrcode.min.js"> </script>
         <script
-            src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-            integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8="
+            src="https://code.jquery.com/jquery-3.4.1.min.js?1"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
             crossorigin="anonymous"></script>
         
     </head>
     <body>
         <header>
-            <div style="position:absolute;bottom:12px;left:12px;">
+            <div id="btn-menu" style="position:absolute;top:12px;left:12px;">
                 <nav>
-                        v2019-08-28-00
+                    <img src='./img/menu-icon-36.jpg'>
+                    <div id="menu" style="display: none;"></div>
                 </nav>
             </div>
         </header>
@@ -132,6 +133,13 @@ $(function(){
     //------------------------------------------------------------
     // for DOM
 
+    //menu box
+    const MENU_HTML=
+        `<li><a href="./index.html">Home</a></li>
+         <hr><li><a href="./buy-ticket.html">Buy Ticket</a></li>
+         <hr><li><a href="./auth-ticket.html">Auth Ticket</a></li>
+        `
+
     //loading html
     const LOADING_HTML='<div class="loader">Loading...</div>'
     //buy button
@@ -157,7 +165,7 @@ $(function(){
         </form>`
     //------------------------------------------------------------
     // for MESSAGE
-    const M_DO_YOU_BUY_CONFIRM='Do you want to buy a ticket? The Cost is Libra 20.'
+    const M_DO_YOU_BUY_CONFIRM='Do you want to buy a ticket? The Cost is 10 Libra.'
 
     //------------------------------------------------------------
     // for WebSocket
@@ -193,6 +201,9 @@ $(function(){
         // get new balance of AliceAddressHex on the testnet, and show it
         getAliceBalanceInterval(FIRST_MINT_FOR_ALICE)
         //------------------------------------------------------------
+        // set Event Menu Button
+        setMenuButtonEvent()
+        //------------------------------------------------------------
         // set Event Buy Button
         setBuyButtonEvent()
         //------------------------------------------------------------
@@ -210,7 +221,7 @@ $(function(){
     // @targetElm {string} selector for jquery e.g. '#hoge'
     // @html {string} html
     function mkHtml(targetElm, html){
-        $(targetElm).html(html)
+        return $(targetElm).html(html)
     }
     //------------------------------------------------------------
     // pre) clientプロフィールのHTMLを作る
@@ -237,7 +248,14 @@ $(function(){
 // 
 //-----------------------------------------------------------------------------
 
-
+    //------------------------------------------------------------
+    // pre) Set Menu Event.
+    //
+    function setMenuButtonEvent(){
+        $('#btn-menu').bind(Ticket.clickevt, function(){
+            mkHtml('#menu', MENU_HTML).fadeToggle()
+        })
+    }
     //------------------------------------------------------------
     // 1) Works at click or tap Buy Button
     //
@@ -245,8 +263,7 @@ $(function(){
         $('#btn-buy').bind(Ticket.clickevt, function(){
             event.preventDefault()
             // some codes for click or tap
-            $(this).css({background: '#bbb'})
-
+            $(this).css({background:'cyan'})
             //chk do you buy?
             let okbuy=checkConfirm(M_DO_YOU_BUY_CONFIRM)
             if(okbuy){
@@ -297,16 +314,25 @@ $(function(){
         $('.btn-get-nemonic').bind(Ticket.clickevt, function(){
             event.preventDefault()
             // make output-nemonic area
-            mkHtml('#get-nemonic-box', OUTPUT_NEMONIC_HTML)
+            let box=mkHtml('#get-nemonic-box', OUTPUT_NEMONIC_HTML)
+            if(Ticket.clickevt==='touchstart'){
+                box.height(58)
+                   .css({'padding-bottom': '18px'})
+                $('.outout-nemonic-bar').height(32)
+                $('#info').css({'margin-top': '100px'})
+            }
             $('#outout-nemonic-area').html(newWallet.getMnemonic().toString())
 
             //------------------------------------------------------------
             // copy the textarea to clipboard
             $('#btn-copy-text').bind(Ticket.clickevt, function(){
                 event.preventDefault()
+                $(this).css({background:'cyan'})
                 let textarea = document.getElementById("outout-nemonic-area")
                 // select all text
                 textarea.select()
+                $(textarea).css({background:'#ddd'})
+                $(textarea).attr('readonly', true)
                 // copy
                 document.execCommand("copy")
             })
@@ -314,6 +340,7 @@ $(function(){
             // close nemonic box
             $('#btn-close-nemonic').bind(Ticket.clickevt, function(){
                 event.preventDefault()
+                $(this).css({background:'cyan'})
                 mkHtml('#get-nemonic-box', GET_NEMONIC_HTML)
                 setExprtNemonicEvent(newWallet)
                 //$('.btn-get-nemonic').trigger(Ticket.clickevt);
@@ -493,7 +520,7 @@ $(function(){
     function setQR(targetElm, text){
         $(targetElm).css({
             width: 128*1.6
-            ,height: 128*1.6
+            ,height: 128*1.6 + ((Ticket.clickevt==='touchstart')?18:18)
             ,border: '1px solid #888'
             //,padding:  ((128*1.6)-128)/2
             ,margin:'auto'

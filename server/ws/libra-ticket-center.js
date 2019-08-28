@@ -35,9 +35,6 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
     const BOB_PUB_KEY_HEX = '6e6579f1f368f9a4ac6d20a11a7741ed44d1409a923fa9b213e0160d90aa0ecc';
     const BobPubKey = ec.keyFromPublic(BOB_PUB_KEY_HEX, 'hex');
     //------------------------------------------------------------
-    // ALICE
-    let ALICE_ADDRESS_HEX='5ddea88879129cf59fd59fa82c3096c52e377e1bb258fe70672c016580ae9b89'
-    //------------------------------------------------------------
     // LIBRA
     const CLIENT = new libracore.LibraClient({ network: libracore.LibraNetwork.Testnet });
     //unit of Libra
@@ -246,28 +243,6 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
 
         wssSend(socket, 'sig', [sigB, msgHash])
 
-        
-        return
-        const sequence=getLastSequence(addrees, async function(val){
-            let sequence=+val.sequenceNumber
-
-            console.log('onReceivedAddress', addrees, sequence)
-
-
-
-                /*
-                .then((value) => {
-                    //if(callback)callback( value)
-                    console.log('value:',value)
-                }, (reason) => {
-                    console.log('error:',reason)
-                })*/
-        })
-        
-        return
-        findLastTxBobAndAlic(sequence, ALICE_ADDRESS_HEX)
-        let pubKey=getPubKey(addrees, sequence)
-        //BOB_ADDRESS_HEX   
     }
     async function getTx2(client, addrees, sequence) {
         const transaction = await client.getAccountTransaction(addr, sequence, false)
@@ -278,11 +253,7 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
             
         console.log(reason)
         })
-        //console.log(transaction.signedTransaction.publicKey)
-        //console.log(+transaction.signedTransaction.transaction.sequenceNumber)
-        
-        //console.log(JSON.stringify(transaction, null, 2))
-      }
+    }
 
     //------------------------------------------------------------
     // get accountState object

@@ -4,17 +4,25 @@
         <meta charset=utf-8>
         <meta name=viewport content="width=device-width, initial-scale=1">
         <title>Bob's Ticket Center</title>
-        <link rel="stylesheet" href="./css/main.css">
+        <link rel="stylesheet" href="./css/main.css?1">
         <style>
 
         </style>
         <script
-            src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-            integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8="
+            src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
             crossorigin="anonymous"></script>
         
     </head>
     <body>
+        <header>
+            <div id="btn-menu" style="position:absolute;top:12px;left:12px;">
+                <nav>
+                    <img src='./img/menu-icon-36.jpg'>
+                    <div id="menu" style="display: none;"></div>
+                </nav>
+            </div>
+        </header>
         <div id=contents>
             <section>
                 <img class=logo alt="libra logo" src="./img/libra.png">
@@ -60,5 +68,83 @@
     </body>
 
     <script>
+//=============================================================================
+// main object
+// 
+//-----------------------------------------------------------------------------
+
+    //------------------------------------------------------------
+    // Object for Ticket Demo with Libra Auth method
+    //
+    // Thanx: libraweb loaded by libraweb-v2.js is browserified 
+    // bandifycol/libra-web and perfectmak/libra-core.
+    // Alice's client is connected to proxy ac-libra-testnet.kulap.io in kulapio/libra-core.
+    let Ticket={
+         libraweb: window.libraweb//Hide from window later
+        ,librawebBuffer: window.librawebBuffer//Hide from window later
+        ,conn: {
+            wss_arry: []
+            ,wss: null
+            ,wsNonStopFlg:true
+        }//for WebSocket
+        ,clickevt: 'ontouchstart' in window ? 'touchstart' : 'click'
+    };
+
+//=============================================================================
+// data
+// 
+//-----------------------------------------------------------------------------
+
+    //------------------------------------------------------------
+    // for DOM
+
+    //menu box
+    const MENU_HTML=
+        `<li><a href="./index.html">Home</a></li>
+         <hr><li><a href="./buy-ticket.html">Buy Ticket</a></li>
+         <hr><li><a href="./auth-ticket.html">Auth Ticket</a></li>
+        `
+//=============================================================================
+// main 
+// 
+//-----------------------------------------------------------------------------
+
+    // lets start
+    main ()
+
+    //------------------------------------------------------------
+    // Works at onload
+    function main (){
+        //------------------------------------------------------------
+        // set Event Menu Button
+        setMenuButtonEvent()
+    }
+
+//=============================================================================
+// Dom operations
+// 
+//-----------------------------------------------------------------------------
+
+    //------------------------------------------------------------
+    // pre) mk html
+    // @targetElm {string} selector for jquery e.g. '#hoge'
+    // @html {string} html
+    function mkHtml(targetElm, html){
+        return $(targetElm).html(html)
+    }
+
+//=============================================================================
+// Dom Event operations
+// 
+//-----------------------------------------------------------------------------
+
+    //------------------------------------------------------------
+    // pre) Set Menu Event.
+    //
+    function setMenuButtonEvent(){
+        $('#btn-menu').bind(Ticket.clickevt, function(){
+            mkHtml('#menu', MENU_HTML).fadeToggle()
+        })
+    }
     </script>
 </html>
