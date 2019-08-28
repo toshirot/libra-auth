@@ -4,14 +4,14 @@
         <meta charset=utf-8>
         <meta name=viewport content="width=device-width, initial-scale=1">
         <title>Ticket Center</title>
-        <link rel="stylesheet" href="./css/main.css">
+        <link rel="stylesheet" href="./css/main.css?1">
         <style>
 
         </style>
         <script src="./js/libraweb-v2.js"></script>
         <script src="./js/kulap-libra-b.js"></script>
         <script src="./js/elliptic-b.js"></script>
-        <script src="./js/jsQR.js"> </script>
+        <script src="./js/qrcode.min.js"> </script>
         <script
             src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
             integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8="
@@ -493,7 +493,7 @@ $(function(){
     function setQR(targetElm, text){
         $(targetElm).css({
             width: 128*1.6
-            ,height: 128*1.75
+            ,height: 128*1.6
             ,border: '1px solid #888'
             //,padding:  ((128*1.6)-128)/2
             ,margin:'auto'

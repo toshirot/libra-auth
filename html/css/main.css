@@ -68,6 +68,7 @@ body{
 }
 
 #buy-button-box{
+    box-sizing: border-box;
     margin-top: 12px;
     width: 180px;
     height: 48px;
@@ -75,6 +76,7 @@ body{
     margin: auto;
 }
 #buy-button-box img{
+  box-sizing: border-box;
   margin: auto;
   margin-top: 18px;
 }
