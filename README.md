@@ -233,6 +233,7 @@ function test(){
          <h4>for Others</h4>
                 <ul>
                         <li>davidshimjs/qrcodejs https://github.com/davidshimjs/qrcodejs</li>
+                        <li>cozmo/jsQR https://github.com/cozmo/jsQR</li>
                         <li>jquery https://jquery.com/</li>
                 </ul>
         </div>
