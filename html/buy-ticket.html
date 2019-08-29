@@ -195,8 +195,13 @@ $(function(){
         AliceAccountOj=getNewAccountOj(newWallet)
         // set alice address
         AliceAddressHex=getNewAddressHex(AliceAccountOj)
-        // mint some Libra to Allice "TICKET_PRICE*2"  //Currently you must post it via http "DEFAULT_FAUCET_PROTOCOL" instead of https. 2019-08-27
-        //doMint(AliceAddressHex, FIRST_MINT_FOR_ALICE)
+        // mint some Libra to Allice "TICKET_PRICE*2"  
+        //
+        // Currently 2019-08-27 We must post it via http "DEFAULT_FAUCET_PROTOCOL" instead of https. 
+        // We cannot call "faucet.testnet.libra.org" from within the https page.
+        // because it is Mixed Content.
+        // https://github.com/libra/libra/issues/517#issuecomment-524166059
+        // In this Demo, i use Proxy.
         doMint(AliceAddressHex, FIRST_MINT_FOR_ALICE, PROXY_FAUCET_HOST, PROXY_FAUCET_PROTOCOL)
         // get new balance of AliceAddressHex on the testnet, and show it
         getAliceBalanceInterval(FIRST_MINT_FOR_ALICE)
