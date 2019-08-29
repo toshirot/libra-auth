@@ -26,7 +26,7 @@ Make this. Client and server authentication work sample for ticket application u
                         <li>ALICE: get BOB's PublicKey from testnet transaction</li>
                         <li>BOB:   get ALICE's PublicKey from testnet transaction</li>
                         <li>BOB:   Make the "sigB" by the msg hash and  Bob's Private Key.<br>
-                                And upsert sigB and address to DB<br>
+                                And upsert sigB, address to DB<br>
                                 And send "sigB" and msg to Alice by WebSocket. <br>
 e.g.<pre class=eg>
 msg = (new SHA3(512)).update('msg hello').digest('hex');
