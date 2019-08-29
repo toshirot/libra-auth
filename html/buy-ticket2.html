@@ -229,7 +229,7 @@ $(function(){
         return $(targetElm).html(html)
     }
     //------------------------------------------------------------
-    // pre) clientプロフィールのHTMLを作る
+    // pre) mk client html for balance and address
     // @return {string} html
     function mkClientProfeel(AliceAddressHex, balance){
         return `
@@ -254,7 +254,7 @@ $(function(){
 //-----------------------------------------------------------------------------
 
     //------------------------------------------------------------
-    // pre) Set Menu Event.
+    // pre) Set Menu Event
     //
     function setMenuButtonEvent(){
         $('#btn-menu').bind(Ticket.clickevt, function(){
@@ -262,8 +262,8 @@ $(function(){
         })
     }
     //------------------------------------------------------------
+    // pre) Set Buy Event
     // 1) Works at click or tap Buy Button
-    //
     function setBuyButtonEvent(){
         $('#btn-buy').bind(Ticket.clickevt, function(){
             event.preventDefault()
@@ -313,8 +313,8 @@ $(function(){
         })
     }
     //------------------------------------------------------------
-    // Works at click or tap Get nemonic Button
-    //
+    // Set nemonic Button
+    // Works at click and get nemonic text
     function setExprtNemonicEvent(newWallet){
         $('.btn-get-nemonic').bind(Ticket.clickevt, function(){
             event.preventDefault()
@@ -358,8 +358,9 @@ $(function(){
 // 
 //-----------------------------------------------------------------------------
 
+    // set the WebSocket
     let wss=wssLibraAuth('wss://wss.libra-auth.com:8888/')
-    window.wss=wss//
+
     //------------------------------------------------------------
     // pre) Connect with WebSocket
     // @url {string} target wss Server
@@ -423,6 +424,10 @@ $(function(){
             return 
         }
     }
+
+    //------------------------------------------------------------
+    // stop WebSocket
+    // for stop manually WebSocket, in dev console, do window.wssDelAll()
     window.wssDelAll=wssDelAll
     function wssDelAll(callback) {
         let wss_arry=Ticket.conn.wss_arry
