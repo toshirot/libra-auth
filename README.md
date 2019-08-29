@@ -21,7 +21,7 @@ Make this. Client and server authentication work sample for ticket application u
 <section>
         <div>
                 <ol>
-                        <li>ALICE: Tap or Click [ Entry Button ] send address each other</li>
+                        <li>ALICE: Tap or Click [ Buy ] Button. And send address each other</li>
                         <li>ALICE: Transffer Some Libra to BOB</li>
                         <li>ALICE: get BOB's PublicKey from testnet transaction</li>
                         <li>BOB:   get ALICE's PublicKey from testnet transaction</li>
