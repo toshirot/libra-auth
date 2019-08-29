@@ -226,6 +226,7 @@ function test(){
                         <li>bandprotocol/libra-web https://github.com/bandprotocol/libra-web</li>
                         <li>kulapio/libra-core(kulap-libra) https://github.com/kulapio/libra-core </li>
                         <li>LibraVista https://www.libravista.com/</li>
+                        <li>browserify/browserify https://github.com/browserify/browserify</li>
                 </ul>
         </div>
         <div>
