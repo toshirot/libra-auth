@@ -26,11 +26,12 @@ Make this. Client and server authentication work sample for ticket application u
                         <li>ALICE: get BOB's PublicKey from testnet transaction</li>
                         <li>BOB:   get ALICE's PublicKey from testnet transaction</li>
                         <li>BOB:   Make the "sigB" by the msg hash and  Bob's Private Key.<br>
+                                And upsert sigB and address to DB<br>
                                 And send "sigB" and msg to Alice by WebSocket. <br>
 e.g.<pre class=eg>
 msg = (new SHA3(512)).update('msg hello').digest('hex');
 sigB = BobPriKey.sign(msg).toHex();
-insert sigB and address to DB
+upsert sigB and address to DB
 wss.send(sigB, msg) </pre>
                         </li>
                         <li>ALICE: Verify by Bob's Public Key the "sigB" and the msg that were received.<br>
@@ -45,7 +46,8 @@ if(res6){
         //goto 1
 } </pre>
                         </li>
-                        <li>BOB:  find sigB from DB by Address, and Verify the "sigB" and "sigA" by Alice's Public Key. <br>
+                        <li>BOB:  find sigB from DB by Address, <br>
+                         and Verify the "sigB" and "sigA" by Alice's Public Key. <br>
 e.g.<pre class=eg>
 find sigB from DB by Address
 {bool}  AlicePubKey.verify(sigB, sigA) </pre>
