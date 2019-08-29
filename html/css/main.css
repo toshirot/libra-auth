@@ -69,36 +69,37 @@ body{
 
 #buy-button-box{
     box-sizing: border-box;
-    margin-top: 12px;
-    width: 180px;
+    width: 256px;
     height: 48px;
-    max-width:180px;
+    max-width:256px;
     margin: auto;
+    margin-top: 12px;
 }
 #buy-button-box img{
   box-sizing: border-box;
   margin: auto;
-  margin-top: 18px;
+  margin-top: 5px;
 }
 
 #showTicket{
+  box-sizing: border-box;
   position: relative;
   top: 0;
   left: 0;
-  width: auto;
+  width: 256px;
   background: #280080;
   color: #fff;
   line-height: 1.2;
-  padding: 4px;
+  padding: 12px;
   font-weight: 900;
 }
 
 #balance-box{
-    margin-top: 48px;
-    font-size: 0.5em;
+  margin-top: 60px;
+  font-size: 0.5em;
 }
 #balance-box span{
-    font-weight: 900;
+  font-weight: 900;
 }
 #balance-box  .youraddr{
   margin-left: -10px;
@@ -174,16 +175,23 @@ body{
 }
 #load-button-box{
     margin-top: 12px;
-    width: 180px;
+    width: 200px;
     height: 48px;
-    max-width:180px;
+    max-width:200px;
     margin: auto;
+}
+#scan-qr{
+  margin-right: 8px;
+  width: 30px;
+  height: 30px;
+  vertical-align: sub;
 }
 
 #btn-load{
     background: #000;
     color: #fff;
     border: 1px solid #000;;
+    min-width: 210px;
 }
 #btn-load:hover {
     transition: 0.5s;

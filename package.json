@@ -4,7 +4,9 @@
   "description": "An authentication method using Libra's Public Key and Secret Key. ",
   "main": "index.js",
   "dependencies": {
+    "express": "^4.17.1",
     "libra-core": "^1.0.7",
+    "mongoose": "^5.6.11",
     "ws": "^7.1.2"
   },
   "devDependencies": {},

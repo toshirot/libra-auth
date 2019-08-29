@@ -18,6 +18,7 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
     const https = require('https')
     const WsServer = require('ws').Server
     const fs = require("fs")
+    const modelLibraAuth = require('schma-libra-auth').modelLibraAuth //mongoDB
 
 //=============================================================================
 // data
@@ -157,6 +158,11 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
             if(!received.data)return
             //signeture 
             onGetSigneture(received.data, socket)
+
+        } else if(received.type === 'qr'){
+            if(!received.data)return
+            //verify 
+            onGetQRSigneture(received.data, socket)
         } else if(received.type==='hb'){
             // Heartbeat response
             wssSend(socket, 'hb')
@@ -209,7 +215,7 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
     //------------------------------------------------------------
     // Event executed when an address is received from the client
     // @addrees {number} libra addrees
-    // @return sequence{number} last sequence number
+    // @socket {object} wss client
     async function onReceivedAddress(addrees, socket){
 
         //-------------------------------------------------
@@ -220,6 +226,7 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
         // so it is assumed that the sequence is 0. 
         // At the time of implementation, 
         // it is necessary to search for an appropriate tx.
+
         let seq=0
         const transaction = await CLIENT.getAccountTransaction(addrees, seq, false)
         const publicKeyHex=buffer2hex(transaction.signedTransaction.publicKey)
@@ -238,23 +245,57 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
         // 5. BOB: sigB = BobPriKey.sign(msg)
         const sigB= BobPriKey.sign(msgHash).toHex();
 
+        // 5. upsert sigB and address to DB
+        setAddrSigB(modelLibraAuth, addrees, sigB)
+
         //-------------------------------------------------
-        // 6) BOB: Send sigB and msg to Alice by WebSocket. socket.send(sigB, msg)
+        // 5) BOB: Send sigB and msg to Alice by WebSocket. socket.send(sigB, msg)
 
         wssSend(socket, 'sig', [sigB, msgHash])
 
     }
-    async function getTx2(client, addrees, sequence) {
-        const transaction = await client.getAccountTransaction(addr, sequence, false)
-        .then((value) => {
-            console.log(value)
-           // if(callback)callback( value)
-        }, (reason) => {
-            
-        console.log(reason)
-        })
-    }
+    //------------------------------------------------------------
+    // Event executed when an QR sigA is received from the client
+    // @data {object} {"addr":"...", "sigA":"..."}
+    // @socket {object} wss client
+    async function onGetQRSigneture(data, socket){
 
+        //parse
+        try {
+            data = JSON.parse(data)
+        } catch (e) {
+            console.log('JSONparse err:', data)
+            return
+        }
+        let msg=''
+        console.log(data)
+        console.log('typeof', typeof data)
+        console.log('addr', data.addr)
+        console.log('sigA', data.sigA)
+        if(!data.addr){msg='error 001'}
+        if(!data.sigA){msg='error 002'}
+        if(data.addr.length!==64){msg='error 003'}
+        if(data.sigA.length!==128){msg='error 004'}
+        let seq=0
+        const transaction = await CLIENT.getAccountTransaction(data.addr, seq, false)
+        const publicKeyHex=buffer2hex(transaction.signedTransaction.publicKey)
+        const AlicePubKeyOj = ec.keyFromPublic(publicKeyHex, 'hex')
+        findByAddress(modelLibraAuth, data.addr, function(res){
+            console.log('findByAddress', res)
+            const res9 = AlicePubKeyOj.verify(res.sigB, data.sigA)
+            console.log('res9', res9)
+
+            //-------------------------------------------------
+            // 9) BOB: Send responce
+            if(res9){
+                wssSend(socket, 'res', 'OK')
+            } else {
+                wssSend(socket, 'res', 'NG')
+            }
+            
+        })
+        
+    }
     //------------------------------------------------------------
     // get accountState object
     // @addrees {number} libra addrees
@@ -311,6 +352,72 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
         ).slice(-2)).join('')
     }
 
+//=============================================================================
+// DB  operations
+// 
+//-----------------------------------------------------------------------------
+
+    //------------------------------------------------------------
+    // set upsert Address and SigB
+    //
+    function setAddrSigB(model, addr, sigB, callback){
+        let item={ 
+            "addr": addr
+            ,"sigB": sigB
+            ,"utaime":  (new Date()).getTime()
+        };    
+        upsertAddrSigB(model, item, callback)
+    }
+
+    //------------------------------------------------------------
+    // Upsert Address and SigB
+    //
+    function upsertAddrSigB(model, item, callback) {
+        if (typeof item !== 'object') return;
+        model.updateOne(
+            {
+                addr: item.addr,
+            },
+            item,
+            {upsert: true, useNewUrlParser: true},
+            function(err) {
+                if (err) {
+                    //console.log('upsertAddrSigB: err');
+                    
+                } else {
+                    //console.log('upsertAddrSigB', item);
+                    // some thing do it
+                    if(callback)callback()
+
+                }
+            }
+        );
+    }
+
+    //------------------------------------------------------------
+    // Fined by Address
+    //
+    function findByAddress(model, addr, callback){
+
+        model
+            .find({
+                addr: addr
+            })
+            .limit(1)
+            .exec(function(err, docs) {
+                
+                if(docs[0]){
+                    // 有る時 
+                    if(callback)callback(docs[0])
+                } else {
+                    // 無い時 findAddress undefined err: null
+                    if(callback)callback({
+                         addr: addr
+                        ,sigB: null
+                    })
+                }
+            });
+    }
 //=============================================================================
 // Util Functions
 // 

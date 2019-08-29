@@ -33,7 +33,7 @@
             </section>    
             <header>
                 <div class=header>
-                        <h2>Load User's QR Ticket　</h2>
+                        <h2>Scan User's QR Ticket</h2>
                         　Read the Ticket of QR code and authenticate.
                 </div>
             </header>    
@@ -42,7 +42,7 @@
             </section>    
             <section>
                 <div id=video-box>
-                    <div id="loadingMessage">🎥 Press the Load QR button</div>
+                    <div id="loadingMessage">🎥 Press the [Scan QR] button</div>
                     <canvas id="canvas" hidden></canvas>
                     <div id="output" hidden>
                         <div id="outputMessage">No QR code detected.</div>
@@ -105,6 +105,11 @@ $(function(){
 //-----------------------------------------------------------------------------
 
     //------------------------------------------------------------
+    // for WebSocket
+    const HB=JSON.stringify({type:'hb'})//heartbeat
+    const HEARTBEAT_INTERVAL=60000
+
+    //------------------------------------------------------------
     // for DOM
 
     //loading html
@@ -112,7 +117,7 @@ $(function(){
     //load button
     const LOAD_BUTTON_HTML=
         `<form>
-            <button id=btn-load class="btn">Load QR</button>
+            <button id=btn-load class="btn"><img id=scan-qr src=./img/scan-qr-w.png>Scan QR</button>
         </form>`
     const DISABLE_VIDEO_MSG='🎥 Unable to access video stream (please make sure you have a webcam enabled)'
     //video box
@@ -144,7 +149,7 @@ $(function(){
     // Works at onload
     function main (){
         mkHtml('#menu', '')
-        // make load QR button
+        // make Scan QR button
         mkHtml('#load-button-box', LOAD_BUTTON_HTML)
         $('#balance-box')
            .hide()
@@ -156,7 +161,7 @@ $(function(){
         setMenuButtonEvent()   
         //------------------------------------------------------------
         // set Event Load Button
-        setLoadButtonEvent()
+        setLoadQRButtonEvent()
 
     }
 
@@ -190,17 +195,142 @@ $(function(){
     //------------------------------------------------------------
     // 9) BOB: if 8th is true then login is OK.
     //
-    function setLoadButtonEvent(){
+    function setLoadQRButtonEvent(){
         $('#btn-load').bind(Ticket.clickevt, function(){
             event.preventDefault()
             doTick()
         })
     }
+
+//=============================================================================
+// WebSocket Operations
+// 
+//-----------------------------------------------------------------------------
+
+let wss=wssLibraAuth('wss://wss.libra-auth.com:8888/')
+    window.wss=wss//
+    //------------------------------------------------------------
+    // pre) Connect with WebSocket
+    // @url {string} target wss Server
+    // @return {object} WebSocket instance
+    function wssLibraAuth(url){
+        let  op={
+             protocol: 'wss.libra-auth.com'
+            ,uid: 'wss-' +  uuidv4()
+            ,hbTimeout:null
+        }
+
+        let wss = new WebSocket(url, op.protocol)
+        Ticket.conn.wss_arry.push(wss)
+        wss.op=op
+        wss.on = function (type, fnc){
+            this.addEventListener(type, fnc)
+            return this
+        }
+        //set the Event for WebSocket
+        wss
+            .on('open', function(){heartbeat(wss)})
+            .on('message', function(msg){onmsg(wss,msg)})
+            .on('close', function clear() {
+                clearTimeout(this.pingTimeout)
+                console.log('closed wss:',this.op.uid)
+            })
+
+        return wss;
+    }
+    //------------------------------------------------------------
+    // heartbeat 
+    function heartbeat(wss) {
+        // Start heartbeat send
+        clearInterval(wss.op.hbTimeout);
+        wssSend('hb');
+        wss.op.hbTimeout = setInterval(() => {
+            wssSend('hb');
+        }, HEARTBEAT_INTERVAL);
+    }
+    //------------------------------------------------------------
+    // pre) onmsg
+    // @wss {object} WebSocket instance
+    // @msg {string} stringifyd json message
+    function onmsg(wss, msg){
+        if(!wss)return
+        if(!msg)return
+        if(!msg.data)return
+        let data
+        try{
+            data = JSON.parse(msg.data);
+            if(debug)console.log('onmsg:', data.type, data)
+            if(data.type==='hb'){
+                //hb
+            } else if(data.type==='sig'){
+                //onReceivedSigB(data, wss)
+            } else if(data.type==='auth'){
+                console.log('auth', data)
+            } else if(data.type==='res'){
+                console.log('res', data)
+                $('#video-box').html('').html(data.data).fadeIn().css({'font-size':'48px'})
+            } else {
+               
+            }
+        } catch(e){ 
+            console.error('err', e, data)
+            return 
+        }
+    }
+    window.wssDelAll=wssDelAll
+    function wssDelAll(callback) {
+        let wss_arry=Ticket.conn.wss_arry
+        //del all wss object
+        for(var i=0;i<wss_arry.length;i++){  
+            if(debug)console.log(i
+                , 'deleted wss'
+                , (wss_arry[i].op.uid||'')
+                ,new Date()
+            )
+            wss_arry[i].close()
+        }
+        Ticket.conn.wss_arry=[]
+        if(callback)callback()
+    }
+    //------------------------------------------------------------
+    // wssSend send to wss server
+    // @param type {object} type e.g. 'hb'|'addr'
+    // @param data {any} The object to send
+    function wssSend(type, data){
+        let wss=window.wss
+        if(wss.readyState!==WebSocket.OPEN){
+            //
+        } else {
+            if(type==='hb'){
+                wss.send(HB)
+            } else {
+                wss.send(
+                    JSON.stringify({
+                        type: type,
+                        data: data
+                    })
+                )
+            }
+        }
+    }
+
+//=============================================================================
+// verify sigs
+// 
+//-----------------------------------------------------------------------------
+
+    //------------------------------------------------------------
+    // 
+    //
+
 //=============================================================================
 // Video operations
 // 
 //-----------------------------------------------------------------------------
 
+    //------------------------------------------------------------
+    // draw canvas Line
+    //
     function drawLine(begin, end, color) {
       canvas.beginPath();
       canvas.moveTo(begin.x, begin.y);
@@ -209,7 +339,9 @@ $(function(){
       canvas.strokeStyle = color;
       canvas.stroke();
     }
-
+    //------------------------------------------------------------
+    // do AnimationFrame
+    //
     function doTick(){
         
         // Use facingMode: environment to attemt to get the front camera on phones
@@ -228,8 +360,9 @@ $(function(){
             loadingMessage.innerText = DISABLE_VIDEO_MSG
         })
     }
-
-
+    //------------------------------------------------------------
+    // tick AnimationFrame
+    //
     function tick() {
       loadingMessage.innerText = "⌛ Loading video..."
       if (video.readyState === video.HAVE_ENOUGH_DATA) {
@@ -253,10 +386,13 @@ $(function(){
           outputMessage.hidden = true;
           outputData.parentElement.hidden = false;
           outputData.innerText += '-'+code.data;
+
 console.log(typeof code.data)
 console.log( code.data.length)
 
           clearAnimationFrame()
+          //
+          wssSend('qr', code.data)
           
         } else {
           outputMessage.hidden = false;
@@ -268,10 +404,40 @@ console.log( code.data.length)
       if(window.REQUEST_ID!==null)window.REQUEST_ID=requestAnimationFrame(tick);
       
     }
-
+    //------------------------------------------------------------
+    // stop AnimationFrame
+    //
     function clearAnimationFrame(){
         window.cancelAnimationFrame(window.REQUEST_ID)
         window.REQUEST_ID=null
+    }
+
+//=============================================================================
+// Util Functions
+// 
+//-----------------------------------------------------------------------------
+
+    // -----------------------------------------------------------------------------
+    // uuidv4
+    //
+    function uuidv4() {
+        // Thanx for
+        // https://gist.github.com/jcxplorer/823878
+        // https://web.archive.org/web/20150201084235/http://blog.snowfinch.net/post/3254029029/uuid-v4-js
+
+        let uuid = ''
+        let random;
+        for (let i = 0; i < 32; i++) {
+            random = Math.random() * 16 | 0;
+            if (i == 8 || i == 12 || i == 16 || i == 20) {
+                uuid += '-';
+            }
+            uuid += (i == 12 ? 4 : (i == 16 ? (random & 3 | 8) : random)).toString(16);
+        }
+        setTimeout(function() {
+            uuid=random=null;
+        }, 1000);
+        return uuid;
     }
 })
     </script>

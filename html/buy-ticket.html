@@ -11,7 +11,7 @@
         <script src="./js/libraweb-v2.js"></script>
         <script src="./js/kulap-libra-b.js"></script>
         <script src="./js/elliptic-b.js"></script>
-        <script src="./js/qrcode.min.js"> </script>
+        <script src="./js/qrcode-keeex.js"> </script>
         <script
             src="https://code.jquery.com/jquery-3.4.1.min.js?1"
             integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
@@ -464,6 +464,21 @@ $(function(){
         const msgHash=data.data[1]
         if(!chkDataSimple(sigB, msgHash))return
         
+        // 6)7) ALICE: verify SigB, And Mk SigA QR
+        verifySigBAndMkSigAQR(sigB, msgHash)
+
+        function chkDataSimple(sigB, msgHash){
+            if(!sigB)return false
+            if(!msgHash)return false
+            if(sigB.length!==128)return false
+            if(msgHash.length!==128)return false
+            return true
+        } 
+    }
+    //------------------------------------------------------------
+    // 6)7) ALICE: verify SigB, And Mk SigA QR
+    // 
+    function verifySigBAndMkSigAQR(sigB, msgHash){
         if(!BobPubKeyOj){
             //-------------------------------------------------
             // 3) ALICE: get BOB's PublicKey from testnet transaction
@@ -484,22 +499,16 @@ $(function(){
                 if(debug)console.info('6. OK. verify(msg, sigB) is true.')
                 const AlicePriKeyHex=getAlicePriKeyHex()
                 const AlicePriKeyOj = ec.keyFromSecret(AlicePriKeyHex, 'hex')
+                //mk sigA
                 const sigA=AlicePriKeyOj.sign(sigB).toHex()
-                console.log('sigA', sigA)
-                setQR($('#buy-button-box')[0], '').makeCode(sigA)
-                 
-                
+                let text=JSON.stringify({addr:AliceAddressHex,sigA:sigA})
+                console.log(text)
+                //mk QR
+                setQR($('#buy-button-box')[0], '').makeCode(text)
             } else {
                 if(debug)console.error('6. Error. verify(msg, sigB) is false.')
             }
         }
-        function chkDataSimple(sigB, msgHash){
-            if(!sigB)return false
-            if(!msgHash)return false
-            if(sigB.length!==128)return false
-            if(msgHash.length!==128)return false
-            return true
-        } 
     }
     //------------------------------------------------------------
     // 7) ALICE: if 6th is true then Make the "sigA" by the Alice's Private Key and the "sigB".
@@ -518,24 +527,21 @@ $(function(){
     // @targetElm {string} elem e.g. $('#hoge')[0]
     // @return {object} QRCode Object
     function setQR(targetElm, text){
+        let widthHeight=256
         $(targetElm).css({
-            width: 128*1.6
-            ,height: 128*1.6 + ((Ticket.clickevt==='touchstart')?18:18)
-            ,border: '1px solid #888'
-            //,padding:  ((128*1.6)-128)/2
-            ,margin:'auto'
-            ,'margin-top': '12px'
+            width: widthHeight*1.6
+            ,height: widthHeight+18//*1.6 + ((Ticket.clickevt==='touchstart')?18:18)
         })
         .html('<div id="showTicket">Please show us this QR Ticket at the entrance</div>')
 
         window.qrcode= new QRCode(
             targetElm, {
                  text: text
-                ,width: 128
-                ,height: 128
+                ,width: widthHeight
+                ,height: widthHeight
                 ,colorDark : "#000"
                 ,colorLight : "#fff"
-                ,correctLevel : QRCode.CorrectLevel.Q
+                ,correctLevel : QRCode.CorrectLevel.H
         });
 
         return  qrcode
