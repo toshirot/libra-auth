@@ -7,9 +7,14 @@ In the figure below, User “ALICE” pays the ticket fee to Ticket Center “BO
 
 It is authentication based on the Libra client-key. But the communication between Bob and Alice doesn't put a load on the Libra blockchain. And the processing speed is fast.
 
-<h2>What we are going to make</h2>
+<h2>What we are going to make on this Demo</h2>
 
 Make this. Client and server authentication work sample for ticket application using the libra-auth method.
+
+<h2>Future</h2>
+The Libra Auth method can be used not only for ticket sales authentication as in this demo, but also for normal authentication tasks.
+Especially suitable for authentication tasks involving payments. It provides trust by the Libra blockchain ledger.
+However, each authentication work is fast because it is separated from the Libra Network.
 
 <h2>Demo</h2>
 <a href="https://libra-auth.com/">https://libra-auth.com/</a>
