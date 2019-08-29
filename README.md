@@ -47,8 +47,9 @@ if(res6){
         //goto 1
 } </pre>
                         </li>
-                        <li>BOB:  find sigB from DB by Address, <br>
-                         and Verify the "sigB" and "sigA" by Alice's Public Key. <br>
+                        <li>BOB:  Bob is received "sigA" and Alis's Address.<br>
+                         And find sigB from DB by Address, <br>
+                         And Verify the "sigB" and "sigA" by Alice's Public Key. <br>
 e.g.<pre class=eg>
 find sigB from DB by Address
 {bool}  AlicePubKey.verify(sigB, sigA) </pre>
