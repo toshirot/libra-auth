@@ -34,7 +34,7 @@ sigB = BobPriKey.sign(msg).toHex();
 upsert sigB and address to DB
 wss.send(sigB, msg) </pre>
                         </li>
-                        <li>ALICE: Verify by Bob's Public Key the "sigB" and the msg that were received.<br>
+                        <li>ALICE: Verify by Bob's Public Key the "sigB" and the msg those were received.<br>
 e.g.<pre class=eg>{bool} BobPubKey.verify(msg, sigB)</pre>
                         </li>
                         <li>ALICE: if 6th is true then Make the "sigA" by the Alice's Private Key and the "sigB".<br>
