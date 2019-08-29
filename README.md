@@ -13,6 +13,9 @@ Make this. Client and server authentication work sample for ticket application u
 
 <h2>Demo</h2>
 <a href="https://libra-auth.com/">https://libra-auth.com/</a>
+<li><strong>ALICE: Buy ticket: </strong><br><a href=http://libra-auth.com/buy-ticket.html>http://libra-auth.com/buy-ticket.html</a></li>
+<li><strong>BOB: Authenticate ticket: </strong><br><a href=https://libra-auth.com/auth-ticket.html>https://libra-auth.com/auth-ticket.html</a></li> 
+
 
 <img src=https://libra-auth.com/img/doc/libra-auth-2019-08-29-02.png> 
 
