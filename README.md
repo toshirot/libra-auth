@@ -38,6 +38,7 @@ wss.send(sigB, msg) </pre>
 e.g.<pre class=eg>{bool} BobPubKey.verify(msg, sigB)</pre>
                         </li>
                         <li>ALICE: if 6th is true then Make the "sigA" by the Alice's Private Key and the "sigB".<br>
+                         And Show QR code that is made by "sigA" and Alis's Address<br>
 e.g.<pre class=eg>
 if(res6){
         sigA = AlicePriKey.sign(sigB)
