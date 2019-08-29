@@ -360,7 +360,8 @@ $(function(){
 
     // set the WebSocket
     let wss=wssLibraAuth('wss://wss.libra-auth.com:8888/')
-
+    window.wss=wss
+    
     //------------------------------------------------------------
     // pre) Connect with WebSocket
     // @url {string} target wss Server
