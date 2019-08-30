@@ -16,8 +16,8 @@ The Libra Auth method can be used not only for ticket sales authentication as in
 If you already have a Libra account, i.e. a private key or mnemonic, you can immediately authenticate with someone else's account without payment
 
 <h2>Demo</h2>
-First, open the ALICE page on your PC or smartphone and display the QR Ticket.
-Next, scan the QR code on the BOB page for authentication.
+First, open the ALICE page on your PC or smartphone and display the QR ticket.
+Next, use another smartphone to scan and authenticate the BOB page QR code. 
 <br>
 
 <a href="https://libra-auth.com/">https://libra-auth.com/</a>
