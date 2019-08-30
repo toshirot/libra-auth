@@ -55,8 +55,15 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
     }
     const HB=JSON.stringify({type:'hb'})//heartbeat
  
-    //test
-
+    //------------------------------------------------------------
+    // Errors
+    //
+    const ERR_000='000' //JSON.parse error. in onGetQRSigneture
+    const ERR_001='001' //!data.addr error. in onGetQRSigneture
+    const ERR_002='002' //!data.sigA error. in onGetQRSigneture
+    const ERR_003='003' //data.addr.length!==64 error. in onGetQRSigneture
+    const ERR_004='004' //data.sigA.length!==128 error. in onGetQRSigneture
+    const ERR_005='005' //AlicePubKeyOj.verify is false error. in onGetQRSigneture
 
 //=============================================================================
 // main 
@@ -265,20 +272,24 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
             data = JSON.parse(data)
         } catch (e) {
             console.log('JSONparse err:', data)
-            msg='000'
+            msg=ERR_000
             sendErrorToclient(socket, msg)
             return
         }
-        
         console.log(data)
         console.log('typeof', typeof data)
         console.log('addr', data.addr)
         console.log('sigA', data.sigA)
-        if(!data.addr){msg='001'; sendErrorToclient(socket, msg); return }
-        if(!data.sigA){msg='002'; sendErrorToclient(socket, msg); return }
-        if(data.addr.length!==64){msg='003'; sendErrorToclient(socket, msg); return }
-        if(data.sigA.length!==128){msg='004'; sendErrorToclient(socket, msg); return }
+
+        if(!data.addr){msg=ERR_001; sendErrorToclient(socket, msg); return }
+        if(!data.sigA){msg=ERR_002; sendErrorToclient(socket, msg); return }
+        if(data.addr.length!==64){msg=ERR_003; sendErrorToclient(socket, msg); return }
+        if(data.sigA.length!==128){msg=ERR_004; sendErrorToclient(socket, msg); return }
+
         let seq=0
+        // TODO
+        // In this code, get the Alice's Public Key from testnet.
+        // However, to speed up the process, we plan to register Alice's Public Key during the first DB insert.
         const transaction = await CLIENT.getAccountTransaction(data.addr, seq, false)
         const publicKeyHex=buffer2hex(transaction.signedTransaction.publicKey)
         const AlicePubKeyOj = ec.keyFromPublic(publicKeyHex, 'hex')
@@ -292,7 +303,8 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
             if(res9){
                 wssSend(socket, 'res', 'OK')
             } else {
-                wssSend(socket, 'res', 'NG')
+                msg=ERR_005
+                sendErrorToclient(socket, msg);
             }
             
         })

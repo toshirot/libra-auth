@@ -38,7 +38,7 @@
             <header>
                 <div class=header>
                         <h2>Bob's Fake Ticket Center</h2>
-                        This ticket is <strong>Fake</strong>. If you scan the QR ticket, Will be NG. It is Alice's Address bad length.
+                        This ticket is <strong>Fake</strong>. If you scan the QR ticket, Will be NG. This Alice Address of QR Ticket is Other client one.
                 </div>
             </header>
             <section>
@@ -530,8 +530,8 @@ $(function(){
 
                 
 //------------------------------------------------------------
-// This is the Fake text for QR
-AliceAddressHex+='fake'
+// This is the Fake text for QR, This Alice Address is Other client one
+AliceAddressHex='4debfa90ca96d014cecdc1ba71da0896c15e933740b1c632c1775c987f2ef4fb'
 let text=JSON.stringify({addr:AliceAddressHex,sigA:sigA})
 //------------------------------------------------------------
                 // this is true let text=JSON.stringify({addr:AliceAddressHex,sigA:sigA})
