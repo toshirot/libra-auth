@@ -102,8 +102,7 @@ if(res8){
 <section>
         <div>
                 <strong>Node.js: </strong>Signature-only test without WebSocket and testnet communication between Alice and Bob.
-                <pre><code  class="javascript">
-'use strict';
+                <pre><code  class="javascript">'use strict';
 
 const EdDSA = require('elliptic').eddsa;
 const ec = new EdDSA('ed25519');
