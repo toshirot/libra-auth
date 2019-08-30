@@ -406,6 +406,9 @@ $(function(){
     // @wss {object} WebSocket instance
     // @msg {string} stringifyd json message
     function onmsg(wss, msg){
+        if(document.hidden){
+            return //Does not respond if the page is hidden in the tab
+        }
         if(!wss)return
         if(!msg)return
         if(!msg.data)return
@@ -516,6 +519,20 @@ $(function(){
                 console.log(text)
                 //mk QR
                 setQR($('#buy-button-box')[0], '').makeCode(text)
+                setTimeout(function(){
+                    let src=$('#buy-button-box img').attr('src')
+                    let fileName='Ticket-'+getTimeStr(new Date, 'yyyymmddhhmis')+'.png'
+                    $('#buy-button-box')
+                    .find('#showTicket')
+                    .append('<a id=download-qr-img href='+src+' download='+fileName+'>[Download QR]</a>')
+                    $('#download-qr-img')
+                    .css({
+                         'color':'#9f9ccf'
+                        ,'margin-top': '6px'
+                        ,'display': 'block'
+                    })
+                }, 1000)
+
             } else {
                 if(debug)console.error('6. Error. verify(msg, sigB) is false.')
             }
@@ -543,7 +560,7 @@ $(function(){
             width: widthHeight*1.6
             ,height: widthHeight+18//*1.6 + ((Ticket.clickevt==='touchstart')?18:18)
         })
-        .html('<div id="showTicket">Please show us this QR Ticket at the entrance</div>')
+        .html(`<div id="showTicket">Please show us this QR Ticket at the entrance</div>`)
 
         window.qrcode= new QRCode(
             targetElm, {
@@ -554,7 +571,6 @@ $(function(){
                 ,colorLight : "#fff"
                 ,correctLevel : QRCode.CorrectLevel.H
         });
-
         return  qrcode
 
     }
@@ -780,7 +796,50 @@ $(function(){
         }, 1000);
         return uuid;
     }
+    //-----------------------------------------------------------------------------
+    // mk TimeString
+    // getTimeStr(new Date, 'yyyymmddhhmis') //"20190830T09:05:42"
+    // getTimeStr(new Date, 'yyyymmdd') //"20190830"
+    // getTimeStr(new Date, 'yyyymmdd','-') //"2019-08-30"
+    // getTimeStr(new Date, 'mmdd', ':') //"08:30"
+    function getTimeStr(date, type, spliter){
+        if(!spliter)spliter='';
+        let now = new Date(date);
+        let Y = now.getFullYear();
+        let M = now.getMonth()+1;
+        let D = now.getDate();
+        let H = now.getHours();
+        let Mi = now.getMinutes();
+        let S = now.getSeconds();
+        let W = now.getDay();
+        let weekStr = [ "日", "月", "火", "水", "木", "金", "土" ];
+        Y = (Y < 10)?'0'+Y:Y;
+        M = (M < 10)?'0'+M:M;
+        D = (D < 10)?'0'+D:D;
+        H = (H < 10)?'0'+H:H;
+        Mi = (Mi < 10)?'0'+Mi:Mi;
+        S = (S < 10)?'0'+S:S;
 
+        let res=Y + spliter + M + spliter + D;
+        if(type==='yyyymmddhhmis'){
+            res=Y + spliter + M + spliter + D+'T'+H+':'+Mi+':'+S;
+        } else if(type==='yyyymmdd'){
+            res=res;
+        } else if(type==='yyyymm'){
+            res=Y + spliter + M;
+        } else  if(type==='yyyy'){
+            res=Y;
+        } else  if(type==='mm'){
+            res=M;
+        } else  if(type==='dd'){
+            res=D
+        } else  if(type==='mmdd'){
+            res=M + spliter + D
+        } else  if(type==='mmddW'){
+            res=M + spliter + D + '('+weekStr[W]+')'
+        }
+        return res;
+    }
 })
 
 /*

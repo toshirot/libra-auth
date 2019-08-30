@@ -253,6 +253,9 @@ let wss=wssLibraAuth('wss://wss.libra-auth.com:8888/')
     // @wss {object} WebSocket instance
     // @msg {string} stringifyd json message
     function onmsg(wss, msg){
+        if(document.hidden){
+            return //Does not respond if the page is hidden in the tab
+        }
         if(!wss)return
         if(!msg)return
         if(!msg.data)return
