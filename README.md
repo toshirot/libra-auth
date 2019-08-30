@@ -31,7 +31,7 @@ If you already have a Libra account, i.e. a private key or mnemonic, you can imm
                         <li>ALICE: Tap or Click [ Buy ] Button. And get address each other</li>
                         <li>ALICE: Transffer Some Libra to BOB</li>
                         <li>ALICE: get BOB's PublicKey from testnet transaction</li>
-                        <li>BOB:   get ALICE's PublicKey from testnet transaction</li>
+                        <li>BOB:   get ALICE's PublicKey from testnet transaction and Check payment if necessary</li>
                         <li>BOB:   Make the "sigB" by the msg hash and  Bob's Private Key.<br>
                                 And upsert sigB, address to DB<br>
                                 And send "sigB" and msg to Alice by WebSocket. <br>
