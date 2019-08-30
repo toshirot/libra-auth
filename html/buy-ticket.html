@@ -4,7 +4,7 @@
         <meta charset=utf-8>
         <meta name=viewport content="width=device-width, initial-scale=1">
         <title>Ticket Center</title>
-        <link rel="stylesheet" href="./css/main.css?1">
+        <link rel="stylesheet" href="./css/main.css?2">
         <style>
 
         </style>
@@ -74,7 +74,7 @@
 
 $(function(){
 
-    let debug=true
+    let debug=false
 
 // Eventually the libraweb code will be Hide from window object later.
 
@@ -149,7 +149,7 @@ $(function(){
     //buy button
     const BUY_BUTTON_HTML=
         `<form>
-            <button id=btn-buy class="btn">Buy</button>
+            <button id=btn-buy class="btn" ontouchend="">Buy</button>
         </form>`
     //get nemonic button
     const GET_NEMONIC_HTML=
@@ -276,7 +276,7 @@ $(function(){
         $('#btn-buy').bind(Ticket.clickevt, function(){
             event.preventDefault()
             // some codes for click or tap
-            $(this).css({background:'cyan'})
+            $('#btn-buy').css({'background-color':'#1e7645'})
             //chk do you buy?
             let okbuy=checkConfirm(M_DO_YOU_BUY_CONFIRM)
             if(okbuy){
@@ -528,7 +528,6 @@ $(function(){
                 //mk sigA
                 const sigA=AlicePriKeyOj.sign(sigB).toHex()
                 let text=JSON.stringify({addr:AliceAddressHex,sigA:sigA})
-                console.log(text)
                 //mk QR
                 setQR($('#buy-button-box')[0], '').makeCode(text)
                 setTimeout(function(){
@@ -567,17 +566,17 @@ $(function(){
                 background:'#39298C'
             ,border:0
             ,padding: '3px 9px'
-            });
+            })
+        $('#connect').fadeIn()
     //------------------------------------------------------------
     // Show disconnect Sign
     }
     function connectLinkShowClose() {
         $('.connectLink')
             .text(DISCONNECTET_SIGN)
-            .css({background:'#e28bec'});
+            .css({background:'#e28bec'})
+        $('#connect').fadeIn()
     }
-
-
 //=============================================================================
 // QR Function
 // 
@@ -725,11 +724,9 @@ $(function(){
         clearInterval(GET_BALANCE_TIMER)
         GET_BALANCE_TIMER=setInterval(function(){
             if( getBalanceCounter>=GET_BALANCE_COUNTER_MAX){
-                console.log('---')
                 clearInterval(GET_BALANCE_TIMER)
                 if(callback)callback('-')
             }
-           
             _getBalance(AliceAddressHex, callback)
             getBalanceCounter++;
         },1000)

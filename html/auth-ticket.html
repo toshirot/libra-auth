@@ -4,7 +4,7 @@
         <meta charset=utf-8>
         <meta name=viewport content="width=device-width, initial-scale=1">
         <title>Ticket Center</title>
-        <link rel="stylesheet" href="./css/main.css?3">
+        <link rel="stylesheet" href="./css/main.css?4">
         <style>
 
         </style>
@@ -76,7 +76,7 @@
 
 $(function(){
 
-    let debug=true
+    let debug=false
 
 // Eventually the libraweb code will be Hide from window object later.
 
@@ -278,9 +278,9 @@ let wss=wssLibraAuth('wss://wss.libra-auth.com:8888/')
             } else if(data.type==='sig'){
                 //onReceivedSigB(data, wss)
             } else if(data.type==='auth'){
-                console.log('auth', data)
+                //
             } else if(data.type==='res'){
-                console.log('res', data)
+                //OK|NG massage
                 $('#video-box').html('').html(data.data).fadeIn().css({'font-size':'48px'})
             } else {
                
@@ -333,16 +333,18 @@ let wss=wssLibraAuth('wss://wss.libra-auth.com:8888/')
             .text(CONNECTET_SIGN)
             .css({
                 background:'#39298C'
-                ,border:0
-                ,padding: '3px 9px'
-            });
+            ,border:0
+            ,padding: '3px 9px'
+            })
+        $('#connect').fadeIn()
     //------------------------------------------------------------
     // Show disconnect Sign
     }
     function connectLinkShowClose() {
         $('.connectLink')
             .text(DISCONNECTET_SIGN)
-            .css({background:'#e28bec'});
+            .css({background:'#e28bec'})
+        $('#connect').fadeIn()
     }
 //=============================================================================
 // verify sigs
@@ -417,8 +419,11 @@ let wss=wssLibraAuth('wss://wss.libra-auth.com:8888/')
           outputData.parentElement.hidden = false;
           outputData.innerText += '-'+code.data;
 
-console.log(typeof code.data)
-console.log( code.data.length)
+          if(debug){
+                console.log( 'typeof', typeof code.data)
+                console.log( 'length', code.data.length)
+                console.log( 'data', code.data )
+          }
 
           clearAnimationFrame()
           //
