@@ -7,6 +7,8 @@ In the figure below, User “ALICE” pays the ticket fee to Ticket Center “BO
 
 It is authentication based on the Libra client-key. But the communication between Bob and Alice doesn't put a load on the Libra blockchain. And the processing speed is fast.
 
+Why is it fast? For example, when if tens of thousands of people enter the stadium, libra-auth authentication can be handled only by the client-side QR Tiket (address and sigA) and server-side DB (address and pubKey and sigB) without accessing the Libra network.
+
 <h2>What we are going to make on this Demo</h2>
 
 Make this. Client and server authentication work sample for ticket application using the libra-auth method.
