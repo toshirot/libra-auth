@@ -11,10 +11,6 @@ It is authentication based on the Libra client-key. But the communication betwee
 
 Make this. Client and server authentication work sample for ticket application using the libra-auth method.
 
-<h2>Future</h2>
-The Libra Auth method can be used not only for ticket sales authentication as in this demo but also for normal authentication tasks. Especially suitable for authentication tasks involving payments. It provides trust by the Libra blockchain ledger. However, each authentication work is fast because it is separated from the Libra Network.  
-If you already have a Libra account, i.e. a private key or mnemonic, you can immediately authenticate with someone else's account without payment
-
 <h2>Demo</h2>
 First, open the ALICE page on your PC or smartphone and display the QR ticket.
 Next, use another smartphone to authenticate by scanning the ALICE QR code from the BOB page.
@@ -30,6 +26,10 @@ Next, use another smartphone to authenticate by scanning the ALICE QR code from 
 <li><strong>test-2 <u>QR ticket with changed to Fake address was used.</u> </strong><br><a href=https://libra-auth.com/test/buy-ticket-fake-2.html>https://libra-auth.com/test/buy-ticket-fake-2.html</a> 7th in the figure below, Alice's address is Other client one.</li>
 </ul>
 
+
+<h2>Future</h2>
+The Libra Auth method can be used not only for ticket sales authentication as in this demo but also for normal authentication tasks. Especially suitable for authentication tasks involving payments. It provides trust by the Libra blockchain ledger. However, each authentication work is fast because it is separated from the Libra Network.  
+If you already have a Libra account, i.e. a private key or mnemonic, you can immediately authenticate with someone else's account without payment
 
 <img src=https://libra-auth.com/img/doc/libra-auth-2019-08-29-02.png> 
 
