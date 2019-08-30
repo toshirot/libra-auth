@@ -40,7 +40,7 @@ If you already have a Libra account, i.e. a private key or mnemonic, you can imm
 <section>
         <div>
                 <ol>
-                        <li>ALICE: Tap or Click [ Buy ] Button. And get address each other</li>
+                        <li>ALICE: Tap or Click [ Buy ] Button. And get address each other. and wss.send(msg) </li>
                         <li>ALICE: Transffer Some Libra to BOB</li>
                         <li>ALICE: get BOB's PublicKey from testnet transaction</li>
                         <li>BOB:   get ALICE's PublicKey from testnet transaction and Check payment if necessary</li>
@@ -48,7 +48,7 @@ If you already have a Libra account, i.e. a private key or mnemonic, you can imm
                                 And upsert sigB, address to DB<br>
                                 And send "sigB" and msg to Alice by WebSocket. <br>
 e.g.<pre class=eg>
-msg = (new SHA3(512)).update('msg hello').digest('hex');
+msg = (new SHA3(512)).update(msg).digest('hex');
 sigB = BobPriKey.sign(msg).toHex();
 upsert sigB and address to DB
 wss.send(sigB, msg) </pre>
