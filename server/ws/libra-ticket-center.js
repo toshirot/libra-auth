@@ -259,23 +259,25 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
     // @data {object} {"addr":"...", "sigA":"..."}
     // @socket {object} wss client
     async function onGetQRSigneture(data, socket){
-
+        let msg=''
         //parse
         try {
             data = JSON.parse(data)
         } catch (e) {
             console.log('JSONparse err:', data)
+            msg='000'
+            sendErrorToclient(socket, msg)
             return
         }
-        let msg=''
+        
         console.log(data)
         console.log('typeof', typeof data)
         console.log('addr', data.addr)
         console.log('sigA', data.sigA)
-        if(!data.addr){msg='error 001'}
-        if(!data.sigA){msg='error 002'}
-        if(data.addr.length!==64){msg='error 003'}
-        if(data.sigA.length!==128){msg='error 004'}
+        if(!data.addr){msg='001'; sendErrorToclient(socket, msg); return }
+        if(!data.sigA){msg='002'; sendErrorToclient(socket, msg); return }
+        if(data.addr.length!==64){msg='003'; sendErrorToclient(socket, msg); return }
+        if(data.sigA.length!==128){msg='004'; sendErrorToclient(socket, msg); return }
         let seq=0
         const transaction = await CLIENT.getAccountTransaction(data.addr, seq, false)
         const publicKeyHex=buffer2hex(transaction.signedTransaction.publicKey)
@@ -294,7 +296,11 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
             }
             
         })
-        
+    }
+    //------------------------------------------------------------
+    // send Error to client
+    function sendErrorToclient(socket, err){
+        wssSend(socket, 'res', 'NG:'+err)
     }
     //------------------------------------------------------------
     // get accountState object
