@@ -76,7 +76,8 @@ $(function(){
 
     let debug=false
 
-// Eventually the libraweb code will be Hide from window object later.
+// In this demo, the libraweb Object of libraweb-v2.js is public inside the window object. 
+// When actually using it, it is recommended to private it inside the function.
 
 //=============================================================================
 // main object
@@ -112,7 +113,7 @@ $(function(){
     //In this demo Alice wallet and account is Newly made every time.
     let   AliceAddressHex=''//made every time
     let   AliceAccountOj=null//made every time
-    let   AlicePriKeyOj=null
+    let   AlicePriKeyOj=null//made every time
     const BOB_ADDRESS_HEX='b7c811fd8f488e9c41f03a2cc1671b3a65b4638806a2ad72c96109924bde8454'
     let   BobPubKeyOj=null;//from LIBRA
     //unit of Libra
@@ -143,7 +144,6 @@ $(function(){
          <hr><li><a href="./buy-ticket.html">Buy Ticket</a></li>
          <hr><li><a href="./auth-ticket.html">Auth Ticket</a></li>
         `
-
     //loading html
     const LOADING_HTML='<div class="loader">Loading...</div>'
     //buy button
