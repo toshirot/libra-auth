@@ -43,7 +43,7 @@ If you already have a Libra account, i.e. a private key or mnemonic, you can imm
                         <li>ALICE: Tap or Click [ Buy ] Button. And get address each other. and send a msg to Bob.
 e.g.<pre class=eg>
 msg = (new SHA3(512)).update(msg).digest('hex');
-wss.send(msg) </pre>
+wss.send(addr, msg) </pre>
                  </li>
                         <li>ALICE: Transffer Some Libra to BOB</li>
                         <li>ALICE: get BOB's PublicKey from testnet transaction</li>
