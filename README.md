@@ -17,7 +17,7 @@ If you already have a Libra account, i.e. a private key or mnemonic, you can imm
 
 <h2>Demo</h2>
 First, open the ALICE page on your PC or smartphone and display the QR ticket.
-Next, use another smartphone to scan and authenticate the BOB page QR code. 
+Next, use another smartphone to authenticate by scanning the ALICE QR code from the BOB page.
 <br>
 
 <a href="https://libra-auth.com/">https://libra-auth.com/</a>
