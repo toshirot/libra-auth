@@ -26,8 +26,8 @@ Next, use another smartphone to authenticate by scanning the ALICE QR code from 
 <li><strong>BOB: Authenticate ticket: </strong><br><a href=https://libra-auth.com/auth-ticket.html>https://libra-auth.com/auth-ticket.html</a></li>
 </ol>
 <ul>
-<li><strong>test-1 ALICE: Buy <u>Fake</u> ticket: </strong><br><a href=https://libra-auth.com/test/buy-ticket-fake-1.html>https://libra-auth.com/test/buy-ticket-fake-1.html</a> 7th in the figure below, Alice's address length was different recieved the server.</li>
-<li><strong>test-2 <u>QR ticket with changed to Fake address was used.</u> ticket: </strong><br><a href=https://libra-auth.com/test/buy-ticket-fake-2.html>https://libra-auth.com/test/buy-ticket-fake-2.html</a> 7th in the figure below, Alice's address is Other client one.</li>
+<li><strong>test-1 <u>QR ticket's addres was bloken.</u> </strong><br><a href=https://libra-auth.com/test/buy-ticket-fake-1.html>https://libra-auth.com/test/buy-ticket-fake-1.html</a> 7th in the figure below, Alice's address length was different recieved the server.</li>
+<li><strong>test-2 <u>QR ticket with changed to Fake address was used.</u> </strong><br><a href=https://libra-auth.com/test/buy-ticket-fake-2.html>https://libra-auth.com/test/buy-ticket-fake-2.html</a> 7th in the figure below, Alice's address is Other client one.</li>
 </ul>
 
 
