@@ -40,8 +40,8 @@ If you already have a Libra account, i.e. a private key or mnemonic, you can imm
 <section>
         <div>
                 <ol>
-                        <li>ALICE: Tap or Click [ Buy ] Button. And get address each other.
-                         And send Alice's address and msg to Bob by WebSocket. Bob.
+                        <li>ALICE: Tap or Click [ Buy ] Button. And get address each other.<br>
+                         And  Alice send address and msg to Bob by WebSocket.
 e.g.<pre class=eg>
 msg = (new SHA3(512)).update(msg).digest('hex');
 wss.send(addr, msg) </pre>
