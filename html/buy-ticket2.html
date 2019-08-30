@@ -26,17 +26,21 @@
                     <div id="menu" style="display: none;"></div>
                 </nav>
             </div>
+            <div id=connect>
+                <a class="connectLink" href="javascript:(function(){
+                })()"></a>
+            </div>
         </header>
         <div id=contents>
             <section>
                 <img class=logo alt="libra logo" src="./img/libra.png">
-            </section>    
+            </section>
             <header>
                 <div class=header>
                         <h2>Bob's Ticket Center</h2>
                         The ticket price is <strong>10 Libra</strong>. If Buy Button click sent 10 Libra and you can take the Ticket.
                 </div>
-            </header>    
+            </header>
             <section>
                 <div id=buy-button-box></div>
             </section>    
@@ -66,7 +70,7 @@
         
     </body>
 
-    <script>
+<script>
 
 $(function(){
 
@@ -163,6 +167,10 @@ $(function(){
         <form>
             <textarea id="outout-nemonic-area" class="outout-nemonic"></textarea>
         </form>`
+    // connect signs
+    const CONNECTET_SIGN='connected to Center'
+    const DISCONNECTET_SIGN='disconnected'
+
     //------------------------------------------------------------
     // for MESSAGE
     const M_DO_YOU_BUY_CONFIRM='Do you want to buy a ticket? The Cost is 10 Libra.'
@@ -382,9 +390,13 @@ $(function(){
         }
         //set the Event for WebSocket
         wss
-            .on('open', function(){heartbeat(wss)})
+            .on('open', function(){
+                connectLinkShowConnect()
+                heartbeat(wss)
+            })
             .on('message', function(msg){onmsg(wss,msg)})
             .on('close', function clear() {
+                connectLinkShowClose()
                 clearTimeout(this.pingTimeout)
                 console.log('closed wss:',this.op.uid)
             })
@@ -523,14 +535,16 @@ $(function(){
                     let src=$('#buy-button-box img').attr('src')
                     let fileName='Ticket-'+getTimeStr(new Date, 'yyyymmddhhmis')+'.png'
                     $('#buy-button-box')
-                    .find('#showTicket')
-                    .append('<a id=download-qr-img href='+src+' download='+fileName+'>[Download QR]</a>')
+                        .find('#showTicket')
+                        .append('<a id=download-qr-img style=display:block href='+src+' download='+fileName+'>[Download QR]</a>')
+
                     $('#download-qr-img')
-                    .css({
-                         'color':'#9f9ccf'
-                        ,'margin-top': '6px'
-                        ,'display': 'block'
-                    })
+                        .css({
+                            'color':'#9f9ccf'
+                            ,'margin-top': '6px'
+                        })
+                        .hide()
+                        .fadeIn()
                 }, 1000)
 
             } else {
@@ -544,6 +558,25 @@ $(function(){
     function mkSigA(data, wss){
         const sigA = AlicePriKey.sign(sigB)
     }
+    //------------------------------------------------------------
+    // Show connect Sign
+    function connectLinkShowConnect() {
+        $('.connectLink')
+            .text(CONNECTET_SIGN)
+            .css({
+                background:'#39298C'
+            ,border:0
+            ,padding: '3px 9px'
+            });
+    //------------------------------------------------------------
+    // Show disconnect Sign
+    }
+    function connectLinkShowClose() {
+        $('.connectLink')
+            .text(DISCONNECTET_SIGN)
+            .css({background:'#e28bec'});
+    }
+
 
 //=============================================================================
 // QR Function
@@ -842,13 +875,5 @@ $(function(){
     }
 })
 
-/*
-・QRコードを読んでOK|NGを出すページ
-✔mint もproxyで　https化
-✔get pubkeyもproxyで　https化
-✔get pub key のスタブを実装
-・DB for Bob
-・最初のmint失敗時再mint 失敗の種類 connect エラー https mixd エラー
-*/
-    </script>
+</script>
 </html>

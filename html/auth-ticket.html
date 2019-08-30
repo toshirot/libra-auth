@@ -26,6 +26,10 @@
                     <div id="menu" style="display: none;"></div>
                 </nav>
             </div>
+            <div id=connect>
+                <a class="connectLink" href="javascript:(function(){
+                })()">connected to Center</a>
+            </div>
         </header>
         <div id=contents>
             <section>
@@ -68,8 +72,7 @@
         </div>
         
     </body>
-
-    <script>
+<script>
 
 $(function(){
 
@@ -126,6 +129,9 @@ $(function(){
          <hr><li><a href="./buy-ticket.html">Buy Ticket</a></li>
          <hr><li><a href="./auth-ticket.html">Auth Ticket</a></li>
         `
+    // connect signs
+    const CONNECTET_SIGN='connected to Center'
+    const DISCONNECTET_SIGN='disconnected'
 
     window.REQUEST_ID=null //cancel AnimationFrame
 
@@ -229,9 +235,13 @@ let wss=wssLibraAuth('wss://wss.libra-auth.com:8888/')
         }
         //set the Event for WebSocket
         wss
-            .on('open', function(){heartbeat(wss)})
+            .on('open', function(){
+                connectLinkShowConnect()
+                heartbeat(wss)
+            })
             .on('message', function(msg){onmsg(wss,msg)})
             .on('close', function clear() {
+                connectLinkShowClose()
                 clearTimeout(this.pingTimeout)
                 console.log('closed wss:',this.op.uid)
             })
@@ -316,7 +326,24 @@ let wss=wssLibraAuth('wss://wss.libra-auth.com:8888/')
             }
         }
     }
-
+    //------------------------------------------------------------
+    // Show connect Sign
+    function connectLinkShowConnect() {
+        $('.connectLink')
+            .text(CONNECTET_SIGN)
+            .css({
+                background:'#39298C'
+                ,border:0
+                ,padding: '3px 9px'
+            });
+    //------------------------------------------------------------
+    // Show disconnect Sign
+    }
+    function connectLinkShowClose() {
+        $('.connectLink')
+            .text(DISCONNECTET_SIGN)
+            .css({background:'#e28bec'});
+    }
 //=============================================================================
 // verify sigs
 // 
@@ -443,5 +470,5 @@ console.log( code.data.length)
         return uuid;
     }
 })
-    </script>
+</script>
 </html>
