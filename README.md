@@ -25,6 +25,9 @@ Next, use another smartphone to authenticate by scanning the ALICE QR code from 
 <li><strong>ALICE: Buy ticket: </strong><br><a href=http://libra-auth.com/buy-ticket.html>http://libra-auth.com/buy-ticket.html</a></li>
 <li><strong>BOB: Authenticate ticket: </strong><br><a href=https://libra-auth.com/auth-ticket.html>https://libra-auth.com/auth-ticket.html</a></li>
 </ol>
+<ul>
+<li><strong>test ALICE: Buy <u>Fake</u> ticket: </strong><br><a href=https://libra-auth.com/test/buy-ticket-fake-1.html>https://libra-auth.com/test/buy-ticket-fake-1.html</a></li>
+</ul>
 
 
 <img src=https://libra-auth.com/img/doc/libra-auth-2019-08-29-02.png> 
