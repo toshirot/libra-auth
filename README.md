@@ -26,7 +26,7 @@ Next, use another smartphone to authenticate by scanning the ALICE QR code from 
 <li><strong>BOB: Authenticate ticket: </strong><br><a href=https://libra-auth.com/auth-ticket.html>https://libra-auth.com/auth-ticket.html</a></li>
 </ol>
 <ul>
-<li><strong>test-1 ALICE: Buy <u>Fake</u> ticket: </strong><br><a href=https://libra-auth.com/test/buy-ticket-fake-1.html>https://libra-auth.com/test/buy-ticket-fake-1.html</a> Alice's address length is different on the server</li>
+<li><strong>test-1 ALICE: Buy <u>Fake</u> ticket: </strong><br><a href=https://libra-auth.com/test/buy-ticket-fake-1.html>https://libra-auth.com/test/buy-ticket-fake-1.html</a> 7th in the figure below, Alice's address length is different on the server</li>
 </ul>
 
 
