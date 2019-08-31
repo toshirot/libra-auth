@@ -55,7 +55,7 @@ wss.send(addr, msg) </pre>
 e.g.<pre class=eg>
 sigB = BobPriKey.sign(msg).toHex();
 upsert sigB and address to DB
-wss.send(sigB, msg) </pre>
+wss.send(sigB) </pre>
                         </li>
                         <li>ALICE: Verify by Bob's Public Key the "sigB" and the msg those were received.<br>
 e.g.<pre class=eg>{bool} BobPubKey.verify(msg, sigB)</pre>
