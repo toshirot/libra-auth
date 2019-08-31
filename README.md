@@ -58,9 +58,7 @@ upsert sigB and address to DB
 wss.send(sigB) </pre>
                         </li>
                         <li>ALICE: Verify by Bob's Public Key the "sigB" and the "msg" those were received.<br>
-                         Well, Bob's Public Key was get from testnet.
-"sigB" was send from Bob.
-"msg" was made by Alice.<br>
+                         Well, Bob's Public Key was getting from testnet. "sigB" was send from Bob. "msg" was made by Alice.<br>
 e.g.<pre class=eg>{bool} BobPubKey.verify(msg, sigB)</pre>
                         </li>
                         <li>ALICE: if 6th is true then Make the "sigA" by the Alice's Private Key and the "sigB".<br>
@@ -76,7 +74,7 @@ if(res6){
                         <li>BOB:  Bob is received "sigA" and Alis's Address.<br>
                          And find sigB from DB by Address, <br>
                          And Verify the "sigB" and "sigA" by Alice's Public Key. <br>
-                         Well, Alice's Public Key was get from testnet. "sigA" was scaned from Alice's smartphone. "sigB" was made by Bob.<br>
+                         Well, Alice's Public Key was getting from testnet. "sigA" was scanned from Alice's smartphone. "sigB" was made by Bob.<br>
 e.g.<pre class=eg>
 find sigB from DB by Address
 {bool}  AlicePubKey.verify(sigB, sigA) </pre>
