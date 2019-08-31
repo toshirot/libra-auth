@@ -41,7 +41,7 @@ If you already have a Libra account, i.e. a private key or mnemonic, you can imm
         <div>
                 <ol>
                         <li>ALICE: Tap or Click [ Buy ] Button. And get address each other.<br>
-                         And  Alice send address and msg to Bob by WebSocket.
+                         And  Alice send "address" and "msg" to Bob by WebSocket.
 e.g.<pre class=eg>
 msg = CryptoJS.SHA3(msg+Math.random()).toString();
 wss.send(addr, msg) </pre>
@@ -49,7 +49,7 @@ wss.send(addr, msg) </pre>
                         <li>ALICE: Transffer Some Libra to BOB</li>
                         <li>ALICE: get BOB's PublicKey from testnet transaction</li>
                         <li>BOB:   get ALICE's PublicKey from testnet transaction and Check payment if necessary</li>
-                        <li>BOB:   Make the "sigB" by the msg and  Bob's Private Key.<br>
+                        <li>BOB:   Make the "sigB" by the "msg" and  Bob's Private Key.<br>
                                 And upsert sigB, address to DB<br>
                                 And send "sigB" to Alice by WebSocket. <br>
 e.g.<pre class=eg>
@@ -57,7 +57,10 @@ sigB = BobPriKey.sign(msg).toHex();
 upsert sigB and address to DB
 wss.send(sigB) </pre>
                         </li>
-                        <li>ALICE: Verify by Bob's Public Key the "sigB" and the msg those were received.<br>
+                        <li>ALICE: Verify by Bob's Public Key the "sigB" and the "msg" those were received.<br>
+                         Well, Bob's Public Key was get from testnet.
+"sigB" was send from Bob.
+"msg" was made by Alice.<br>
 e.g.<pre class=eg>{bool} BobPubKey.verify(msg, sigB)</pre>
                         </li>
                         <li>ALICE: if 6th is true then Make the "sigA" by the Alice's Private Key and the "sigB".<br>
