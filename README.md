@@ -43,7 +43,7 @@ If you already have a Libra account, i.e. a private key or mnemonic, you can imm
                         <li>ALICE: Tap or Click [ Buy ] Button. And get address each other.<br>
                          And  Alice send address and msg to Bob by WebSocket.
 e.g.<pre class=eg>
-msg = (new SHA3(512)).update(msg+random).digest('hex');
+msg = CryptoJS.SHA3(msg+Math.random()).toString();
 wss.send(addr, msg) </pre>
                  </li>
                         <li>ALICE: Transffer Some Libra to BOB</li>
