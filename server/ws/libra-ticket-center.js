@@ -48,7 +48,7 @@ pm2 start|restart|stop /pathTo/libra-ticket-center.js
     //------------------------------------------------------------
     // WebSocket config
     //
-    const port = 8888//8888 //from client port 443 by nginx proxy upstream websocket 
+    const port = 8888 //from client port
     const host='wss.libra-auth.com'
     const pemPath='/etc/myletsencrypt/live/'+host
     const options = {
@@ -140,6 +140,7 @@ pm2 start|restart|stop /pathTo/libra-ticket-center.js
     //------------------------------------------------------------
     // onmsg
     // @param msg {string} received json stringified message
+    // @param socket {object} wss client socket
     function onmsg(msg, socket){
 
         //parse
@@ -184,6 +185,7 @@ pm2 start|restart|stop /pathTo/libra-ticket-center.js
 
     //------------------------------------------------------------
     // wssSend send to client
+    // @param socket {object} wss client socket
     // @param type {object} type e.g. 'hb'|'addr'|'sig'
     // @param data {any} The object to send
     function wssSend(socket, type, data){
@@ -204,7 +206,8 @@ pm2 start|restart|stop /pathTo/libra-ticket-center.js
     }
     //------------------------------------------------------------
     // delClient
-    // @param socket {object} socket
+    // @param socket {object} wss client socket
+    // @at {string} memo
     function delClient(socket, at) {
         console.log('--to be del--: '
             , at
@@ -225,7 +228,7 @@ pm2 start|restart|stop /pathTo/libra-ticket-center.js
     //------------------------------------------------------------
     // Event executed when an address is received from the client
     // @addreesAndMsg {object} libra addrees  //e.g. { addr:AliceAddressHex, msg: AliceMsgHash} 
-    // @socket {object} wss client
+    // @socket {object} wss client socket
     async function onReceivedAddress(addreesAndMsg, socket){
 
         //-------------------------------------------------
@@ -278,7 +281,7 @@ pm2 start|restart|stop /pathTo/libra-ticket-center.js
     //------------------------------------------------------------
     // Event executed when an QR sigA is received from the client
     // @data {object} {"addr":"...", "sigA":"..."}
-    // @socket {object} wss client
+    // @socket {object} wss client socket
     async function onGetQRSigneture(data, socket){
         let msg=''
         //parse
@@ -339,6 +342,8 @@ pm2 start|restart|stop /pathTo/libra-ticket-center.js
     }
     //------------------------------------------------------------
     // send Error to client
+    // @socket {object} wss client socket
+    // @err {string} err code
     function sendErrorToclient(socket, err){
         wssSend(socket, 'res', 'NG:'+err)
     }
@@ -359,7 +364,11 @@ pm2 start|restart|stop /pathTo/libra-ticket-center.js
 
     //------------------------------------------------------------
     // set upsert Address and SigB and pubkey
-    //
+    // @model {object} model
+    // @addr {string} Alice's address
+    // @sigB {string} Bob's address
+    // @pubkey {string} Alice's pubkey
+    // @callback {function} callback
     function setAddrSigBPubkey(model, addr, sigB, pubkey, callback){
         let item={ 
             "addr": addr
@@ -372,7 +381,9 @@ pm2 start|restart|stop /pathTo/libra-ticket-center.js
 
     //------------------------------------------------------------
     // Upsert Address and SigB
-    //
+    // @model {object} model
+    // @item {object} item
+    // @callback {function} callback
     function upsertAddrSigB(model, item, callback) {
         if (typeof item !== 'object') return;
         model.updateOne(
@@ -397,7 +408,9 @@ pm2 start|restart|stop /pathTo/libra-ticket-center.js
 
     //------------------------------------------------------------
     // Fined by Address
-    //
+    // @model {object} model
+    // @addr {string} seach address
+    // @callback {function} callback
     function findByAddress(model, addr, callback){
 
         model
