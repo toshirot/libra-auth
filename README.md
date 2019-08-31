@@ -4,10 +4,9 @@
 An authentication method using Libra's Public Key and Secret Key.
 Use a signature by EdDSA.
 In the figure below, User “ALICE” pays the ticket fee to Ticket Center “BOB” with Libra and is authenticated with the signature ticket.  
+It is authentication based on the Libra client keys. And the processing speed is fast.
 
-It is authentication based on the Libra client keys. But the communication between Bob and Alice doesn't put a load on the Libra blockchain. And the processing speed is fast.
-
-Why is it fast? For example, when if tens of thousands of people enter the stadium, libra-auth authentication can be handled only by the client-side  and server-side  without "transaction" of accessing the Libra network.
+Why is it fast?the communication between Bob and Alice doesn't put a load on the Libra blockchain. For example, when if tens of thousands of people enter the stadium, libra-auth authentication can be handled only by the client-side and server-side without "transaction" of accessing the Libra network.
 
 <h2>What we are going to make on this Demo</h2>
 
