@@ -12,6 +12,7 @@
         <script src="./js/kulap-libra-b.js"></script>
         <script src="./js/elliptic-b.js"></script>
         <script src="./js/qrcode-keeex.js"> </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
         <script
             src="https://code.jquery.com/jquery-3.4.1.min.js?1"
             integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
@@ -74,7 +75,7 @@
 
 $(function(){
 
-    let debug=false
+    let debug=true
 
 // In this demo, the libraweb Object of libraweb-v2.js is public inside the window object. 
 // When actually using it, it is recommended to private it inside the function.
@@ -114,6 +115,7 @@ $(function(){
     let   AliceAddressHex=''//made every time
     let   AliceAccountOj=null//made every time
     let   AlicePriKeyOj=null//made every time
+    let   Alice1stMsg=''//1st msg
     const BOB_ADDRESS_HEX='b7c811fd8f488e9c41f03a2cc1671b3a65b4638806a2ad72c96109924bde8454'
     let   BobPubKeyOj=null;//from LIBRA
     //unit of Libra
@@ -299,8 +301,11 @@ $(function(){
                         balance=+accountState.balance.toString()
                         if(typeof balance==='number'){
                             $('#buy-button-box').html('')
-                            //1) send alice address to bob
-                            wssSend('addr', AliceAddressHex)
+                            //1) Alice send address and msg to Bob 
+                            //wssSend('addr', AliceAddressHex)
+                            let msg="hello-"+Math.random()
+                            Alice1stMsg = CryptoJS.SHA3(msg).toString()
+                            wssSend('addr', { addr:AliceAddressHex, msg: Alice1stMsg} )
                             // stop Interval
                             clearInterval(GET_BALANCE_TIMER)
                             // show addr and balance
@@ -447,7 +452,7 @@ $(function(){
     // for stop manually WebSocket, in dev console, do window.wssDelAll()
     window.wssDelAll=wssDelAll
     function wssDelAll(callback) {
-        let wss_arry=Ticket.conn.wss_arry
+        let wss_arry=Ticket.conn.wss_arr
         //del all wss object
         for(var i=0;i<wss_arry.length;i++){  
             if(debug)console.log(i
@@ -483,12 +488,15 @@ $(function(){
     }
     //------------------------------------------------------------
     // 6) Event executed when an sigB is received from the server
-    // @data {object} sigB and msg {type:'sig', data:[sigB, msgHash]}
+    // @data {object} sigB and msg {type:'sig', data: sigB}
     function onReceivedSigB(data, wss){
         if(!data.data)return
-        if(data.data.length!==2)return
-        const sigB=data.data[0]
-        const msgHash=data.data[1]
+        const sigB=data.data
+        const msgHash=Alice1stMsg
+
+        if(debug)console.log('onReceivedSigB sigB send from Bob', sigB)
+        if(debug)console.log('onReceivedSigB msgHash Alice maked', msgHash)
+
         if(!chkDataSimple(sigB, msgHash))return
         
         // 6)7) ALICE: verify SigB, And Mk SigA QR
@@ -526,8 +534,20 @@ $(function(){
                 if(debug)console.info('6. OK. verify(msg, sigB) is true.')
                 const AlicePriKeyHex=getAlicePriKeyHex()
                 const AlicePriKeyOj = ec.keyFromSecret(AlicePriKeyHex, 'hex')
+
                 //mk sigA
                 const sigA=AlicePriKeyOj.sign(sigB).toHex()
+
+                if(debug){
+                    let AlicePubKeyHex=getAlicePubKeyHex()
+                    console.log('do6and7 AlicePubKeyHex', AlicePubKeyHex)
+                    const AlicePubKeyOj = ec.keyFromPublic(AlicePubKeyHex, 'hex')
+                    //chk
+                    const res9 = AlicePubKeyOj.verify(sigB, sigA)
+                    console.log('do6and7 res9', res9)
+                }
+
+                if(debug)console.log('verifySigBAndMkSigAQR sigA', sigA)
                 let text=JSON.stringify({addr:AliceAddressHex,sigA:sigA})
                 //mk QR
                 setQR($('#buy-button-box')[0], '').makeCode(text)
@@ -793,6 +813,11 @@ $(function(){
     // 7) get AlicePriKeyHex
     function getAlicePriKeyHex(){
         return librawebBuffer.from(AliceAccountOj.keyPair.getSecretKey()).toString("hex")
+    }
+    //------------------------------------------------------------
+    // get AlicePubKeyHex
+    function getAlicePubKeyHex(){
+        return librawebBuffer.from(AliceAccountOj.keyPair.getPublicKey()).toString("hex")
     }
     //------------------------------------------------------------
     // 5) WebSocketでsignatureとmassageを送る

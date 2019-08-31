@@ -11,6 +11,8 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
 //-----------------------------------------------------------------------------
 'use strict'
 
+    const debug=true
+
     const EdDSA = require('elliptic').eddsa
     const ec = new EdDSA('ed25519')
     const { SHA3 } = require('sha3');
@@ -46,7 +48,7 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
     //------------------------------------------------------------
     // WebSocket config
     //
-    const port = 8888 //from client port 443 by nginx proxy upstream websocket 
+    const port = 8888//8888 //from client port 443 by nginx proxy upstream websocket 
     const host='wss.libra-auth.com'
     const pemPath='/etc/myletsencrypt/live/'+host
     const options = {
@@ -167,6 +169,7 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
             onGetSigneture(received.data, socket)
 
         } else if(received.type === 'qr'){
+            if(debug)console.log('onmsg type qr', received.data)
             if(!received.data)return
             //verify 
             onGetQRSigneture(received.data, socket)
@@ -221,9 +224,9 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
 
     //------------------------------------------------------------
     // Event executed when an address is received from the client
-    // @addrees {number} libra addrees
+    // @addreesAndMsg {object} libra addrees  //e.g. { addr:AliceAddressHex, msg: AliceMsgHash} 
     // @socket {object} wss client
-    async function onReceivedAddress(addrees, socket){
+    async function onReceivedAddress(addreesAndMsg, socket){
 
         //-------------------------------------------------
         // 5) mk sigB
@@ -234,31 +237,42 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
         // At the time of implementation, 
         // it is necessary to search for an appropriate tx.
 
+        // need input check and error handling
+        let addrees=addreesAndMsg.addr
+        let msgHash=addreesAndMsg.msg
+  
+        if(debug)console.log('onReceivedAddress', typeof addrees, addrees)
+        if(debug)console.log('onReceivedAddress msgHash', typeof msgHash, msgHash)
+
         let seq=0
         const transaction = await CLIENT.getAccountTransaction(addrees, seq, false)
         const publicKeyHex=buffer2hex(transaction.signedTransaction.publicKey)
-        const AlicePubKey = ec.keyFromPublic(publicKeyHex, 'hex')
+        const AlicePubKeyOj = ec.keyFromPublic(publicKeyHex, 'hex')
+
+        if(debug)console.log('onReceivedAddress alice publicKeyHex', typeof publicKeyHex, publicKeyHex)
 
         // set to Notes for each client
         socket.client.addrees=addrees
         socket.client.pubkey=publicKeyHex
 
+        /*
         // mk Massage
         const salt = 'my sweet salt'
         const saltHash = (new SHA3(512)).update(salt).digest('hex')
         const random = saltHash + Math.random().toString()
         const msgHash = (new SHA3(512)).update(random).digest('hex')
+        */
 
         // 5. BOB: sigB = BobPriKey.sign(msg)
         const sigB= BobPriKey.sign(msgHash).toHex();
 
-        // 5. upsert sigB and address to DB
-        setAddrSigB(modelLibraAuth, addrees, sigB)
+        // 5. upsert sigB, Alice address, Alice PublicKey to DB
+        setAddrSigBPubkey(modelLibraAuth, addrees, sigB, publicKeyHex)
 
         //-------------------------------------------------
-        // 5) BOB: Send sigB and msg to Alice by WebSocket. socket.send(sigB, msg)
+        // 5) BOB: Send sigB to Alice by WebSocket. socket.send(sigB)
 
-        wssSend(socket, 'sig', [sigB, msgHash])
+        wssSend(socket, 'sig', sigB)
 
     }
     //------------------------------------------------------------
@@ -276,10 +290,6 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
             sendErrorToclient(socket, msg)
             return
         }
-        console.log(data)
-        console.log('typeof', typeof data)
-        console.log('addr', data.addr)
-        console.log('sigA', data.sigA)
 
         if(!data.addr){msg=ERR_001; sendErrorToclient(socket, msg); return }
         if(!data.sigA){msg=ERR_002; sendErrorToclient(socket, msg); return }
@@ -290,12 +300,29 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
         // TODO
         // In this code, get the Alice's Public Key from testnet.
         // However, to speed up the process, we plan to register Alice's Public Key during the first DB insert.
+        /* old code from testnet
         const transaction = await CLIENT.getAccountTransaction(data.addr, seq, false)
-        const publicKeyHex=buffer2hex(transaction.signedTransaction.publicKey)
-        const AlicePubKeyOj = ec.keyFromPublic(publicKeyHex, 'hex')
+        let publicKeyHex=buffer2hex(transaction.signedTransaction.publicKey)
+        let AlicePubKeyOj = ec.keyFromPublic(publicKeyHex, 'hex')
+        let AlicePubKeyOj2 = ec.keyFromPublic(publicKeyHex, 'hex')
+        if(debug){
+            console.log('findByAddress publicKeyHex from testnet', publicKeyHex.length, publicKeyHex)
+        }
+        */
         findByAddress(modelLibraAuth, data.addr, function(res){
-            console.log('findByAddress', res)
-            const res9 = AlicePubKeyOj.verify(res.sigB, data.sigA)
+            
+            const publicKeyHex=res.pubkey
+            const AlicePubKeyOj = ec.keyFromPublic(publicKeyHex, 'hex')
+
+            const sigB=res.sigB
+            const sigA=data.sigA
+            if(debug)console.log('findByAddress res.pubkey from DB', res.pubkey)
+            if(debug)console.log('findByAddress res.sigB   from DB', res.sigB)
+            if(debug)console.log('findByAddress data.sigA  from QR', data.sigA)
+            if(debug)console.log('findByAddress data.addr  from QR', data.addr)
+
+            const res9 = AlicePubKeyOj.verify(sigB, sigA)
+
             console.log('res9', res9)
 
             //-------------------------------------------------
@@ -315,52 +342,6 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
         wssSend(socket, 'res', 'NG:'+err)
     }
     //------------------------------------------------------------
-    // get accountState object
-    // @addrees {number} libra addrees
-    // @return accountState{Objecr} accountState
-    function getAccountStat(addrees){
-        return CLIENT.getAccountState(addrees)
-    }
-    //------------------------------------------------------------
-    // get balance 
-    // @addrees {number} libra addrees
-    // @return accountState{Objecr} accountState
-    function getBalance(accountState){
-        return CLIENT.getAccountState(addrees)
-    }
-    //------------------------------------------------------------
-    // 4) 最新のシークエンス番号を取得する
-    // @addrees {number} libra addrees
-    // @return sequence{string} string of last sequence number
-    function getLastSequence(addrees, callback){
-        //const accountState = CLIENT.getAccountState(addrees)
-            CLIENT
-                .getAccountState(addrees)
-                .then((value) => {
-                    if(callback)callback( value)
-                }, (reason) => {
-                    console.log('error:',reason)
-                })
-        
-        
-    }
-    //------------------------------------------------------------
-    // 4) seach last transaction from bob and alice address
-    // @sequence{number} sequence number
-    // @clientAddr {number} client Address
-    // @return {object} transaction
-    function findLastTxBobAndAlic(sequence, clientAddr){
-        let tx
-        for(let i=sequence;i<=0;i--){
-            tx=null; tx=getTx(alice, sequence, false)
-
-            //chk alice bob balance これで特定してよいか
-            console.log(getPubKey(transaction))
-        }
-
-        return tx
-    }
-    //------------------------------------------------------------
     // buffer to hex
     // @array{uint8array} array
     // @return {string} hex
@@ -376,12 +357,13 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
 //-----------------------------------------------------------------------------
 
     //------------------------------------------------------------
-    // set upsert Address and SigB
+    // set upsert Address and SigB and pubkey
     //
-    function setAddrSigB(model, addr, sigB, callback){
+    function setAddrSigBPubkey(model, addr, sigB, pubkey, callback){
         let item={ 
             "addr": addr
             ,"sigB": sigB
+            ,"pubkey": pubkey
             ,"utaime":  (new Date()).getTime()
         };    
         upsertAddrSigB(model, item, callback)

@@ -13,12 +13,12 @@ function test(){
     //==============================================
     // ALICE
 
-    const AlicePriKeyHex='fa127e73935678a647daf3d3af2a934dc0e9c9c39dc4ac2e69c9c3648447ff53';
+    const AlicePriKeyHex='2dde91f2830bda4b1eda07b33e45736f4c9e34707f655b110e0dca5751144336';
     // Create key pair from secret
     const AlicePriKey = ec.keyFromSecret(AlicePriKeyHex, 'hex');// hex string, array or Buffer
 
     // Import public key
-    const AlicePubKeyHex = '78cd96278f49a78664faf50e9b238f3f5642360d80b3b0ce82782a4a8af3a8e9';
+    const AlicePubKeyHex = '5e173066752204c1824f90bc5d6f1d68bbca920be020c9bb0abce4da4398ef07';
     const AlicePubKey = ec.keyFromPublic(AlicePubKeyHex, 'hex');
 
     //==============================================
