@@ -366,7 +366,7 @@ pm2 start|restart|stop /pathTo/libra-ticket-center.js
     // set upsert Address and SigB and pubkey
     // @model {object} model
     // @addr {string} Alice's address
-    // @sigB {string} Bob's address
+    // @sigB {string} Bob's signature for Alice
     // @pubkey {string} Alice's pubkey
     // @callback {function} callback
     function setAddrSigBPubkey(model, addr, sigB, pubkey, callback){
