@@ -47,7 +47,9 @@ wss.send(addr, msg) </pre>
                  </li>
                         <li>ALICE: Transffer Some Libra to BOB</li>
                         <li>ALICE: get BOB's PublicKey from testnet transaction</li>
-                        <li>BOB:   get ALICE's PublicKey from testnet transaction and Check payment if necessary</li>
+                        <li>BOB:   get ALICE's PublicKey from testnet transaction and Check payment if necessary.<br>
+                                And send "msg" to Bob by WebSocket. 
+                        </li>
                         <li>BOB:   Make the "sigB" by the "msg" and  Bob's Private Key.<br>
                                 And upsert sigB, Alice address, Alice PublicKey to DB<br>
                                 And send "sigB" to Alice by WebSocket. <br>
