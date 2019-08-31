@@ -50,7 +50,7 @@ wss.send(addr, msg) </pre>
                         <li>ALICE: get BOB's PublicKey from testnet transaction</li>
                         <li>BOB:   get ALICE's PublicKey from testnet transaction and Check payment if necessary</li>
                         <li>BOB:   Make the "sigB" by the "msg" and  Bob's Private Key.<br>
-                                And upsert sigB, address to DB<br>
+                                And upsert sigB, Alice address, Alice PublicKey to DB<br>
                                 And send "sigB" to Alice by WebSocket. <br>
 e.g.<pre class=eg>
 sigB = BobPriKey.sign(msg).toHex();
