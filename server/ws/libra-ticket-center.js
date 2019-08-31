@@ -2,7 +2,7 @@
 // Libra Ticket Center Demo
 /* libra-ticket-center.js
 
-sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
+pm2 start|restart|stop /pathTo/libra-ticket-center.js
 
 */
 //=============================================================================
