@@ -33,27 +33,32 @@ Next, use another smartphone to authenticate by scanning the ALICE QR code from 
 The Libra Auth method can be used not only for ticket sales authentication as in this demo but also for normal authentication tasks. Especially suitable for authentication tasks involving payments. It provides trust by the Libra blockchain ledger. However, each authentication work is fast because it is separated from the Libra Network.  
 If you already have a Libra account, i.e. a private key or mnemonic, you can immediately authenticate with someone else's account without payment
 
-<img src=https://libra-auth.com/img/doc/libra-auth-2019-08-30-01.png> 
+<img src=https://libra-auth.com/img/doc/libra-auth-2019-08-31-05.png> 
 
 <h2>flow</h2>
 
 <section>
         <div>
                 <ol>
-                        <li>ALICE: Tap or Click [ Buy ] Button. And get address each other</li>
+                        <li>ALICE: Tap or Click [ Buy ] Button. And get address each other.<br>
+                         And  Alice send "address" and "msg" to Bob by WebSocket.
+e.g.<pre class=eg>
+msg = CryptoJS.SHA3(msg+Math.random()).toString();
+wss.send(addr, msg) </pre>
+                 </li>
                         <li>ALICE: Transffer Some Libra to BOB</li>
                         <li>ALICE: get BOB's PublicKey from testnet transaction</li>
                         <li>BOB:   get ALICE's PublicKey from testnet transaction and Check payment if necessary</li>
-                        <li>BOB:   Make the "sigB" by the msg hash and  Bob's Private Key.<br>
+                        <li>BOB:   Make the "sigB" by the "msg" and  Bob's Private Key.<br>
                                 And upsert sigB, address to DB<br>
-                                And send "sigB" and msg to Alice by WebSocket. <br>
+                                And send "sigB" to Alice by WebSocket. <br>
 e.g.<pre class=eg>
-msg = (new SHA3(512)).update('msg hello').digest('hex');
 sigB = BobPriKey.sign(msg).toHex();
 upsert sigB and address to DB
-wss.send(sigB, msg) </pre>
+wss.send(sigB) </pre>
                         </li>
-                        <li>ALICE: Verify by Bob's Public Key the "sigB" and the msg those were received.<br>
+                        <li>ALICE: Verify by Bob's Public Key the "sigB" and the "msg" those were received.<br>
+                         Well, Bob's Public Key was getting from testnet. "sigB" was send from Bob. "msg" was made by Alice.<br>
 e.g.<pre class=eg>{bool} BobPubKey.verify(msg, sigB)</pre>
                         </li>
                         <li>ALICE: if 6th is true then Make the "sigA" by the Alice's Private Key and the "sigB".<br>
@@ -69,6 +74,7 @@ if(res6){
                         <li>BOB:  Bob is received "sigA" and Alis's Address.<br>
                          And find sigB from DB by Address, <br>
                          And Verify the "sigB" and "sigA" by Alice's Public Key. <br>
+                         Well, Alice's Public Key was getting from testnet. "sigA" was scanned from Alice's smartphone. "sigB" was made by Bob.<br>
 e.g.<pre class=eg>
 find sigB from DB by Address
 {bool}  AlicePubKey.verify(sigB, sigA) </pre>
