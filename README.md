@@ -97,14 +97,14 @@ if(res8){
                         <li>ALICE: if the sixth verify is true, That means 
                         <ol>
                                 <li>Bob's Public Key and signeture "sigB" and msg were valid.</li>
-                                <li>Bob has the Private Key used in this transaction.</li>
+                                <li>Bob has the Private Key used in this Libra transaction.</li>
                                 <li>Therefore, 5's Bob is the person Alice paid Libra in 2's transaction.</li>
                         </ol>
                         </li>
                         <li>BOB: if the 8th verify is true,That means 
                         <ol>
                                 <li>Alice's Public Key and signeture "sigA" and signeture "sigB" were valid.</li>
-                                <li>Alice has the Private Key used in 2's transaction.</li>
+                                <li>Alice has the Private Key used in 2's Libra transaction.</li>
                                 <li>And this msg was recieved from Bob to Alice at 6. So 7's Allice is the same as 6.</li>
                                 <li>Therefore, 7's Alice is the person who paid Libra to Bob in 2 transactions.</li>
                         </ol>   
