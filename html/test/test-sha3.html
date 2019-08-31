@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset=utf-8>
+        <meta name=viewport content="width=device-width, initial-scale=1">
+        <title>test sha3-512</title>
+        <style>
+
+        </style>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+    </head>
+    <body>
+        <div id="msgdiv"></div>
+        <div id="hashdiv"></div>
+        <script>
+        'use strict';
+    
+        test()
+    
+        function test(){
+            
+            //==============================================
+            // Mk hash
+    
+            let msg="Message-"+Math.random()
+            window.hash = CryptoJS.SHA3(msg).toString()
+            console.log(msg)
+            console.log(hash)
+            msgdiv.innerHTML=msg
+            hashdiv.innerHTML=hash
+
+        }
+
+        //@see https://github.com/brix/crypto-js
+
+        /* response sample
+        Message-0.044285436909049514
+        adfbe13a8a9d74560f99156c33e8920a8e32da1847cca5871cdcd4c4e3c7aec1f633cdcf69fd4d43c9e5c066965fffbbb954bba8d5e2e1315b2d0fc9b5e63015
+
+        */
+        </script>
+    </body>
+</html>
