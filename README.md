@@ -76,6 +76,7 @@ if(res6){
                         <li>BOB:  Bob is received "sigA" and Alis's Address.<br>
                          And find sigB from DB by Address, <br>
                          And Verify the "sigB" and "sigA" by Alice's Public Key. <br>
+                         Well, Alice's Public Key was get from testnet. "sigA" was scaned from Alice's smartphone. "sigB" was made by Bob.<br>
 e.g.<pre class=eg>
 find sigB from DB by Address
 {bool}  AlicePubKey.verify(sigB, sigA) </pre>
