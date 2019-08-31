@@ -287,6 +287,8 @@ function test(){
                         <li>jquery https://jquery.com/</li>
                 </ul>
         </div>
+ 
+There are many others. Thank you everyone!
 </section>
 </body>
 </html>
