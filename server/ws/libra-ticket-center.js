@@ -11,7 +11,7 @@ pm2 start|restart|stop /pathTo/libra-ticket-center.js
 //-----------------------------------------------------------------------------
 'use strict'
 
-    const debug=true
+    const debug=false
 
     const EdDSA = require('elliptic').eddsa
     const ec = new EdDSA('ed25519')
