@@ -255,6 +255,7 @@ function test(){
                 <ul>
                         <li>indutny/elliptic https://github.com/indutny/elliptic</li>
                         <li>phusion/node-sha3 https://github.com/phusion/node-sha3</li>
+                        <li>brix/crypto-js https://github.com/brix/crypto-js</li>
                 </ul>
         </div>
         <div>
