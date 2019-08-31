@@ -297,6 +297,7 @@ sudo pm2 start|restart|stop /pathTo/libra-ticket-center.js
         if(data.sigA.length!==128){msg=ERR_004; sendErrorToclient(socket, msg); return }
 
         let seq=0
+        // I Doit 2019-08-30
         // TODO
         // In this code, get the Alice's Public Key from testnet.
         // However, to speed up the process, we plan to register Alice's Public Key during the first DB insert.
