@@ -30,7 +30,10 @@ Next, use another smartphone to authenticate by scanning the ALICE QR code from 
 
 <h2>Future</h2>
 The Libra Auth method can be used not only for ticket sales authentication as in this demo but also for normal authentication tasks. Especially suitable for authentication tasks involving payments. It provides trust by the Libra blockchain ledger. However, each authentication work is fast because it is separated from the Libra Network.  
-If you already have a Libra account, i.e. a private key or mnemonic, you can immediately authenticate with someone else's account without payment
+<br>
+If you already have a Libra account, i.e. a private key or mnemonic, you can immediately authenticate with someone else's account without payment.
+<br>
+By the way, mnemonic are important. I did n’t make import mnemonic this time, But with that, if Alice loses the QR ticket, You can reissue a secure QR ticket from the same address from 1 to 7. BOB can invalidate old tickets by overwriting Alice's address DB.
 
 <img src=https://libra-auth.com/img/doc/libra-auth-2019-08-31-10.png> 
 
