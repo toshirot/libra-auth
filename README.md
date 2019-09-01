@@ -47,7 +47,7 @@ In another case, Alice can pass resale information to Bob. If Bob allows it, Bob
 
 <img src=https://libra-auth.com/img/doc/libra-auth-2019-08-31-10.png> 
 
-<h2>flow</h2>
+<h2>Flow</h2>
 
 <section>
         <div>
@@ -103,7 +103,7 @@ if(res8){
         </div>
 </section>
 
-<h2>discription</h2>
+<h2>Discription</h2>
 <section>
         <div>
                 <ul>
