@@ -24,7 +24,7 @@ Next, use another smartphone to authenticate by scanning the ALICE QR code from 
 </ol>
 <ul>
 <li><strong>test-1 <u>QR ticket's address was broken.</u> </strong><br><a href=https://libra-auth.com/test/buy-ticket-fake-1.html>https://libra-auth.com/test/buy-ticket-fake-1.html</a> 7th in the figure below, Alice's address length was different received the server.</li>
-<li><strong>test-2 <u>QR ticket with changed to Fake address was used.</u> </strong><br><a href=https://libra-auth.com/test/buy-ticket-fake-2.html>https://libra-auth.com/test/buy-ticket-fake-2.html</a> 7th in the figure below, Alice's address is Other client one.</li>
+<li><strong>test-2 <u>QR ticket with changed to Fake address was used.</u> </strong><br><a href=https://libra-auth.com/test/buy-ticket-fake-2.html>https://libra-auth.com/test/buy-ticket-fake-2.html</a> 7th in the figure below, Alice's address is another client one.</li>
 </ul>
 
 
