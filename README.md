@@ -277,7 +277,7 @@ function test(){
                 </ul>
         </div>
          <div>
-         <h4>for Demo' https Server</h4>
+         <h4>for https Server</h4>
                 <ul>
                         <li>nginx/nginx https://github.com/nginx/nginx</li>
                 </ul>
