@@ -258,22 +258,28 @@ function test(){
                 </ul>
         </div>
         <div>
-         <h4>for WebSocket</h4>
-                <ul>
-                        <li>websockets/ws https://github.com/websockets/ws</li>
-                </ul>
-        </div>
-         <div>
-         <div>
          <h4>for DB</h4>
                 <ul>
                         <li>mongoDB https://www.mongodb.com</li>
                         <li>Automattic/mongoose https://github.com/Automattic/mongoose</li>
                 </ul>
         </div>
+        <div>
+         <h4>for WebSocket Server</h4>
+                <ul>
+                        <li>websockets/ws https://github.com/websockets/ws</li>
+                </ul>
+        </div>
+        <div>
          <h4>for Proxy Server</h4>
                 <ul>
                         <li>expressjs/express https://github.com/expressjs/express</li>
+                </ul>
+        </div>
+         <div>
+         <h4>for Demo' https Server</h4>
+                <ul>
+                        <li>nginx/nginx https://github.com/nginx/nginx</li>
                 </ul>
         </div>
          <div>
