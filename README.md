@@ -42,7 +42,7 @@ If you already have a Libra account, i.e. a private key or mnemonic, you can imm
 By the way, mnemonics are important. I did n’t make import mnemonic this time, But with that, if Alice loses the QR ticket, She can reissue a secure QR ticket from the same address from 1 to 7. BOB can invalidate old tickets by overwriting Alice's address DB.
 </p>
 <p>
-In another case, Alice can pass resale information to Bob. If Bob allows it, Bob and Eve will be able to issue a new QR Tiket by executing 1-7 from the transaction that Eve sent the Libra to Alice.　Bob can also receive a resale fee.
+In another case, Alice can pass resale information to Bob. If Bob allows it, Bob and Eve will be able to issue a new QR Tiket by executing 1-7 from the transaction that Eve sent the Libra to Alice.　Bob can also receive a resale fee. If you are strictly concerned about QR Ticket theft or unauthorized resale, there is a way to prove Alice at the entrance with private key.
 </p>
 
 <img src=https://libra-auth.com/img/doc/libra-auth-2019-08-31-10.png> 
