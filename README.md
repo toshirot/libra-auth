@@ -297,7 +297,7 @@ function test(){
                 </ul>
         </div>
  
-There are many others. Thank you everyone!
+There are many others. Thank you, everyone!
 </section>
 </body>
 </html>
