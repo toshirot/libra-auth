@@ -1,12 +1,15 @@
 <h1>Libra Auth</h1>
 
- 
+<p>
 An authentication method using Libra's Public Key and Secret Key.
 Use a signature by EdDSA.
-In the figure below, User “ALICE” pays the ticket fee to Ticket Center “BOB” with Libra and is authenticated with the signature ticket.    <br><br>
+In the figure below, User “ALICE” pays the ticket fee to Ticket Center “BOB” with Libra and is authenticated with the signature ticket. </p>
+<p>
 It is authentication based on the Libra client keys. And the processing speed is fast.
-
+</p>
+<p>
 Why is it fast?the communication between Bob and Alice doesn't put a load on the Libra blockchain. For example, when if tens of thousands of people enter the stadium, libra-auth authentication can be handled only by the client-side and server-side without "transaction" of accessing the Libra network.
+</p>
 
 <h2>What we are going to make on this Demo</h2>
 
