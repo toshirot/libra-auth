@@ -128,7 +128,7 @@ if(res8){
         </div>
 </section>
 
-<h2>test Implementation</h2>
+<h2>Test implementation for Signature-verify-only</h2>
 <section>
         <div>
                 <strong>Node.js: </strong>Signature-only test without WebSocket and testnet communication between Alice and Bob.
