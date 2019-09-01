@@ -291,6 +291,9 @@ function test(){
                         <li>key Icon https://icon-rainbow.com/</li>
                         <li>my favorite drawing tool https://www.draw.io/</li>
                         <li>jquery https://jquery.com/</li>
+                        <li>nvm-sh/nvm https://github.com/nvm-sh/nvm</li>
+                        <li>npm https://github.com/npm</li>
+                        <li>nodejs/node https://github.com/nodejs/node</li>
                         <li>Let’s Encrypt https://letsencrypt.org/</li>
                         <li>Oracle VM VirtualBox https://www.virtualbox.org/</li>
                         <li>Ubuntu 18.04.3 LTS https://ubuntu.com/download/server</li>
