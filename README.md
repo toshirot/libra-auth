@@ -237,7 +237,7 @@ function test(){
                 </code></pre>
         </div>
 </section>
-<h2>Thanx main dependence</h2>
+<h2>Thanx main dependence for this Demo</h2>
 <section>
         <div>
          <h4>for LIBRA</h4>
@@ -292,6 +292,8 @@ function test(){
                         <li>my favorite drawing tool https://www.draw.io/</li>
                         <li>jquery https://jquery.com/</li>
                         <li>Let’s Encrypt https://letsencrypt.org/</li>
+                        <li>Oracle VM VirtualBox https://www.virtualbox.org/</li>
+                        <li>Ubuntu 18.04.3 LTS https://ubuntu.com/download/server</li>
                 </ul>
         </div>
  
