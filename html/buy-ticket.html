@@ -132,8 +132,11 @@ $(function(){
     const PROXY_FAUCET_HOST='libra-auth.com'
     //protocol for mint. http or https
     const PROXY_FAUCET_PROTOCOL='https' 
-    //default libra explorer url
-    const LIBRA_EXPLORER='https://www.libravista.com/address'
+
+    //temp0906
+    //const LIBRA_EXPLORER='https://www.libravista.com/address/'
+    const LIBRA_EXPLORER='https://libexplorer.com/transactions?q='
+
     let   GET_BALANCE_TIMER=1000
     const GET_BALANCE_COUNTER_MAX=3
 
@@ -245,7 +248,7 @@ $(function(){
     function mkClientProfeel(AliceAddressHex, balance){
         return `
         <div class=youraddr><span>Your Address:</span><br>
-            <a target=_blank href=${LIBRA_EXPLORER}/${AliceAddressHex}>${AliceAddressHex}</a>
+            <a target=_blank href=${LIBRA_EXPLORER}${AliceAddressHex}>${AliceAddressHex}</a>
         </div>
         <div class=yourbalance><span>Your Balance: </span>${balance}</div>`
     }
@@ -292,9 +295,14 @@ $(function(){
                     getBobPubKeyHex(function(BobPubKeyHex){
                         BobPubKeyOj = ec.keyFromPublic(BobPubKeyHex, 'hex');
                     })
-                    
+                  
                     // get Address Hex of Alice
                     let senderAddrHex=Ticket.librawebBuffer.from(fromAddrOj.address.addressBytes).toString('hex') 
+
+                    //------------------------------------------------------------
+                    // for temp0906
+                    let senderPubkey=Ticket.librawebBuffer.from(fromAddrOj.keyPair.getPublicKey()).toString("hex")
+
                     //get accountState
                     getAccountState(senderAddrHex, function(accountState){
                         // get balance
@@ -305,7 +313,12 @@ $(function(){
                             //wssSend('addr', AliceAddressHex)
                             let msg="hello-"+Math.random()
                             Alice1stMsg = CryptoJS.SHA3(msg).toString()
-                            wssSend('addr', { addr:AliceAddressHex, msg: Alice1stMsg} )
+
+                            //------------------------------------------------------------
+                            // for temp0906
+                            //wssSend('addr', { addr:AliceAddressHex, msg: Alice1stMsg} )
+                            wssSend('addr', { addr:AliceAddressHex, msg: Alice1stMsg, pub: senderPubkey} )
+
                             // stop Interval
                             clearInterval(GET_BALANCE_TIMER)
                             // show addr and balance

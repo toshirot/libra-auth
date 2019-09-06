@@ -67,6 +67,9 @@ pm2 start|restart|stop /pathTo/libra-ticket-center.js
     const ERR_004='004' //data.sigA.length!==128 error. in onGetQRSigneture
     const ERR_005='005' //AlicePubKeyOj.verify is false error. in onGetQRSigneture
 
+    const ERR_100='wss closed' //close WEbSocket 
+
+    const ERR_999='Sorry, this is something error.'
 //=============================================================================
 // main 
 // 
@@ -243,15 +246,22 @@ pm2 start|restart|stop /pathTo/libra-ticket-center.js
         // need input check and error handling
         let addrees=addreesAndMsg.addr
         let msgHash=addreesAndMsg.msg
-  
+
         if(debug)console.log('onReceivedAddress', typeof addrees, addrees)
         if(debug)console.log('onReceivedAddress msgHash', typeof msgHash, msgHash)
 
         let seq=0
-        const transaction = await CLIENT.getAccountTransaction(addrees, seq, false)
-        const publicKeyHex=buffer2hex(transaction.signedTransaction.publicKey)
-        const AlicePubKeyOj = ec.keyFromPublic(publicKeyHex, 'hex')
+        //------------------------------------------------------------
+        // for befor temp0906
+        // const transaction = await CLIENT.getAccountTransaction(addrees, seq, false)
+        // const publicKeyHex=buffer2hex(transaction.signedTransaction.publicKey)
+        // const AlicePubKeyOj = ec.keyFromPublic(publicKeyHex, 'hex')
 
+        //------------------------------------------------------------
+        // for temp0906
+        let publicKeyHex=addreesAndMsg.pub
+        const AlicePubKeyOj = ec.keyFromPublic(publicKeyHex, 'hex')
+        if(debug)console.log('onReceivedAddress pub', typeof publicKeyHex, publicKeyHex)
         if(debug)console.log('onReceivedAddress alice publicKeyHex', typeof publicKeyHex, publicKeyHex)
 
         // set to Notes for each client
