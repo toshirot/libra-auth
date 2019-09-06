@@ -16,10 +16,11 @@ Why is it fast?the communication between Bob and Alice doesn't put a load on the
 Make this. Client and server authentication work sample for ticket application using the libra-auth method.
 
 <h2>Demo</h2>
+<p>
 <li>2019-09-06 on "after0901" branch, i fixed it. to make stub for connections to telnet. https://github.com/toshirot/libra-auth/tree/after0901
 my demo now works.</li>
 <li>2019-09-05 This demo currently stops with transaction-related errors. @see https://github.com/perfectmak/libra-core/issues/41</li>
-
+</p>
 <p>
 First, open the ALICE page on your PC or smartphone and display the QR ticket.
 Next, use another smartphone to authenticate by scanning the ALICE QR code from the BOB page.
