@@ -17,7 +17,7 @@ Make this. Client and server authentication work sample for ticket application u
 
 <h2>Demo</h2>
 <p>
-<li>2019-09-06 on "after0901" branch, i fixed it. to make stub for connections to telnet. https://github.com/toshirot/libra-auth/tree/after0901
+<li>2019-09-06 on "after0901" branch, i fixed it. i made stub for connections to telnet. https://github.com/toshirot/libra-auth/tree/after0901
 my demo now works.</li>
 <li>2019-09-05 This demo currently stops with transaction-related errors. @see https://github.com/perfectmak/libra-core/issues/41</li>
 </p>
