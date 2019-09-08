@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset=utf-8>
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <title>memo</title>
+    <link rel="stylesheet" href="../css/main.css?2">
+    <style>
+        body{
+            margin:24px;
+            overflow:auto;
+        }
+        .flow{
+            margin: 18px;
+        }
+    </style>
+
+</head>
+<body>
+    <header>
+        <h2>Todo for libra-auth</h2>
+    </header>
+    <section>
+            <div id=todolists>
+                <ol>
+                    <li>the Entry user client side libra-auth object. like buy-ticket.html
+                        <ul>
+                            <li>libraAuth.create() list of argument options
+                                <ul>
+                                    <li>for Libra
+                                        <ul>
+                                                <li>1) BOB_ADDRESS_HEX</li>
+                                                <li>3) BOB_PUBLIC_KEY</li>
+                                                <li>1) ALICE_ADDRESS_HEX</li>
+                                                <li>4) ALICE_PUBLIC_KEY</li>
+                                                <li>7) ALICE_PRIVATE_KEY or NEMONIC</li>
+                                        </ul>
+                                    </li>
+                                    <li>for WebSocket
+                                        <ul>
+                                                <li>1) WSS_URL</li>
+                                                <li>5) TIMEOUT_FROM_BOB</li>
+                                        </ul>
+                                    </li>
+                                    <li>for Confirm the transaction
+                                        <ul>
+                                                <li>LIBRA_EXPLORER_URL</li>
+                                        </ul>
+                                    </li>
+                                    <li>for QR
+                                        <ul>
+                                                <li>7) target Element for QR image</li>
+                                                <li>7) QR_WIDTH *height is same with QR_WIDTH</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>Steps
+                                <ul>
+                                    <li>Alice and Bob authentication steps
+                                        <ul>
+                                                <li>1) send addr and msg to Bob</li>
+                                                <li>6) recieave sigB from Bob. and verify msg, sigB. </li>
+                                                <li>7) mk sigA by sigB. show QRor output of addr+sigA.</li>
+                                                
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li>the Authenticating client side libra-auth object. like auth-ticket.html
+                        <ul>
+                            <li>libraAuth.auth() list of argument options
+                                <ul>
+                                    <li>for WebSocket
+                                        <ul>
+                                                <li>1) WSS_URL</li>
+                                        </ul>
+                                    </li>
+                                    <li>for QR
+                                        <ul>
+                                                <li>7) target Element for QR image</li>
+                                                <li>7) QR_WIDTH *height is same with QR_WIDTH</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>Steps
+                                <ul>
+                                    <li>Alice and Bob authentication steps
+                                        <ul>
+                                                <li>8) read QR. 
+                                                <li>and send to Bob  addr, sigA. </li>
+                                                <li>Authentication result fron Bob</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+
+
+                    <li>the server side libra-auth object
+                        <ul>
+                            <li>libraAuth start list of argument options
+                                <ul>
+                                    <li>for Libra
+                                        <ul>
+                                                <li>1) BOB_ADDRESS_HEX</li>
+                                                <li>3) BOB_PUBLIC_KEY</li>
+                                                <li>5) BOB_PRIVATE_KEY or NEMONIC</li>
+                                        </ul>
+                                    </li>
+                                    <li>for WebSocket
+                                        <ul>
+                                                <li>1) WSS_URL</li>
+                                                <li>PATH_TO_PEM *Https if this exists.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>Steps
+                                <ul>
+                                    <li>Alice and Bob authentication steps
+                                        <ul>
+                                                <li>5) send sigB by msg to Alice. set expire until 7)8)</li>
+                                                <li>8) recieave sigA from Alice. </li>
+                                                <li>9)  verify sigA, sigB.</li>
+                                                <li>Authentication result to Auth client</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+            </ol>
+            </div>
+            <div>
+                <h2>Flow of the libra-auth Demo</h2>
+                <div class='flow'>
+
+                        github: libra-auth <a href="https://github.com/toshirot/libra-auth/">https://github.com/toshirot/libra-auth/</a>
+                        <img src=https://camo.githubusercontent.com/1d65b74f350078cdc8ff98750b593e35b4b0d4e7/68747470733a2f2f6c696272612d617574682e636f6d2f696d672f646f632f6c696272612d617574682d323031392d30382d33312d31302e706e67>
+        
+                </div>
+            </div>
+    </section>
+
+    <footer>
+            <div id=info>
+                <aside>  
+                </aside>
+            </div>
+            <div id=powerd>
+                <nav>
+                    powerd by <a href="https://github.com/toshirot/libra-auth">libra-auth method</a>
+                </nav>
+            </div>
+        </footer>
+    </div>
+    
+</body>
+</html>
