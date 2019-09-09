@@ -27,30 +27,38 @@
                         <ul>
                             <li>libraAuth.create() list of argument options
                                 <ul>
+                                    <li>for DOM
+                                        <ul>
+                                                <li>USE_IMPORT_FORM {bool} default true</li>
+                                                <li>USE_EXPORT_FORM {bool} default true</li>
+                                                <li>USE_ENTRY_BUTTON {bool} default true</li>
+                                                <li>USE_USR_DATA_BOX {json}  default true*balance, address</li>
+                                        </ul>
+                                    </li>
                                     <li>for Libra
                                         <ul>
-                                                <li>1) BOB_ADDRESS_HEX</li>
-                                                <li>3) BOB_PUBLIC_KEY</li>
-                                                <li>1) ALICE_ADDRESS_HEX</li>
-                                                <li>4) ALICE_PUBLIC_KEY</li>
-                                                <li>7) ALICE_PRIVATE_KEY or NEMONIC</li>
+                                                <li>1) BOB_ADDRESS_HEX {string} default null</li>
+                                                <li>3) BOB_PUBLIC_KEY {string} default null</li>
+                                                <li>1) ALICE_ADDRESS_HEX {string} default null</li>
+                                                <li>4) ALICE_PUBLIC_KEY {string} default null</li>
+                                                <li>7) ALICE_PRIVATE_KEY or NEMONIC {string} default null</li>
                                         </ul>
                                     </li>
                                     <li>for WebSocket
                                         <ul>
-                                                <li>1) WSS_URL</li>
-                                                <li>5) TIMEOUT_FROM_BOB</li>
+                                                <li>1) WSS_URL {string} default "https://libra-auth.com:8000/wss/"</li>
+                                                <li>5) TIMEOUT_FROM_BOBL {number} 1000*60 </li>
                                         </ul>
                                     </li>
                                     <li>for Confirm the transaction
                                         <ul>
-                                                <li>LIBRA_EXPLORER_URL</li>
+                                                <li>LIBRA_EXPLORER_URL {string} default "https://www.libravista.com/address/" | "https://libexplorer.com/transactions?q="</li>
                                         </ul>
                                     </li>
                                     <li>for QR
                                         <ul>
-                                                <li>7) target Element for QR image</li>
-                                                <li>7) QR_WIDTH *height is same with QR_WIDTH</li>
+                                                <li>7) target Element for QR image {string} dom element selector</li>
+                                                <li>7) QR_WIDTH *height is same with QR_WIDTH {number} default 256</li>
                                         </ul>
                                     </li>
                                 </ul>
