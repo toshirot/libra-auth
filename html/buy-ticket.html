@@ -9,7 +9,7 @@
 
         </style>
         <script src="./js/libraweb-v2.js"></script>
-        <script src="./js/kulap-libra-b.js"></script>
+        <script src="./js/kulap-libra@1.0.17-b.js"></script>
         <script src="./js/elliptic-b.js"></script>
         <script src="./js/qrcode-keeex.js"> </script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
@@ -116,7 +116,7 @@ $(function(){
     let   AliceAccountOj=null//made every time
     let   AlicePriKeyOj=null//made every time
     let   Alice1stMsg=''//1st msg
-    const BOB_ADDRESS_HEX='b7c811fd8f488e9c41f03a2cc1671b3a65b4638806a2ad72c96109924bde8454'
+    const BOB_ADDRESS_HEX='4fb5de5cf96588273ceab41ee1a807ea4efb0c6f8c08f10c2efc617175cea390'
     let   BobPubKeyOj=null;//from LIBRA
     //unit of Libra
     const LIBRA_UNIT=1000000
@@ -132,8 +132,11 @@ $(function(){
     const PROXY_FAUCET_HOST='libra-auth.com'
     //protocol for mint. http or https
     const PROXY_FAUCET_PROTOCOL='https' 
-    //default libra explorer url
-    const LIBRA_EXPLORER='https://www.libravista.com/address'
+
+    //temp0906
+    //const LIBRA_EXPLORER='https://www.libravista.com/address/'
+    const LIBRA_EXPLORER='https://libexplorer.com/transactions?q='
+
     let   GET_BALANCE_TIMER=1000
     const GET_BALANCE_COUNTER_MAX=3
 
@@ -245,7 +248,7 @@ $(function(){
     function mkClientProfeel(AliceAddressHex, balance){
         return `
         <div class=youraddr><span>Your Address:</span><br>
-            <a target=_blank href=${LIBRA_EXPLORER}/${AliceAddressHex}>${AliceAddressHex}</a>
+            <a target=_blank href=${LIBRA_EXPLORER}${AliceAddressHex}>${AliceAddressHex}</a>
         </div>
         <div class=yourbalance><span>Your Balance: </span>${balance}</div>`
     }
@@ -292,9 +295,14 @@ $(function(){
                     getBobPubKeyHex(function(BobPubKeyHex){
                         BobPubKeyOj = ec.keyFromPublic(BobPubKeyHex, 'hex');
                     })
-                    
+                  
                     // get Address Hex of Alice
                     let senderAddrHex=Ticket.librawebBuffer.from(fromAddrOj.address.addressBytes).toString('hex') 
+
+                    //------------------------------------------------------------
+                    // for temp0906
+                    let senderPubkey=Ticket.librawebBuffer.from(fromAddrOj.keyPair.getPublicKey()).toString("hex")
+
                     //get accountState
                     getAccountState(senderAddrHex, function(accountState){
                         // get balance
@@ -305,7 +313,12 @@ $(function(){
                             //wssSend('addr', AliceAddressHex)
                             let msg="hello-"+Math.random()
                             Alice1stMsg = CryptoJS.SHA3(msg).toString()
-                            wssSend('addr', { addr:AliceAddressHex, msg: Alice1stMsg} )
+
+                            //------------------------------------------------------------
+                            // for temp0906
+                            //wssSend('addr', { addr:AliceAddressHex, msg: Alice1stMsg} )
+                            wssSend('addr', { addr:AliceAddressHex, msg: Alice1stMsg, pub: senderPubkey} )
+
                             // stop Interval
                             clearInterval(GET_BALANCE_TIMER)
                             // show addr and balance
