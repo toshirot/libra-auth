@@ -17,6 +17,7 @@ Make this. Client and server authentication work sample for ticket application u
 
 <h2>Demo</h2>
 <p>
+<li>2019-09-18 Libra Auth won 'Honorable mention' at HackLibra.  https://medium.com/@hacklibra/hacklibra-winners-8da1a9124628
 <li>2019-09-10 Demo maintenance completed.
 <li>2019-09-10 Now the demo is under maintenance.
 <li>2019-09-06 on "after0901" branch, i fixed it. i made stub in the faulty part of the connection to Testnet. https://github.com/toshirot/libra-auth/tree/after0901
