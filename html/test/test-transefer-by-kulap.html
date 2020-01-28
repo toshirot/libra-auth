@@ -6,10 +6,51 @@
         <title>test transefer</title>
         <style>
         </style>
-        <script src="../js/kulap-libra-b.js"></script>
+        <script src="../js/kulap-libra@1.0.17-b.js"></script>
     </head>
     <body>
- 
+    <h3>test kulap-libra@1.0.17-b.js client.transferCoins</h3>
+    <p>kulap-libra@1.0.17-b.js is browserified kulap-libra</p>
+    <p>2019-09-13  Can't transfer. Is something wrong?</p>
+    <pre style="background:#eee;border:1px solid #ddd; padding:12px;"> <code>
+        &lt;script src="../js/kulap-libra@1.0.17-b.js">&lt;/script>
+        &lt;script>
+        
+        test()
+    
+        function test(){
+            
+            //==============================================
+            //  
+            //@see https://github.com/kulapio/libra-core
+
+            //On Browser
+            const client = new kulaplibra.LibraClient({
+                transferProtocol: 'https',
+                host: 'ac-libra-testnet.kulap.io',
+                port: '443',
+                dataProtocol: 'grpc-web-text'
+            })
+
+            let mnemonic='recipe patch airport shove toast detect echo type stand zero choice eye head spoon jungle three lava shallow lizard craft cancel brush stairs avoid'
+            //let address1='ca1b2332ed90385257598d9bba84d15bc35bc7260540ab1f48e39428bee60955'
+
+            let address2='f96314b256a0af3dfe138c6e6363e5cea3ea2abb914135e1706bf9af63b38290'
+            
+            const wallet = new kulaplibra.LibraWallet({ mnemonic:mnemonic  })
+            
+            const account1 = wallet.newAccount()
+            console.log('account1', account1.getAddress().toHex())
+            const account2 = address2
+
+            const response = client.transferCoins(account1, account2, 3e6)
+        }
+        &lt;/script>
+    </code></pre>
+    @see <a href="https://libexplorer.com/transactions?q=ca1b2332ed90385257598d9bba84d15bc35bc7260540ab1f48e39428bee60955">
+        https://libexplorer.com/transactions?q=ca1b2332ed90385257598d9bba84d15bc35bc7260540ab1f48e39428bee60955</a><br>
+    @see <a href="https://libexplorer.com/transactions?q=f96314b256a0af3dfe138c6e6363e5cea3ea2abb914135e1706bf9af63b38290">
+        https://libexplorer.com/transactions?q=f96314b256a0af3dfe138c6e6363e5cea3ea2abb914135e1706bf9af63b38290</a>
         <script>
         'use strict';
     
@@ -30,14 +71,15 @@
             })
 
             let mnemonic='recipe patch airport shove toast detect echo type stand zero choice eye head spoon jungle three lava shallow lizard craft cancel brush stairs avoid'
-            let address1='ca1b2332ed90385257598d9bba84d15bc35bc7260540ab1f48e39428bee60955'
+            //let address1='ca1b2332ed90385257598d9bba84d15bc35bc7260540ab1f48e39428bee60955'
 
-            let address2='5ddea88879129cf59fd59fa82c3096c52e377e1bb258fe70672c016580ae9b89'
+            let address2='f96314b256a0af3dfe138c6e6363e5cea3ea2abb914135e1706bf9af63b38290'
             
             const wallet = new kulaplibra.LibraWallet({ mnemonic:mnemonic  })
+
             const account1 = wallet.newAccount()
-            console.log('account1',account1)
-            const account2 = address2//wallet.getAccount(1)
+            console.log('account1', account1.getAddress().toHex())
+            const account2 = address2
 
             const response = client.transferCoins(account1, account2, 3e6)
         }

@@ -7,7 +7,8 @@ const https = require('https');
 const express = require('express');
 const app = express();
 
-
+const client = new libracore.LibraClient({ network: libracore.LibraNetwork.Testnet });
+const sequence=0 
 
 //=============================================================================
 // data
@@ -62,13 +63,14 @@ app.options('*', function (req, res) {
     res.sendStatus(200);
   });
 
-//const client = new libracore.LibraClient({ network: libracore.LibraNetwork.Testnet });
-//const sequence=0 
 
 app.get('/', (req, res) => {
     res.send('Simple REST API');
 });
 
+//------------------------------------------------------------
+// mintで入金する
+// e.g. https://libra-auth.com:3000/api/faucet-testnet/ca1b2332ed90385257598d9bba84d15bc35bc7260540ab1f48e39428bee60955
 app.get('/api/faucet-testnet/:addr', (req, res) => {
 
     console.log('ADDRESS_HEX', req.params.addr)
@@ -79,6 +81,9 @@ app.get('/api/faucet-testnet/:addr', (req, res) => {
     //res.send(JSON.stringify({type:'mint', body:'ok'}));
 });
 
+//------------------------------------------------------------
+// pubkeyを取得する
+// e.g. https://libra-auth.com:3000/api/pubkey/hoge
 app.get('/api/pubkey/:addr', (req, res) => {
     
     console.log('ADDRESS_HEX', req.params.addr)
@@ -104,12 +109,18 @@ app.get('/api/pubkey/:addr', (req, res) => {
 // 
 //-----------------------------------------------------------------------------
 
+
+//------------------------------------------------------------
+// Publick key を取得する
+// @client {object} 
+// @addr {string} 
+// @sequence {number} 
+// @callback {function} 
 async function getPubKeyOj(client, addr, sequence, callback) {
     const transaction = await client.getAccountTransaction(addr, sequence, false);
     const pubkeyHex=buffer2hex(transaction.signedTransaction.publicKey)
     if(callback)callback(pubkeyHex)
 }
-
 function buffer2hex(buffer) {
     return Array.prototype.map.call(
     new Uint8Array(buffer), x => ('00' + x.toString(16)
