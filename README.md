@@ -54,7 +54,7 @@ By the way, mnemonics are important. I did n’t make import mnemonic this time,
 In another case, Alice can pass resale information to Bob. If Bob allows it, Bob and Eve will be able to issue a new QR Tiket by executing 1-7 from the transaction that Eve sent the Libra to Alice.　Bob can also receive a resale fee. If you are strictly concerned about QR Ticket theft or unauthorized resale, there is a way to prove Alice at the entrance with the private key.
 </p>
 
-<img src=https://libra-auth.com/img/doc/libra-auth-2019-08-31-10.png> 
+<img src=https://reien.top/img/toshirot/libra-auth.png> 
 
 <h2>Flow</h2>
 
