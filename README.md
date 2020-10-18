@@ -321,7 +321,12 @@ function test(){
                         <li>Ubuntu 18.04.3 LTS https://ubuntu.com/download/server</li>
                 </ul>
         </div>
- 
+          <div>
+         <h4>other</h4>
+                <ul>
+                        <li>reien.top https://reien.top/</li>
+                </ul>
+        </div>
 There are many others. Thank you, everyone!
 </section>
 </body>
