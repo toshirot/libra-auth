@@ -8,6 +8,7 @@
     "kulap-libra": "^1.0.17",
     "libra-core": "^1.0.7",
     "mongoose": "^5.8.10",
+    "elliptic": ">=6.5.3",
     "ws": "^7.1.2"
   },
   "devDependencies": {},
