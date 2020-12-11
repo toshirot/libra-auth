@@ -4,11 +4,12 @@
   "description": "An authentication method using Libra's Public Key and Secret Key. ",
   "main": "index.js",
   "dependencies": {
+    "elliptic": "^6.5.3",
     "express": "^4.17.1",
     "kulap-libra": "^1.0.17",
     "libra-core": "^1.0.7",
     "mongoose": "^5.8.10",
-    "elliptic": ">=6.5.3",
+    "node-fetch": "^2.6.1",
     "ws": "^7.1.2"
   },
   "devDependencies": {},
