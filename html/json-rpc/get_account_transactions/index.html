@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<title>get_account_transactions 自分で作ったアカウントのトランザクション(複数)をJavaScriptで取ってみる</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="get_account_transactions_transaction 自分で作ったアカウントのトランザクション(複数)をJavaScriptで取ってみる" />
+	<meta name="keywords" content="get_account_transactions 自分で作ったアカウントのトランザクション(複数)をJavaScriptで取ってみる" />
+	<meta name="author" content="Toshirot" />
+    <!-- for ogp -->
+    <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# website: http://ogp.me/ns/website#">
+    <meta property="og:url" content="<?php echo (empty($_SERVER['HTTPS']) ? 'http://' : 'https://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']; ?>">
+    <meta property="og:title" content="get_account_transactions 自分で作ったアカウントのトランザクション(複数)をJavaScriptで取ってみる">
+    <meta property="og:description" content="Facebookの仮想通貨LibraあらためDiemについてのテストなど">
+    <meta property="og:image" content="https://libra-auth.com/img/diem-34o.png">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Facebookの仮想通貨LibraあらためDiemについてのテストなど">
+    <meta property="og:locale" content="ja_JP">
+    <!-- /for ogp -->
+    <style>
+        *{
+            font-family: Meiryo, メイリオ, Meiryo, 游ゴシック, "ヒラギノ角ゴ Pro", sans-serif;
+            box-sizing: border-box;
+        }
+        body{ padding:24px;}
+        #precode{ background-color:#ddd;overflow: visible; }
+    </style>
+
+    
+<nav>
+    <a href="https://jsgt.org/wp/">JavaScript++かも日記</a> | 
+    <a href="https://jsgt.org/wp/?p=1219">Method get_account_transactions アカウントのトランザクション(複数)取得</a>
+</nav>
+</head>
+<body>
+
+
+<h2>get_account_transactions 自分で作ったアカウントのトランザクション(複数)をJavaScriptで取ってみる</h2>
+<p>
+このページを開くと<a href="https://jsgt.org/wp/?p=1135">ここで作ったアカウントアリス 3be5596596c8970b183d91dffd0a9bb3 </a>のトランザクションがDiemのtestネットから取得されて、JSON形式で表示されます。
+</p>
+<p>
+    シークエンスは0からlimitは100に設定してますが100ではなく当然ながらある分だけ返ってきます。
+</p>
+<pre id="precode"><code>
+//ここに戻り値のJSONを出力します
+</code></pre>
+
+<script>
+/*
+curl -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"get_account_transactions","params":["c1fda0ec67c1b87bfb9e883e2080e530", 0, 100, false],"id":1}'  https://testnet.diem.com/v1これを JavaScript functionで書いてみます
+*/
+
+//=========================================================
+// 実行
+// アカウントアドレス "3be5596596c8970b183d91dffd0a9bb3" のトランザクション情報を取得する
+get_account_transactions(
+    {
+        address:"3be5596596c8970b183d91dffd0a9bb3"
+        ,start:0
+        ,limit:100
+        ,include_events:false
+    }
+    ,function(data){
+        data=JSON.stringify(data, null, 4)
+        precode.innerHTML=data
+    })
+
+//=========================================================
+// get account
+// アカウント情報取得
+// @args{object} 
+// @callback{function}
+// e.g. get_account_transactions({address:'3be5596596c8970b183d91dffd0a9bb3'}, function(data){})
+function get_account_transactions(args, callback){
+    if(!args)return
+    if(!args.address)return
+    let method_name="get_account_transactions"
+    let address=args.address
+    let start=args.start||0
+    let limit=args.limit||10
+    let events=args.include_events||true
+    let data={
+        "jsonrpc":"2.0"
+        ,"method":method_name
+        ,"params":[address, start, limit, events]
+        ,"id":1
+    }
+    postToTestnet(data)
+        .then(data => {
+            if(callback)callback(data)
+        });
+}
+
+//=========================================================
+//テストネットへPOSTする
+//
+async function postToTestnet(data = {}) {
+    let url = 'https://testnet.libra.org/v1'
+    const response = await fetch(url, {
+        method: 'POST',             //POSTで
+        cache: 'no-cache',          //キャッシュしない
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    return response.json();
+}
+</script>
+
+
+
+
+
+
+<nav>
+  <div class="links" style="
+              text-align: right;
+              position: relative;
+              top: 20px;
+              padding:24px;
+              margin-left:-24px;
+              font-size: 12px;
+              width: 100%;
+              color: #333;
+               
+           
+              ">
+              <style>
+              .links li{
+                display:inline-block;
+              }
+              .links li:before {
+                content: '';
+                width: 10px;
+                height: 10px;
+                display: inline-block;
+                border-radius: 100%;
+                background: #888;
+                position: relative;
+                left: -2px;
+                top: 0px;
+              }
+              .links li a{
+                font-size:12px;
+                color:rgb(63 91 167);
+              }
+              </style>
+              <hr>
+              <h3>
+              久しぶりに新しいサイトを作ったので宣伝しておきます。高橋　よろしくね。
+              </h3>
+              <ul>
+                
+                <li><a href="https://reien.top/">お墓検索の【霊園ガイド】</a></li><br><br>
+                <li><a href="https://reien.top/blog/opinion/render/">get_account 自分で作ったアカウント情報をJavaScriptで取ってみる</a></li>
+                <li><a href="https://reien.top/list/eki-kara.html">特集 駅から歩ける霊園</a></li>
+                <li><a href="https://reien.top/list/corona.html">特集 コロナ対策のある霊園</a></li>
+                <li><a href="https://reien.top/area-city.html">首都圏のお墓を市区町村別に探す「都県>市区町村」</a></li>
+                <li><a href="https://reien.top/eki-rosen-link.html">駅からお墓を探す「電車の路線>駅」</a></li>
+                <li><a href="https://reien.top/range.html">「首都圏>都県>市区町村 10km圏 20km圏」のお墓</a></li>
+                <li><a href="https://reien.top/range-tokyo.html">「東京都>市区町村 10km圏 20km圏」のお墓</a></li>
+                <li><a href="https://reien.top/range-kanagawa.html">「神奈川県>市区町村 10km圏 20km圏」のお墓</a></li>
+                <li><a href="https://reien.top/range-saitama.html">「埼玉県>市区町村 10km圏 20km圏」のお墓</a></li>
+                <li><a href="https://reien.top/range-chiba.html">「千葉県>市区町村 10km圏 20km圏」のお墓</a></li>
+                <li><a href="https://reien.top/range-ibaraki.html">「茨城県>市区町村 10km圏 20km圏」のお墓</a></li>
+                <li><a href="https://reien.top/state.html">首都圏のお墓を住所別に探す</a></li>
+                <li><a href="https://reien.top/list/area.php?state=tokyo&g=1">東京都のお墓</a></li>
+                <li><a href="https://reien.top/list/area.php?state=kanagawa&g=1">神奈川県のお墓</a></li>
+                <li><a href="https://reien.top/list/area.php?state=saitama&g=1">埼玉県のお墓</a></li>
+                <li><a href="https://reien.top/list/area.php?state=chiba&g=1">千葉県のお墓</a></li>
+                <li><a href="https://reien.top/list/area.php?state=kanagawa&g=1">茨城県のお墓</a></li>
+                <li><a href="https://xn--u9j432glyf5tr199c.com/list/city.html?mycity=13000">東京の近くにお墓を探す</a></li>
+                <li><a href="https://xn--u9j467iqpbcwh2v5bjh0b.com/list/city.html?mycity=14000">神奈川の近くにお墓を探す</a></li>
+                <li><a href="https://xn--u9j816hvtc2u6d5ut.com/list/city.html?mycity=12000">千葉の近くにお墓を探す</a></li>
+                <li><a href="https://xn--u9j467i9tac02fqd1b.com/list/city.html?mycity=11000">埼玉の近くにお墓を探す</a></li>
+                <li><a href="https://xn--u9j467icqah10lh1u.com/list/city.html?mycity=08000">茨城の近くにお墓を探す</a></li>
+                <li><a href="https://xn--t8j0a968wtij.net/">お墓探し.net</a></li>
+                <li><a href="https://xn--t8je0aj1162c.net/">お墓さがし.net</a></li>
+                <li><a href="https://xn--hdsp20m.net/">霊園.net</a></li>
+              </ul>
+
+      </div>
+    </nav>
+</body>
+</html>

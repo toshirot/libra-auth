@@ -1,0 +1,62 @@
+<style>
+#precode{ background-color:#ddd; }
+</style>
+<pre id="precode"><code>
+//ここに戻り値のJSONを出力します
+</code></pre>
+
+<script>
+/*
+curl -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"get_account","params":["1668f6be25668c1a17cd8caf6b8d2f25"],"id":1}' https://testnet.libra.org/v1
+これを JavaScript functionで書いてみます
+*/
+
+//=========================================================
+// 実行
+// アカウントアドレス "1668f6be25668c1a17cd8caf6b8d2f25" の情報を取得する
+get_account("1668f6be25668c1a17cd8caf6b8d2f25"
+, function(data){
+    data=JSON.stringify(data, null, 4)
+    precode.innerHTML=data
+})
+
+//=========================================================
+// get account
+// アカウント情報取得
+// @address{string} 
+// @callback{function}
+function get_account(address, callback){
+    let method_name="get_account"
+    let data={
+        "jsonrpc":"2.0"
+        ,"method":method_name
+        ,"params":[address]
+        ,"id":1
+    }
+    postToTestnet(data)
+    .then(data => {
+        if(callback)callback(data)
+    });
+}
+
+//=========================================================
+//テストネットへPOSTする
+//
+async function postToTestnet(data = {}) {
+    let url = 'https://testnet.libra.org/v1'
+    // 既定のオプションには * が付いています
+    const response = await fetch(url, {
+        method: 'POST',             //POSTで
+        mode: 'cors',               //オリジン間アクセスOK
+        cache: 'no-cache',          //キャッシュしない
+        credentials: 'omit',        //ここではクッキーは使わない
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        redirect: 'follow', // manual, *follow, error
+        referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+        body: JSON.stringify(data) // 本文のデータ型は "Content-Type" ヘッダーと一致する必要があります
+    })
+    return response.json(); // レスポンスの JSON を解析
+}
+</script>
