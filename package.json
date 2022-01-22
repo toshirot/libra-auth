@@ -12,7 +12,7 @@
     "libra-core": "^1.0.7",
     "mongoose": "^5.11.7",
     "mquery": "^3.2.3",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^3.1.1",
     "ws": "^7.4.1"
   },
   "devDependencies": {},
